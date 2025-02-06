@@ -10,7 +10,8 @@ namespace HRMS.Domain.Repository
        Task DeleteEntityAsync(TEntity entity);
        Task SaveEntityAsync(TEntity entity);
        Task<List<TEntity>> GetAllAsync();
-      // Task<OperactionResult> GetAllAsync(Expression<Func<TEntity, bool>> filter);
+      
+       Task<OperationResult> GetAllAsync(Expression<Func<TEntity, bool>> filter);
        Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter);
 
     }
