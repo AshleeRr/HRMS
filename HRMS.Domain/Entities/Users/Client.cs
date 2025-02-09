@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HRMS.Domain.Entities.Users
 {
-    internal class prueba4
+    internal class Client
     {
     }
 }
