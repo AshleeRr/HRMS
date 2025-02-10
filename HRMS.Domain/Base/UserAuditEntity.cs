@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HRMS.Domain.Base
+﻿namespace HRMS.Domain.Base
 {
-    internal class UserAuditEntity
+    public abstract class UserAuditEntity
     {
+        public DateTime? FechaCreacion { get; set; }
+        public bool? Estado { get; set; }
     }
 }
