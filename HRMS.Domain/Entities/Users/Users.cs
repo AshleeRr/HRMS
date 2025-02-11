@@ -9,21 +9,18 @@ namespace HRMS.Domain.Entities.Users
     {
         [Key]
         public int IdUsuario { get; set; }
-        public string? NombreCompleto { get; set; }
-        public string? Correo { get; set; }
+
         public string? Clave { get; set; }
         [ForeignKey("UserRole")]
         public int? IdRolUsuario { get; set; } // FK
-        
-        public Users(int idUsuario, string? nombreCompleto = null, string? correo = null, string? clave = null, int? idRolUsuario = null, DateTime? fechaCreacion = null, bool? estado = null)
+
+        public Users(int idUsuario, string? clave = null, int? idRolUsuario = null, string? nombreCompleto = null, string? correo = null)
         {
             IdUsuario = idUsuario;
-            NombreCompleto = nombreCompleto;
-            Correo = correo;
             Clave = clave;
             IdRolUsuario = idRolUsuario;
-            FechaCreacion = fechaCreacion;
-            Estado = estado;
+            NombreCompleto = nombreCompleto;
+            Correo = correo;
         }
     }
 }
