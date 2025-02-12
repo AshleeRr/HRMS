@@ -7,8 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\RoomManagment\" />
-    <Folder Include="Entities\Reservation\" />
+    <Compile Remove="Entities\RoomManagment\**" />
+    <EmbeddedResource Remove="Entities\RoomManagment\**" />
+    <None Remove="Entities\RoomManagment\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Entities\Servicio\" />
     <Folder Include="Entities\Users\" />
   </ItemGroup>
 

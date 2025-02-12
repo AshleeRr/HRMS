@@ -1,8 +1,12 @@
-﻿using HRMS.Domain.Base;
+﻿using System.ComponentModel.DataAnnotations;
+using HRMS.Domain.Base;
+using System.ComponentModel.DataAnnotations.Schema;
+namespace HRMS.Domain.Entities.RoomManagement;
 
-namespace HRMS.Domain.RoomManagement.Entities;
-
+[Table("EstadoHabitacion")]
 public sealed class EstadoHabitacion : AuditEntity
 {
-    string? Descripcion { get; set; }
+    [Key]
+    public int Id { get; set; }
+    public string? Descripcion { get; set; }
 }

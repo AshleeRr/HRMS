@@ -5,19 +5,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HRMS.Domain.Entities.Users
 {
     [Table("RolUsuario")]
-    public class UserRole : UserAuditEntity
+    public class UserRole : AuditEntity
     {
         [Key]
         public int IdRolUsuario { get; set; }
         public string? Description { get; set; }
 
-        public UserRole(int idRolUsuario, string? description = null, DateTime? fechaCreacion = null, bool? estado = null)
+        public UserRole(int idRolUsuario, string? description = null)
         {
             IdRolUsuario = idRolUsuario;
             Description = description;
-            FechaCreacion = fechaCreacion;
-            Estado = estado;
+
         }
     }
 }
-

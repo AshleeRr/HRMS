@@ -1,8 +1,9 @@
 ﻿namespace HRMS.Domain.Base
 {
-    public abstract class UserAuditEntity
+    public abstract class UserAuditEntity : AuditEntity
     {
-        public DateTime? FechaCreacion { get; set; }
-        public bool? Estado { get; set; }
+
+        public string? NombreCompleto { get; set; }
+        public string? Correo { get; set; }
     }
 }
