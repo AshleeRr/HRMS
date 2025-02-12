@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\Servicio\" />
     <Folder Include="Entities\RoomManagment\" />
     <Folder Include="Entities\Reservation\" />
     <Folder Include="Entities\Users\" />
