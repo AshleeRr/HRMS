@@ -1,9 +1,10 @@
 ﻿using HRMS.Domain.Base;
 
-namespace HRMS.Domain.RoomManagement.Entities;
+namespace HRMS.Domain.Entities.RoomManagement;
 
 public sealed class Habitacion : AuditEntity
 {
+    public int Id { get; set; }
     public string? Numero { get; set;}
     public string? Detalle { get; set;}
     public decimal? Precio { get; set;}

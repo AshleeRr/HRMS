@@ -1,5 +1,5 @@
 ﻿
-namespace HRMS.Domain.RoomManagement.Entities;
+namespace HRMS.Domain.Entities.RoomManagement;
 
 public sealed class Servicios 
 {

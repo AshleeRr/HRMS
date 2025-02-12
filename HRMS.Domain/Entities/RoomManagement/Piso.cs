@@ -1,8 +1,9 @@
 ﻿using HRMS.Domain.Base;
 
-namespace HRMS.Domain.RoomManagement.Entities;
+namespace HRMS.Domain.Entities.RoomManagement;
 
 public sealed class Piso : AuditEntity
 {
+    public int Id { get; set; }
     public string? Descripcion{ get; set; }
 }
