@@ -10,7 +10,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="" />
+    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Categoria.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Categoria.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/EstadoHabitacion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/EstadoHabitacion.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Habitacion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Habitacion.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
