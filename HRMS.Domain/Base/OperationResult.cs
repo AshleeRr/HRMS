@@ -4,7 +4,7 @@
     {
         public OperationResult() 
         {
-            this.IsSuccessSuccess = true;
+            this.IsSuccess = true;
 
         }
         public bool IsSuccess { get; set; }
