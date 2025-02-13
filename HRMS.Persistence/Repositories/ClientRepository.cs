@@ -9,16 +9,26 @@ namespace HRMS.Persistence.Repositories
     public class ClientRepository : BaseRepository<Client, int>, IClientRepository
     {
         //tomar en cuenta que no puede llegar null a baseRepository 
-        private readonly HRMSContext _context;
+        
         public ClientRepository(HRMSContext context) : base(context) 
         { 
-            _context = context;
         }
 
         public OperationResult GetClientByClientId(int IdCliente)
         {
             throw new NotImplementedException();
         }
+
+        public Task<Client> GetClientByCorreo(string correo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Client>> GetClientsByDocument(string documento)
+        {
+            throw new NotImplementedException();
+        }
+
         //sobreescribir todos los metodos
         public override Task<OperationResult> SaveEntityAsync(Client entity)
         {
@@ -26,6 +36,9 @@ namespace HRMS.Persistence.Repositories
             return base.SaveEntityAsync(entity);
         }
 
-
+        Task<Client> IClientRepository.GetClientByClientId(int IdCliente)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
