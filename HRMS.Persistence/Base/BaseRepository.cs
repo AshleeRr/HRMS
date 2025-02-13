@@ -8,7 +8,7 @@ namespace HRMS.Persistence.Base
 {
     public abstract class BaseRepository<TEntity, TType> : IBaseRepository<TEntity, TType> where TEntity : class
     {
-        private readonly HRMSContext _context;
+        protected readonly HRMSContext _context;
         private DbSet<TEntity> Entity { get; set; }
         protected BaseRepository(HRMSContext context)
         {
