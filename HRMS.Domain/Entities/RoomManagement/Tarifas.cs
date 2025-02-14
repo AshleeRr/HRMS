@@ -1,11 +1,17 @@
-﻿using HRMS.Domain.Base;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using HRMS.Domain.Base;
 
 namespace HRMS.Domain.Entities.RoomManagement
 {
+    [Table("Tarifas")]
     public class Tarifas : AuditEntity
     {
-        public int IdTarifa { get; set; }
-        public int IdHabitacion { get; set; }
+        [Key]
+        public int IdTarifa { get; set; } 
+
+        [ForeignKey("IdHabitacion")] 
+        public int? IdHabitacion { get; set; }
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
         public decimal PrecioPorNoche { get; set; }
