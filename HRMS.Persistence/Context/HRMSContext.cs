@@ -1,5 +1,9 @@
+
+﻿using HRMS.Domain.Entities.Servicio;
+
 ﻿using HRMS.Domain.Entities.Reservation;
 using HRMS.Domain.Entities.RoomManagement;
+
 using HRMS.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +17,10 @@ namespace HRMS.Persistence.Context
         public DbSet<Users> Users { get; set; }
         public DbSet<Client> Clients { get; set; }
 
+
+        public DbSet<Servicios> Servicios { get; set; }
+
+
         public DbSet<Reservation> Reservations { get; set; }
 
         
@@ -21,6 +29,7 @@ namespace HRMS.Persistence.Context
         public DbSet<Piso> Pisos { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Tarifas> Tarifas { get; set; }
+
 
     }
 }
