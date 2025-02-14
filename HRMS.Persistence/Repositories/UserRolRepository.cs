@@ -3,6 +3,7 @@ using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -19,6 +20,11 @@ namespace HRMS.Persistence.Repositories
             _context = context;
             _logger = logger;
             _configuration = configuration;
+        }
+        public async Task<UserRole> GetRoleByDescription(string descripcion)
+        {
+            return await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.Descripcion == descripcion);
+         
         }
         public async Task<OperationResult> UpdateDescription(int idRolUsuario, string nuevaDescripcion)
         {

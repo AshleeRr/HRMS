@@ -6,6 +6,7 @@ namespace HRMS.Persistence.Interfaces
 {
     public interface IUserRoleRepository : IBaseRepository<UserRole, int>
     {
+        Task<UserRole> GetRoleByDescription (string descripcion);
         Task<OperationResult> UpdateDescription(int idRolUsuario, string nuevaDescripcion);
     }
 }
