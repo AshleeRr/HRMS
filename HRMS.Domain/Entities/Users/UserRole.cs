@@ -9,12 +9,12 @@ namespace HRMS.Domain.Entities.Users
     {
         [Key]
         public int IdRolUsuario { get; set; }
-        public string? Description { get; set; }
+        public string? Descripcion { get; set; }
 
-        public UserRole(int idRolUsuario, string? description = null)
+        public UserRole(int idRolUsuario, string? descripcion = null)
         {
             IdRolUsuario = idRolUsuario;
-            Description = description;
+            Descripcion = descripcion;
 
         }
     }
