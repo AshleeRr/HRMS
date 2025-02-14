@@ -12,7 +12,7 @@ public sealed class Habitacion : AuditEntity
     public string? Numero { get; set;}
     public string? Detalle { get; set;}
     public decimal? Precio { get; set; }
-
+    
     [ForeignKey("EstadoHabitacion")]
     public int? IdEstadoHabitacion { get; set;}
     [ForeignKey("Piso")]
