@@ -1,9 +1,8 @@
 ﻿using HRMS.Domain.Base;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.Repository;
-using System.Threading.Tasks;
 
-namespace HRMS.Persistence.Interfaces
+namespace HRMS.Persistence.Interfaces.IUsersRepository
 {
     public interface IUserRepository : IBaseRepository<Users, int>
     {
