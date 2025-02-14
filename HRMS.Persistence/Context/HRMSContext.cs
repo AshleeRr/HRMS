@@ -1,4 +1,5 @@
-﻿using HRMS.Domain.Entities.Users;
+﻿using HRMS.Domain.Entities.Servicio;
+using HRMS.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRMS.Persistence.Context
@@ -10,6 +11,8 @@ namespace HRMS.Persistence.Context
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<Users> Users { get; set; }
         public DbSet<Client> Clients { get; set; }
+
+        public DbSet<Servicios> servicios { get; set; }
 
 
     }
