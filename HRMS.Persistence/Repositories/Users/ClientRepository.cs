@@ -2,12 +2,12 @@
 using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
-using HRMS.Persistence.Interfaces;
+using HRMS.Persistence.Interfaces.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace HRMS.Persistence.Repositories
+namespace HRMS.Persistence.Repositories.Users
 {
     public class ClientRepository : BaseRepository<Client, int>, IClientRepository
     {
@@ -32,7 +32,7 @@ namespace HRMS.Persistence.Repositories
                 _logger.LogWarning("No se encontró un cliente con ese id");
             }
             return cliente;
-            }
+        }
 
         public async Task<Client> GetClientByCorreo(string correo)
         {
@@ -49,8 +49,8 @@ namespace HRMS.Persistence.Repositories
         {
             ArgumentException.ThrowIfNullOrEmpty(documento, nameof(documento));
             var clientes = await _context.Clients.Where(c => c.Documento == documento).ToListAsync();
-            if (!clientes.Any()) 
-            { 
+            if (!clientes.Any())
+            {
                 _logger.LogWarning("No se encontraron clientes con ese documento");
             }
 

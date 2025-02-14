@@ -3,7 +3,7 @@ using HRMS.Domain.Entities.Users;
 using HRMS.Domain.Repository;
 using System.Threading.Tasks;
 
-namespace HRMS.Persistence.Interfaces
+namespace HRMS.Persistence.Interfaces.Users
 {
     public interface IUserRepository : IBaseRepository<Users, int>
     {
