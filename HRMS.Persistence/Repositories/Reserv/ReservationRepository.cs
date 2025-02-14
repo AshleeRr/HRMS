@@ -153,6 +153,6 @@ namespace HRMS.Persistence.Repositories.Reserv
 
 
         private string? _getErrorMessage([CallerMemberName]string source ="")
-            => _configuration["ErrorMessages:ReservationRepository:" + source]; 
+            => _configuration["ErrorReservationRepository:" + source]; 
     }
 }
