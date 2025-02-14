@@ -124,9 +124,9 @@ namespace HRMS.Persistence.Repositories.Reserv
             {
                 try
                 {
-                    var query = from r in _Context.Reservations
-                                join c in _Context.Clients on r.idCliente equals c.IdCliente
-                                join h in _Context.Habitaciones on r.idHabitacion equals h.Id
+                    var query = from r in _context.Reservations
+                                join c in _context.Clients on r.idCliente equals c.IdCliente
+                                join h in _context.Habitaciones on r.idHabitacion equals h.Id
                                 where r.idCliente == clientId
                                 select new ReservHabitClientModel
                                 {
@@ -163,7 +163,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             {
                 try
                 {
-                    var query = _Context.Reservations.Where(r => r.FechaEntrada >= start && r.FechaSalida <= end);
+                    var query = _context.Reservations.Where(r => r.FechaEntrada >= start && r.FechaSalida <= end);
                     result.Data = await query.ToListAsync();
                 }
                 catch (Exception ex)
