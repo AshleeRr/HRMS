@@ -18,7 +18,7 @@ public class PisoRepository : BaseRepository<Piso , int> , IPisoRepository
         var result = new OperationResult();
         try
         {
-            var data = await _Context.Pisos
+            var data = await _context.Pisos
                 .Where(x => x.Estado == true)
                 .ToListAsync();
             result.Data = data;

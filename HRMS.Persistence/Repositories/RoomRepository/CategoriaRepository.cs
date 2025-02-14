@@ -16,7 +16,7 @@ public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepo
         var result = new OperationResult();
         try
         {
-            var datos = await _Context.Set<Categoria>()
+            var datos = await _context.Set<Categoria>()
                 .Where(c => c.IdServicio == idServicio)
                 .ToListAsync();
             result.Data = datos;
@@ -34,7 +34,7 @@ public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepo
         var result = new OperationResult();
         try
         {
-            var datos = await _Context.Set<Categoria>()
+            var datos = await _context.Set<Categoria>()
                 .Where(c => c.Estado == true)
                 .ToListAsync();
             result.Data = datos;

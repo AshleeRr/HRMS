@@ -19,7 +19,7 @@ public class EstadoHabitacionRepository : BaseRepository<EstadoHabitacion, int>,
         var result = new OperationResult();
         try
         {
-            var datos = await _Context.Set<EstadoHabitacion>()
+            var datos = await _context.Set<EstadoHabitacion>()
                 .Where(e => e.Estado ==  true)
                 .ToListAsync();
             result.Data = datos;
