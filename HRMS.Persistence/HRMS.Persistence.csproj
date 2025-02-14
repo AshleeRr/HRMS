@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HRMS.Domain\HRMS.Domain.csproj" />
+    <ProjectReference Include="..\HRMS.Models\HRMS.Models.csproj" />
   </ItemGroup>
 
 </Project>
