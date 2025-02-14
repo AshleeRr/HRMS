@@ -151,30 +151,6 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-        public async Task<OperationResult> GetReservationsInTimeLapse(DateTime start, DateTime end)
-        {
-            OperationResult result = new OperationResult();
-            if (start > end)
-            {
-                result.IsSuccess = false;
-                result.Message = "La fecha de inicio no puede ser mayor que la fecha de fin.";
-            }
-            else
-            {
-                try
-                {
-                    var query = _context.Reservations.Where(r => r.FechaEntrada >= start && r.FechaSalida <= end);
-                    result.Data = await query.ToListAsync();
-                }
-                catch (Exception ex)
-                {
-                    result.IsSuccess = false;
-                    result.Message = _getErrorMessage();
-                    _logger.LogError(result.Message, ex.ToString());
-                }
-            }
-            return result;
-        }
 
         private string? _getErrorMessage([CallerMemberName]string source ="")
             => _configuration["ErrorMessages:ReservationRepository:" + source]; 
