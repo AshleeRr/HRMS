@@ -12,7 +12,7 @@ namespace HRMS.Persistence.Context
         public DbSet<Users> Users { get; set; }
         public DbSet<Client> Clients { get; set; }
 
-        public DbSet<Servicios> servicios { get; set; }
+        public DbSet<Servicios> Servicios { get; set; }
 
 
     }
