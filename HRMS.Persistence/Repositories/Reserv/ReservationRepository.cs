@@ -70,7 +70,8 @@ namespace HRMS.Persistence.Repositories.Reserv
         }
 
         private bool _validReservationForSaving(Reservation resev)
-            => (resev.idCliente != 0 &&
+            => (resev != null &&
+               resev.idCliente != 0 &&
                resev.idCliente != null &&
                resev.FechaEntrada > DateTime.Now &&
                resev.FechaSalida > resev.FechaEntrada);
@@ -114,30 +115,38 @@ namespace HRMS.Persistence.Repositories.Reserv
         public async Task<OperationResult> GetReservationsByClientId(int clientId)
         {
             OperationResult result = new OperationResult();
-            try
-            {
-                var query = from r in _Context.Reservations
-                            join c in _Context.Clients on r.idCliente equals c.IdCliente
-                            join h in _Context.Habitaciones on r.idHabitacion equals h.Id
-                            where r.idCliente == clientId
-                            select new ReservHabitClientModel
-                            {
-                                ReservationID = r.idRecepcion,
-                                In = r.FechaEntrada.Value,
-                                Out = r.FechaSalida.Value,
-                                Total = r.TotalPagado,
-                                RoomNumber = h.Numero,
-                                ClientID = c.IdCliente,
-                                ClientName = c.NombreCompleto
-                            };
-
-                result.Data = await query.ToListAsync();
-            }
-            catch(Exception ex)
+            if (clientId == 0)
             {
                 result.IsSuccess = false;
-                result.Message = _getErrorMessage();
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = "No se ha especificado un cliente.";
+            }
+            else
+            {
+                try
+                {
+                    var query = from r in _Context.Reservations
+                                join c in _Context.Clients on r.idCliente equals c.IdCliente
+                                join h in _Context.Habitaciones on r.idHabitacion equals h.Id
+                                where r.idCliente == clientId
+                                select new ReservHabitClientModel
+                                {
+                                    ReservationID = r.idRecepcion,
+                                    In = r.FechaEntrada.Value,
+                                    Out = r.FechaSalida.Value,
+                                    Total = r.TotalPagado,
+                                    RoomNumber = h.Numero,
+                                    ClientID = c.IdCliente,
+                                    ClientName = c.NombreCompleto
+                                };
+
+                    result.Data = await query.ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    result.IsSuccess = false;
+                    result.Message = _getErrorMessage();
+                    _logger.LogError(result.Message, ex.ToString());
+                }
             }
             return result;
         }
@@ -145,16 +154,24 @@ namespace HRMS.Persistence.Repositories.Reserv
         public async Task<OperationResult> GetReservationsInTimeLapse(DateTime start, DateTime end)
         {
             OperationResult result = new OperationResult();
-            try
-            {
-                var query = _Context.Reservations.Where(r => r.FechaEntrada >= start && r.FechaSalida <= end);
-                result.Data = await query.ToListAsync();
-            }
-            catch (Exception ex)
+            if (start > end)
             {
                 result.IsSuccess = false;
-                result.Message = _getErrorMessage();
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = "La fecha de inicio no puede ser mayor que la fecha de fin.";
+            }
+            else
+            {
+                try
+                {
+                    var query = _Context.Reservations.Where(r => r.FechaEntrada >= start && r.FechaSalida <= end);
+                    result.Data = await query.ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    result.IsSuccess = false;
+                    result.Message = _getErrorMessage();
+                    _logger.LogError(result.Message, ex.ToString());
+                }
             }
             return result;
         }
