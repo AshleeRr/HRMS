@@ -11,11 +11,13 @@ namespace HRMS.Persistence.Repositories
 {
     public class ClientRepository : BaseRepository<Client, int>, IClientRepository
     {
+        private readonly HRMSContext _context;
         private readonly IConfiguration _configuration;
         private readonly ILogger<ClientRepository> _logger;
         public ClientRepository(HRMSContext context, ILogger<ClientRepository> logger,
                                                      IConfiguration configuration) : base(context)
         {
+            _context = context;
             _logger = logger;
             _configuration = configuration;
         }
