@@ -1,7 +1,7 @@
 ﻿using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
-using HRMS.Persistence.Interfaces;
+using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
