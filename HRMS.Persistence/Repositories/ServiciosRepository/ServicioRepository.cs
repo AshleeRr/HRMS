@@ -2,7 +2,6 @@
 
 using HRMS.Domain.Base;
 using HRMS.Domain.Entities.Servicio;
-using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IServicioRepository;
