@@ -8,14 +8,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace HRMS.Persistence.Repositories
+namespace HRMS.Persistence.Repositories.ClientRepository
 {
     public class UserRepository : BaseRepository<Users, int>, IUserRepository
     {
         private readonly HRMSContext _context;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<ClientRepository> _logger;
-        public UserRepository(HRMSContext context, ILogger<ClientRepository> logger,
+        private readonly ILogger<Repositories.ClientRepository.ClientRepository> _logger;
+        public UserRepository(HRMSContext context, ILogger<Repositories.ClientRepository.ClientRepository> logger,
                                                      IConfiguration configuration) : base(context)
         {
             _context = context;

@@ -1,5 +1,4 @@
-﻿using HRMS.Domain.Base;
-using HRMS.Domain.Entities.Users;
+﻿using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces;
@@ -7,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace HRMS.Persistence.Repositories
+namespace HRMS.Persistence.Repositories.ClientRepository
 {
     public class ClientRepository : BaseRepository<Client, int>, IClientRepository
     {
