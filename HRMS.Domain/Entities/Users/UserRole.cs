@@ -10,12 +10,5 @@ namespace HRMS.Domain.Entities.Users
         [Key]
         public int IdRolUsuario { get; set; }
         public string? Descripcion { get; set; }
-
-        public UserRole(int idRolUsuario, string? descripcion = null)
-        {
-            IdRolUsuario = idRolUsuario;
-            Descripcion = descripcion;
-
-        }
     }
 }
