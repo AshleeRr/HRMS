@@ -2,11 +2,10 @@
 using HRMS.Domain.Repository;
 using HRMS.Domain.Base;
 
-namespace HRMS.Persistence.Interfaces.Users
+namespace HRMS.Persistence.Interfaces
 {
     public interface IClientRepository : IBaseRepository<Client, int>
     {
-        Task<Client> GetClientByClientId(int idCliente);
         Task<Client> GetClientByCorreo(string correo);
         Task<List<Client>> GetClientsByDocument(string documento);
     }

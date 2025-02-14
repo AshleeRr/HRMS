@@ -1,13 +1,17 @@
 ﻿using HRMS.Domain.Base;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace HRMS.Domain.Entities.Reservation
 {
+
+    [Table("Recepcion")]
     public class Reservation : AuditEntity
     {
+        [Key]
         public int idRecepcion { get; set; }
-        public int? idCliente { get; set; }
-        public int? idHabitacion { get; set; }
+
         public DateTime? FechaEntrada { get; set; }
         public DateTime? FechaSalida { get; set; }
         public DateTime? FechaSalidaConfirmacion { get; set; }
@@ -24,5 +28,11 @@ namespace HRMS.Domain.Entities.Reservation
         {
             get; set;
         }
+
+        [ForeignKey("idCliente")]
+        public int? idCliente { get; set; }
+
+        [ForeignKey("idHabitacion")]
+        public int? idHabitacion { get; set; }
     }
 }

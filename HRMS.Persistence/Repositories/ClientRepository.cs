@@ -2,36 +2,24 @@
 using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
-using HRMS.Persistence.Interfaces.Users;
+using HRMS.Persistence.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace HRMS.Persistence.Repositories.Users
+namespace HRMS.Persistence.Repositories
 {
     public class ClientRepository : BaseRepository<Client, int>, IClientRepository
     {
+        private readonly HRMSContext _context;
         private readonly IConfiguration _configuration;
         private readonly ILogger<ClientRepository> _logger;
         public ClientRepository(HRMSContext context, ILogger<ClientRepository> logger,
                                                      IConfiguration configuration) : base(context)
         {
+            _context = context;
             _logger = logger;
             _configuration = configuration;
-        }
-
-        public async Task<Client> GetClientByClientId(int idCliente)
-        {
-            if (idCliente < 1)
-            {
-                throw new ArgumentException("El ID del cliente no puede ser menor a 1", nameof(idCliente));
-            }
-            var cliente = await _context.Clients.FindAsync(idCliente);
-            if (cliente == null)
-            {
-                _logger.LogWarning("No se encontró un cliente con ese id");
-            }
-            return cliente;
         }
 
         public async Task<Client> GetClientByCorreo(string correo)

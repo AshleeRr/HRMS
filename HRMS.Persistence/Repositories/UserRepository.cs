@@ -3,20 +3,22 @@ using HRMS.Domain.Entities.Users;
 using HRMS.Models.Models;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
-using HRMS.Persistence.Interfaces.Users;
+using HRMS.Persistence.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace HRMS.Persistence.Repositories.Users
+namespace HRMS.Persistence.Repositories
 {
     public class UserRepository : BaseRepository<Users, int>, IUserRepository
     {
+        private readonly HRMSContext _context;
         private readonly IConfiguration _configuration;
         private readonly ILogger<ClientRepository> _logger;
         public UserRepository(HRMSContext context, ILogger<ClientRepository> logger,
                                                      IConfiguration configuration) : base(context)
         {
+            _context = context;
             _logger = logger;
             _configuration = configuration;
         }
@@ -28,36 +30,6 @@ namespace HRMS.Persistence.Repositories.Users
                           ?? throw new KeyNotFoundException("Error al encontrar el usuario por nombre");
             return usuario;
         }
-
-        public async Task<OperationResult> GetUserByUserId(int idUsuario)
-        {
-            OperationResult result = new OperationResult();
-            try
-            {
-                if (!ValidateUserId(idUsuario, result))
-                    return result;
-
-                var usuario = await _context.Users.FindAsync(idUsuario);
-
-                if (usuario == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se encontró un usuario con este id";
-                    return result;
-                }
-
-                result.IsSuccess = true;
-                result.Data = usuario;
-            }
-            catch (Exception ex)
-            {
-                result.Message = _configuration["ErrorUserRepository: GetUserByUserId"];
-                result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
-            }
-            return result;
-        }
-
         public async Task<OperationResult> GetUsersByUserRolId(int idUsuario)
         {
             OperationResult result = new OperationResult();
