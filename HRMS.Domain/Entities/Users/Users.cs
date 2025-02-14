@@ -14,14 +14,6 @@ namespace HRMS.Domain.Entities.Users
         [ForeignKey("UserRole")]
         public int? IdRolUsuario { get; set; } // FK
 
-        public Users(int idUsuario, string? clave = null, int? idRolUsuario = null, string? nombreCompleto = null, string? correo = null)
-        {
-            IdUsuario = idUsuario;
-            Clave = clave;
-            IdRolUsuario = idRolUsuario;
-            NombreCompleto = nombreCompleto;
-            Correo = correo;
-        }
     }
 }
 

@@ -11,8 +11,5 @@ namespace HRMS.Domain.Entities.RoomManagement
         public decimal PrecioPorNoche { get; set; }
         public decimal Descuento { get; set; }
         public string Descripcion { get; set; } = string.Empty;
-
-
-
     }
 }
