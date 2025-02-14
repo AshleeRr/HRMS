@@ -1,4 +1,5 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Entities.Reservation;
 using HRMS.Domain.Entities.Users;
 using HRMS.Models.Models;
 using HRMS.Persistence.Base;
@@ -7,6 +8,7 @@ using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 
 namespace HRMS.Persistence.Repositories.ClientRepository
 {
@@ -14,8 +16,9 @@ namespace HRMS.Persistence.Repositories.ClientRepository
     {
         private readonly HRMSContext _context;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<Repositories.ClientRepository.ClientRepository> _logger;
-        public UserRepository(HRMSContext context, ILogger<Repositories.ClientRepository.ClientRepository> logger,
+        private readonly ILogger<UserRepository> _logger;
+
+        public UserRepository(HRMSContext context, ILogger<UserRepository> logger,
                                                      IConfiguration configuration) : base(context)
         {
             _context = context;
@@ -105,6 +108,99 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             return result;
 
         }
+        public override async Task<bool> ExistsAsync(Expression<Func<Users, bool>> filter)
+        {
+            if (filter == null)
+            {
+                return false;
+            }
+            return await base.ExistsAsync(filter);
+        }
+        public override async Task<OperationResult> GetAllAsync(Expression<Func<Users, bool>> filter)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (filter != null)
+                {
+                    return await base.GetAllAsync(filter);
+                }
+                result.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = _configuration["ErrorUserRepository: GetAllAsync"];
+                result.IsSuccess = false;
+                _logger.LogError(result.Message, ex.ToString());
+            }
+            return result;
+        } 
+        public override async Task<Users> GetEntityByIdAsync(int id)
+        {
+            var entity = await _context.Users.FindAsync(id);
+            if (entity == null)
+            {
+                _logger.LogWarning("No se encontró un cliente con ese id");
+            }
+            return entity;
+        }
+        public override async Task<OperationResult> SaveEntityAsync(Users entity)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (!ValidateUser(entity, result))
+                    return result;
+
+                await _context.Users.AddAsync(entity);
+                await _context.SaveChangesAsync();
+
+                result.IsSuccess = true;
+                result.Message = "Usuario guardado correctamente.";
+                _logger.LogInformation(result.Message);
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = "Ocurrió un error al guardar el usuario.";
+                _logger.LogError(ex, result.Message);
+            }
+
+            return result;
+        }
+
+        public override async Task<OperationResult> UpdateEntityAsync(Users entity)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (!ValidateUser(entity, result))
+                    return result;
+
+                var usuarioExistente = await _context.Users.FindAsync(entity.IdUsuario);
+
+                if (usuarioExistente == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "El usuario no existe en la base de datos.";
+                    return result;
+                }
+
+                _context.Entry(usuarioExistente).CurrentValues.SetValues(entity);
+                await _context.SaveChangesAsync();
+
+                result.IsSuccess = true;
+                result.Message = "Usuario actualizado correctamente.";
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = "Ocurrió un error al actualizar el usuario.";
+                _logger.LogError(ex, result.Message);
+            }
+
+            return result;
+        }
         private bool ValidateUserId(int idUsuario, OperationResult result)
         {
             if (idUsuario < 1)
@@ -115,6 +211,14 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return true;
         }
-    }
 
+        private bool ValidateUser(Users entity, OperationResult result)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity), "El usuario no puede ser nulo.");
+            }
+            return true;
+        }
+    }
 }
