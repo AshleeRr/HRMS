@@ -21,7 +21,7 @@ namespace HRMS.Persistence.Repositories.ServiciosRepository
             var result = new OperationResult();
             try
             {
-                var datos = await _Context.Set<Servicios>().ToListAsync();
+                var datos = await _context.Set<Servicios>().ToListAsync();
                 result.Data = datos;
             }
             catch (Exception ex)
@@ -38,7 +38,7 @@ namespace HRMS.Persistence.Repositories.ServiciosRepository
             var result = new OperationResult();
             try
             {
-                var dato = await _Context.Set<Servicios>().FindAsync(id);
+                var dato = await _context.Set<Servicios>().FindAsync(id);
                 result.Data = dato;
             }
             catch (Exception ex)
@@ -55,8 +55,8 @@ namespace HRMS.Persistence.Repositories.ServiciosRepository
             var result = new OperationResult();
             try
             {
-                await _Context.Set<Servicios>().AddAsync(servicio);
-                await _Context.SaveChangesAsync();
+                await _context.Set<Servicios>().AddAsync(servicio);
+                await _context.SaveChangesAsync();
                 result.Data = servicio;
             }
             catch (Exception ex)
@@ -73,8 +73,8 @@ namespace HRMS.Persistence.Repositories.ServiciosRepository
             var result = new OperationResult();
             try
             {
-                _Context.Set<Servicios>().Update(servicio);
-                await _Context.SaveChangesAsync();
+                _context.Set<Servicios>().Update(servicio);
+                await _context.SaveChangesAsync();
                 result.Data = servicio;
             }
             catch (Exception ex)
@@ -91,11 +91,11 @@ namespace HRMS.Persistence.Repositories.ServiciosRepository
             var result = new OperationResult();
             try
             {
-                var servicio = await _Context.Set<Servicios>().FindAsync(id);
+                var servicio = await _context.Set<Servicios>().FindAsync(id);
                 if (servicio != null)
                 {
-                    _Context.Set<Servicios>().Remove(servicio);
-                    await _Context.SaveChangesAsync();
+                    _context.Set<Servicios>().Remove(servicio);
+                    await _context.SaveChangesAsync();
                     result.Data = true;
                 }
                 else
@@ -118,7 +118,7 @@ namespace HRMS.Persistence.Repositories.ServiciosRepository
             var result = new OperationResult();
             try
             {
-                var datos = await _Context.Set<Servicios>()
+                var datos = await _context.Set<Servicios>()
                     .Where(s => s.Nombre.Contains(nombre))
                     .ToListAsync();
                 result.Data = datos;

@@ -8,24 +8,23 @@ namespace HRMS.Persistence.Base
 {
     public abstract class BaseRepository<TEntity, TType> : IBaseRepository<TEntity, TType> where TEntity : class
     {
-        protected readonly HRMSContext _Context;
+        protected readonly HRMSContext _context;
         private DbSet<TEntity> Entity { get; set; }
         protected BaseRepository(HRMSContext context)
         {
-            _Context = context;
-            Entity = _Context.Set<TEntity>();
+            _context = context;
+            Entity = _context.Set<TEntity>();
         }
         
         public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter) 
         {
             return await Entity.AnyAsync(filter);
+
         }
-        
         public virtual async Task<List<TEntity>> GetAllAsync()
         {
             return await Entity.ToListAsync();
         }
-        
         public virtual async Task<OperationResult> GetAllAsync(Expression<Func<TEntity, bool>> filter)
         {
             OperationResult result = new OperationResult();
@@ -41,7 +40,6 @@ namespace HRMS.Persistence.Base
 
             return result;
         }
-            
         public virtual async Task<TEntity> GetEntityByIdAsync(int id)
         {
             return await Entity.FindAsync(id);
@@ -52,7 +50,7 @@ namespace HRMS.Persistence.Base
             OperationResult resultSave = new OperationResult();
             try { 
                 Entity.Add(entity);
-                await _Context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
             }catch(Exception ex) {
                 resultSave.IsSuccess = false;
@@ -68,13 +66,15 @@ namespace HRMS.Persistence.Base
             try
             {
                 Entity.Update(entity);
-                await _Context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             catch (Exception ex) { 
                 resultUpdate.IsSuccess = false;
                 resultUpdate.Message = "Ocurrió un error actualizando los datos.";
             }
             return resultUpdate;
+
+
         }
     }
 }
