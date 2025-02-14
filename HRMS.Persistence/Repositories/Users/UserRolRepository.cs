@@ -2,11 +2,11 @@
 using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
-using HRMS.Persistence.Interfaces;
+using HRMS.Persistence.Interfaces.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace HRMS.Persistence.Repositories
+namespace HRMS.Persistence.Repositories.Users
 {
     public class UserRolRepository : BaseRepository<UserRole, int>, IUserRoleRepository
     {
@@ -32,7 +32,7 @@ namespace HRMS.Persistence.Repositories
             return usuario;
         }
 
-    
+
 
         public async Task<OperationResult> UpdateDescription(int idRolUsuario, string nuevaDescripcion)
         {
@@ -43,7 +43,7 @@ namespace HRMS.Persistence.Repositories
                 {
                     result.IsSuccess = false;
                     result.Message = "El id del rol de usuario debe ser mayor que 0";
-                     return result;
+                    return result;
                 }
                 if (string.IsNullOrEmpty(nuevaDescripcion))
                 {
@@ -64,9 +64,9 @@ namespace HRMS.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                result.Message = this._configuration["ErrorUserRolRepository: UpdateDescription"];
+                result.Message = _configuration["ErrorUserRolRepository: UpdateDescription"];
                 result.IsSuccess = false;
-                this._logger.LogError(result.Message, ex.ToString());
+                _logger.LogError(result.Message, ex.ToString());
             }
             return result;
         }

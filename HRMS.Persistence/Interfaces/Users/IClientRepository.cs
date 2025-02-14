@@ -2,7 +2,7 @@
 using HRMS.Domain.Repository;
 using HRMS.Domain.Base;
 
-namespace HRMS.Persistence.Interfaces
+namespace HRMS.Persistence.Interfaces.Users
 {
     public interface IClientRepository : IBaseRepository<Client, int>
     {

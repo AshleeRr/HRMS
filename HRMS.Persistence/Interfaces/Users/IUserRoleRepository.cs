@@ -2,7 +2,7 @@
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.Repository;
 
-namespace HRMS.Persistence.Interfaces
+namespace HRMS.Persistence.Interfaces.Users
 {
     public interface IUserRoleRepository : IBaseRepository<UserRole, int>
     {

@@ -3,12 +3,12 @@ using HRMS.Domain.Entities.Users;
 using HRMS.Models.Models;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
-using HRMS.Persistence.Interfaces;
+using HRMS.Persistence.Interfaces.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace HRMS.Persistence.Repositories
+namespace HRMS.Persistence.Repositories.Users
 {
     public class UserRepository : BaseRepository<Users, int>, IUserRepository
     {
@@ -23,10 +23,10 @@ namespace HRMS.Persistence.Repositories
 
         public async Task<Users> GetUserByName(string nombreCompleto)
         {
-           ArgumentException.ThrowIfNullOrEmpty(nombreCompleto, nameof(nombreCompleto));
-                var usuario = await _context.Users.FirstOrDefaultAsync(u => u.NombreCompleto == nombreCompleto) 
-                              ?? throw new KeyNotFoundException("Error al encontrar el usuario por nombre");
-                return usuario;
+            ArgumentException.ThrowIfNullOrEmpty(nombreCompleto, nameof(nombreCompleto));
+            var usuario = await _context.Users.FirstOrDefaultAsync(u => u.NombreCompleto == nombreCompleto)
+                          ?? throw new KeyNotFoundException("Error al encontrar el usuario por nombre");
+            return usuario;
         }
 
         public async Task<OperationResult> GetUserByUserId(int idUsuario)
@@ -51,9 +51,9 @@ namespace HRMS.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                result.Message = this._configuration["ErrorUserRepository: GetUserByUserId"];
+                result.Message = _configuration["ErrorUserRepository: GetUserByUserId"];
                 result.IsSuccess = false;
-                this._logger.LogError(result.Message, ex.ToString());
+                _logger.LogError(result.Message, ex.ToString());
             }
             return result;
         }
@@ -90,9 +90,9 @@ namespace HRMS.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                result.Message = this._configuration["ErrorUserRepository: GetUserByUserRolId"];
+                result.Message = _configuration["ErrorUserRepository: GetUserByUserRolId"];
                 result.IsSuccess = false;
-                this._logger.LogError(result.Message, ex.ToString());
+                _logger.LogError(result.Message, ex.ToString());
 
             }
             return result;
@@ -126,12 +126,12 @@ namespace HRMS.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                result.Message = this._configuration["ErrorUserRepository: UpdatePassword"];
+                result.Message = _configuration["ErrorUserRepository: UpdatePassword"];
                 result.IsSuccess = false;
-                this._logger.LogError(result.Message, ex.ToString());
+                _logger.LogError(result.Message, ex.ToString());
             }
             return result;
-        
+
         }
         private bool ValidateUserId(int idUsuario, OperationResult result)
         {
