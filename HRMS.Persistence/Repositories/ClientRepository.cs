@@ -3,42 +3,58 @@ using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HRMS.Persistence.Repositories
 {
     public class ClientRepository : BaseRepository<Client, int>, IClientRepository
     {
-        //tomar en cuenta que no puede llegar null a baseRepository 
-        
-        public ClientRepository(HRMSContext context) : base(context) 
-        { 
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<ClientRepository> _logger;
+        public ClientRepository(HRMSContext context, ILogger<ClientRepository> logger,
+                                                     IConfiguration configuration) : base(context)
+        {
+            _logger = logger;
+            _configuration = configuration;
         }
 
-        public OperationResult GetClientByClientId(int IdCliente)
+        public async Task<Client> GetClientByClientId(int idCliente)
         {
-            throw new NotImplementedException();
+            if (idCliente < 1)
+            {
+                throw new ArgumentException("El ID del cliente no puede ser menor a 1", nameof(idCliente));
+            }
+            var cliente = await _context.Clients.FindAsync(idCliente);
+            if (cliente == null)
+            {
+                _logger.LogWarning("No se encontró un cliente con ese id");
+            }
+            return cliente;
+            }
+
+        public async Task<Client> GetClientByCorreo(string correo)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(correo, nameof(correo));
+            var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Correo == correo);
+            if (cliente == null)
+            {
+                _logger.LogWarning("No se encontró un cliente con ese correo");
+            }
+            return cliente;
         }
 
-        public Task<Client> GetClientByCorreo(string correo)
+        public async Task<List<Client>> GetClientsByDocument(string documento)
         {
-            throw new NotImplementedException();
-        }
+            ArgumentException.ThrowIfNullOrEmpty(documento, nameof(documento));
+            var clientes = await _context.Clients.Where(c => c.Documento == documento).ToListAsync();
+            if (!clientes.Any()) 
+            { 
+                _logger.LogWarning("No se encontraron clientes con ese documento");
+            }
 
-        public Task<List<Client>> GetClientsByDocument(string documento)
-        {
-            throw new NotImplementedException();
-        }
-
-        //sobreescribir todos los metodos
-        public override Task<OperationResult> SaveEntityAsync(Client entity)
-        {
-            //agregar las validaiciones correspondientes
-            return base.SaveEntityAsync(entity);
-        }
-
-        Task<Client> IClientRepository.GetClientByClientId(int IdCliente)
-        {
-            throw new NotImplementedException();
+            return clientes;
         }
     }
 }

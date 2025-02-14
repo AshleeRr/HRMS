@@ -7,8 +7,8 @@ namespace HRMS.Persistence.Interfaces
 {
     public interface IUserRepository : IBaseRepository<Users, int>
     {
-        Task<Users> GetUserByUserId(int idUsuario);
-        Task<OperationResult> DeleteUserbyId(int idUsuario);
+        Task<OperationResult> GetUserByUserId(int idUsuario);
+        Task<OperationResult> GetUsersByUserRolId(int idUsuario);
         Task<Users> GetUserByName(string nombreCompleto);
         Task<OperationResult> UpdatePassword(int idUsuario, string nuevaClave);
     }
