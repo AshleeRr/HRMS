@@ -104,7 +104,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-        public virtual async Task<Reservation> GetEntityByIdAsync(int id)
+        public override async Task<Reservation> GetEntityByIdAsync(int id)
         {
             if (id != 0)
             {
