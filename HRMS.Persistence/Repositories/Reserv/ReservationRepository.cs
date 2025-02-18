@@ -18,7 +18,7 @@ namespace HRMS.Persistence.Repositories.Reserv
         private ILogger _logger;
         private IConfiguration _configuration;
         
-        public ReservationRepository(HRMSContext context,ILogger logger, IConfiguration configuration) : base(context)
+        public ReservationRepository(HRMSContext context, ILogger logger, IConfiguration configuration) : base(context)
         {
             _logger = logger;
             _configuration = configuration;
@@ -49,7 +49,7 @@ namespace HRMS.Persistence.Repositories.Reserv
         public override async Task<OperationResult> SaveEntityAsync(Reservation entity)
         {
             OperationResult result;
-            if (!_validReservationForSaving(entity))
+            if (!await _validReservationForSaving(entity))
             {
                 result = new OperationResult();
                 result.IsSuccess = false;
@@ -57,7 +57,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             }
             else
             {
-                result = await base.UpdateEntityAsync(entity);
+                result = await base.SaveEntityAsync(entity);
                 if (!result.IsSuccess)
                 {
                     string? message = _getErrorMessage();
@@ -69,21 +69,22 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-        private bool _validReservationForSaving(Reservation resev)
+        private async Task<bool> _validReservationForSaving(Reservation resev)
             => (resev != null &&
                resev.idCliente != 0 &&
+               await _isRoomDisponible(resev.idHabitacion, resev.FechaEntrada.Value, resev.FechaSalida.Value) &&
                resev.idCliente != null &&
                resev.FechaEntrada > DateTime.Now &&
                resev.FechaSalida > resev.FechaEntrada);
 
-        private bool _validReservationForUpdating(Reservation resev)
-            => (_validReservationForSaving(resev) &&
+        private async Task<bool> _validReservationForUpdating(Reservation resev)
+            => (await _validReservationForSaving(resev) &&
                 (resev.Estado?? false));
 
         public override async Task<OperationResult> UpdateEntityAsync(Reservation entity)
         {
             OperationResult result;
-            if (!_validReservationForUpdating(entity))
+            if (!await _validReservationForUpdating(entity))
             {
                 result = new OperationResult();
                 result.IsSuccess = false;
@@ -152,6 +153,17 @@ namespace HRMS.Persistence.Repositories.Reserv
         }
 
 
+
+        private async Task<bool> _isRoomDisponible(int?  roomId, DateTime start, DateTime end)
+        {
+            return await _context.Habitaciones.Where(h => h.Id == roomId)
+                .Where(h => !_context.Reservations
+                    .Any(r => r.idHabitacion == h.Id &&
+                        (r.FechaEntrada <= start && r.FechaSalida >= start) ||
+                        (r.FechaEntrada <= end && r.FechaSalida >= end) ||
+                        (r.FechaEntrada >= start && r.FechaSalida <= end)))
+                .AnyAsync();
+        }
         private string? _getErrorMessage([CallerMemberName]string source ="")
             => _configuration["ErrorReservationRepository:" + source]; 
     }
