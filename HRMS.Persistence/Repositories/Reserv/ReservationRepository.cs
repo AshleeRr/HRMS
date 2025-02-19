@@ -69,6 +69,10 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
+        public override async Task<List<Reservation>> GetAllAsync()
+            =>  await _context.Reservations.Where(r => r.Estado.Value).ToListAsync();
+        
+
         private async Task<bool> _validReservationForSaving(Reservation resev)
             => (resev != null &&
                resev.idCliente != 0 &&
@@ -152,7 +156,41 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-
+        public async Task<OperationResult> GetDisponibleRoomsOfCategoryInTimeLapse(DateTime start, DateTime end, int categoriaId)
+        {
+            OperationResult result = new OperationResult();
+            if (start > end)
+            {
+                result.IsSuccess = false;
+                result.Message = "La fecha de inicio no puede ser mayor a la fecha de fin.";
+            }
+            else if (categoriaId == 0)
+            {
+                result.IsSuccess = false;
+                result.Message = "No se ha especificado una categoría.";
+            }
+            else
+            {
+                try
+                {
+                    var query = _context.Habitaciones.Where(h => h.IdCategoria == categoriaId)
+                        .Where(h => !_context.Reservations
+                            .Any(r => r.idHabitacion == h.Id &&
+                                (r.FechaEntrada <= start && r.FechaSalida >= start) ||
+                                (r.FechaEntrada <= end && r.FechaSalida >= end) ||
+                                (r.FechaEntrada >= start && r.FechaSalida <= end)))
+                        .Select(h => h.Id);
+                    result.Data = await query.ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    result.IsSuccess = false;
+                    result.Message = _getErrorMessage();
+                    _logger.LogError(result.Message, ex.ToString());
+                }
+            }
+            return result;
+        }
 
         private async Task<bool> _isRoomDisponible(int?  roomId, DateTime start, DateTime end)
         {
