@@ -80,4 +80,89 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         }
         return result;
     }
+
+    public override async Task<OperationResult> SaveEntityAsync(Habitacion entity)
+    {
+        var result = new OperationResult();
+        try
+        {
+            if (string.IsNullOrEmpty(entity.Numero))
+            {
+                result.IsSuccess = false;
+                result.Message = "El número de habitación es requerido.";
+                return result;
+            }
+            var existingRoom = await GetByNumeroAsync(entity.Numero);
+            
+            if (((OperationResult)existingRoom).Data != null)
+            {
+                result.IsSuccess = false;
+                result.Message = "Ya existe una habitación con ese número.";
+                return result;
+            }
+            entity.FechaCreacion = DateTime.Now;
+            entity.Estado = true;
+
+            await _context.Habitaciones.AddAsync(entity);
+            await _context.SaveChangesAsync();
+
+            result.Data = entity;
+            result.IsSuccess = true;
+            result.Message = "Habitación creada exitosamente.";
+        }
+        catch (Exception)
+        {
+            result.IsSuccess = false;
+            result.Message = "Ocurrió un error guardando la habitación.";
+        }
+
+        return result;
+    }
+    // HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs
+    public override async Task<OperationResult> UpdateEntityAsync(Habitacion entity)
+    {
+        var result = new OperationResult();
+        try
+        {
+            var habitacion = await _context.Habitaciones.FindAsync(entity.IdHabitacion);
+            if (habitacion == null)
+            {
+                result.IsSuccess = false;
+                result.Message = "Habitación no encontrada.";
+                return result;
+            }
+
+            // Solo validamos el precio si se está actualizando
+            if (entity.Precio.HasValue)
+            {
+                if (entity.Precio <= 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "El precio de la habitación no puede ser negativo o igual a 0.";
+                    return result;
+                }
+                habitacion.Precio = entity.Precio;
+            }
+
+            if (!string.IsNullOrEmpty(entity.Numero)) habitacion.Numero = entity.Numero;
+            if (!string.IsNullOrEmpty(entity.Detalle)) habitacion.Detalle = entity.Detalle;
+            if (entity.IdEstadoHabitacion.HasValue) habitacion.IdEstadoHabitacion = entity.IdEstadoHabitacion;
+            if (entity.IdPiso.HasValue) habitacion.IdPiso = entity.IdPiso;
+            if (entity.IdCategoria.HasValue) habitacion.IdCategoria = entity.IdCategoria;
+            if (entity.Estado.HasValue) habitacion.Estado = entity.Estado;
+
+            await _context.SaveChangesAsync();
+        
+            result.IsSuccess = true;
+            result.Message = "Habitación actualizada exitosamente.";
+            result.Data = habitacion;
+        }     
+        catch (Exception)
+        {
+            result.IsSuccess = false;
+            result.Message = "Error al actualizar la habitación.";
+        }
+        return result;
+    }
+  
 }
