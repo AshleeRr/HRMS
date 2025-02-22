@@ -118,7 +118,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             {
                 var query = from r in _context.Reservations
                             join c in _context.Clients on r.idCliente equals c.IdCliente
-                            join h in _context.Habitaciones on r.idHabitacion equals h.Id
+                            join h in _context.Habitaciones on r.idHabitacion equals h.IdHabitacion
                             where r.idCliente == clientId
                             select new ReservHabitClientModel
                             {

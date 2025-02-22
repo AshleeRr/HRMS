@@ -10,11 +10,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="" />
+    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/appsettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Categoria.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Categoria.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/EstadoHabitacion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/EstadoHabitacion.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Habitacion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Habitacion.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Piso.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Piso.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/Reserv/ReservationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/Reserv/ReservationRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DpaMonitoringSettings">
+    <option name="firstShow" value="false" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -46,6 +62,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.HRMS.APIs: http.executor&quot;: &quot;Run&quot;,
     &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
@@ -58,7 +75,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.APIs: IIS Express">
+  <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.APIs: http">
     <configuration name="HRMS.APIs: IIS Express" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net8.0" />
@@ -134,6 +151,16 @@
       <workItem from="1739341381224" duration="96000" />
       <workItem from="1739409935001" duration="1176000" />
       <workItem from="1739476782307" duration="15472000" />
+      <workItem from="1739503545443" duration="429000" />
+      <workItem from="1739504139633" duration="1398000" />
+      <workItem from="1739918571766" duration="2735000" />
+      <workItem from="1739925634354" duration="965000" />
+      <workItem from="1739942728402" duration="1443000" />
+      <workItem from="1740161268760" duration="1750000" />
+      <workItem from="1740187318528" duration="6000" />
+      <workItem from="1740229557844" duration="2893000" />
+      <workItem from="1740232726165" duration="893000" />
+      <workItem from="1740233753265" duration="1062000" />
     </task>
     <servers />
   </component>

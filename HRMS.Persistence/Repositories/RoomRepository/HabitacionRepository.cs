@@ -10,14 +10,14 @@ namespace HRMS.Persistence.Repositories.RoomRepository;
 public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacionRepository
 {
     public HabitacionRepository(HRMSContext context) : base(context) {}
-    public async Task<OperationResult> GetByEstadoAsync(int estado)
+    public async Task<OperationResult> GetByEstadoAsync(bool estado)
     {
         var result = new OperationResult();
         try
         {
             var datos = await _context.Set<Habitacion>()
-                .Where(h => h.IdEstadoHabitacion == estado)
-                .ToListAsync();
+                .Where(h => h.Estado == estado)
+                .ToListAsync(); 
             result.Data = datos;
         }
         catch (Exception)

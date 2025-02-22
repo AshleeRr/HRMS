@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using HRMS.Domain.Base;
 
 namespace HRMS.Domain.Entities.RoomManagement;
@@ -6,6 +7,7 @@ namespace HRMS.Domain.Entities.RoomManagement;
 [Table("Piso")]
 public sealed class Piso : AuditEntity
 {
-    public int Id { get; set; }
+    [Key]
+    public int IdPiso { get; set; }
     public string? Descripcion{ get; set; }
 }
