@@ -11,14 +11,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/HabitacionModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/UpdateRoom.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/UpdateRoomPrice.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/HabitacionCreateDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/UpdateHabitacionDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/UpdatePrecioDto.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/HabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Base/BaseRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Base/BaseRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/HabitacionModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/HabitacionDto.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.css" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,7 +156,7 @@
       <workItem from="1740229557844" duration="2893000" />
       <workItem from="1740232726165" duration="893000" />
       <workItem from="1740233753265" duration="1528000" />
-      <workItem from="1740244930102" duration="10318000" />
+      <workItem from="1740244930102" duration="13149000" />
     </task>
     <servers />
   </component>
