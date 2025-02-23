@@ -8,6 +8,7 @@ namespace HRMS.Domain.Entities.RoomManagement;
 public sealed class Habitacion : AuditEntity
 {
     [Key]
+    [Column("IdHabitacion")]
     public int Id { get; set; }
     public string? Numero { get; set;}
     public string? Detalle { get; set;}

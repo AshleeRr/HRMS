@@ -17,7 +17,7 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
         var result = new OperationResult();
         try
         {
-            var datos = await _Context.Set<Tarifas>()
+            var datos = await _context.Set<Tarifas>()
                 .Where(t => t.FechaInicio <= fecha && t.FechaFin >= fecha)
                 .ToListAsync();
             result.Data = datos;
@@ -34,7 +34,7 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
         var result = new OperationResult();
         try
         {
-            var datos = await _Context.Set<Tarifas>()
+            var datos = await _context.Set<Tarifas>()
                 .Where(t => t.IdHabitacion == idHabitacion)
                 .ToListAsync();
             result.Data = datos;
@@ -51,7 +51,7 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
         var result = new OperationResult();
         try
         {
-            var dato = await _Context.Set<Tarifas>()
+            var dato = await _context.Set<Tarifas>()
                 .Where(t => t.IdHabitacion == idHabitacion 
                             && t.Estado == true 
                             && t.FechaInicio <= DateTime.Now 

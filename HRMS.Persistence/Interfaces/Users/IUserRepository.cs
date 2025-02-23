@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace HRMS.Persistence.Interfaces.Users
 {
-    public interface IUserRepository : IBaseRepository<Users, int>
+    public interface IUserRepository : IBaseRepository<User, int>
     {
         Task<OperationResult> GetUserByUserId(int idUsuario);
         Task<OperationResult> GetUsersByUserRolId(int idUsuario);
-        Task<Users> GetUserByName(string nombreCompleto);
+        Task<User> GetUserByName(string nombreCompleto);
         Task<OperationResult> UpdatePassword(int idUsuario, string nuevaClave);
     }
 }

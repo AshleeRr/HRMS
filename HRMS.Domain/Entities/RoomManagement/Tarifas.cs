@@ -1,9 +1,11 @@
 ﻿using HRMS.Domain.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace HRMS.Domain.Entities.RoomManagement
 {
     public class Tarifas : AuditEntity
     {
+        [Key]
         public int IdTarifa { get; set; }
         public int IdHabitacion { get; set; }
         public DateTime FechaInicio { get; set; }

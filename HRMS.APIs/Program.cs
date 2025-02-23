@@ -1,3 +1,7 @@
+using HRMS.Domain.Repository;
+using HRMS.Persistence.Context;
+using HRMS.Persistence.Repositories.Reserv;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRMS.APIs
 {
@@ -8,8 +12,13 @@ namespace HRMS.APIs
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            builder.Services.AddDbContext<HRMSContext>(options => {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("HRMSBD"));
+            });
+            builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
             builder.Services.AddControllers();
+
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

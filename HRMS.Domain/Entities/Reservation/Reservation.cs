@@ -10,6 +10,7 @@ namespace HRMS.Domain.Entities.Reservation
     public class Reservation : AuditEntity
     {
         [Key]
+        [Column("IdRecepcion")]
         public int idRecepcion { get; set; }
 
         public DateTime? FechaEntrada { get; set; }

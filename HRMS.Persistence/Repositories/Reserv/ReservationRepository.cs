@@ -15,10 +15,10 @@ namespace HRMS.Persistence.Repositories.Reserv
 {
     public class ReservationRepository : BaseRepository<Reservation, int>, IReservationRepository
     {
-        private ILogger _logger;
+        private ILogger<ReservationRepository> _logger;
         private IConfiguration _configuration;
         
-        public ReservationRepository(HRMSContext context, ILogger logger, IConfiguration configuration) : base(context)
+        public ReservationRepository(HRMSContext context, ILogger<ReservationRepository> logger, IConfiguration configuration) : base(context)
         {
             _logger = logger;
             _configuration = configuration;
@@ -82,8 +82,9 @@ namespace HRMS.Persistence.Repositories.Reserv
                resev.FechaSalida > resev.FechaEntrada);
 
         private async Task<bool> _validReservationForUpdating(Reservation resev)
-            => (await _validReservationForSaving(resev) &&
-                (resev.Estado?? false));
+            => (await _validReservationForSaving(resev)
+                && (resev.Estado.Value)
+                );
 
         public override async Task<OperationResult> UpdateEntityAsync(Reservation entity)
         {
@@ -173,13 +174,13 @@ namespace HRMS.Persistence.Repositories.Reserv
             {
                 try
                 {
-                    var query = _context.Habitaciones.Where(h => h.IdCategoria == categoriaId)
-                        .Where(h => !_context.Reservations
-                            .Any(r => r.idHabitacion == h.Id &&
-                                (r.FechaEntrada <= start && r.FechaSalida >= start) ||
-                                (r.FechaEntrada <= end && r.FechaSalida >= end) ||
-                                (r.FechaEntrada >= start && r.FechaSalida <= end)))
-                        .Select(h => h.Id);
+                    var query = _context.Habitaciones
+                                    .Where(h => h.IdCategoria == categoriaId &&
+                                        !_context.Reservations.Any(r =>
+                                            r.idHabitacion == h.Id &&
+                                            !(r.FechaSalida < start || r.FechaEntrada > end)   
+                                        ))
+                                    .Select(h => h.Id);
                     result.Data = await query.ToListAsync();
                 }
                 catch (Exception ex)

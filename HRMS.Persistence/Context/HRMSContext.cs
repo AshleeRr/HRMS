@@ -10,7 +10,7 @@ namespace HRMS.Persistence.Context
         public HRMSContext(DbContextOptions<HRMSContext> options) : base(options){}
 
         public DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<Users> Users { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<Client> Clients { get; set; }
 
         public DbSet<Reservation> Reservations { get; set; }

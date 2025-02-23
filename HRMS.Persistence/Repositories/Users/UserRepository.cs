@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace HRMS.Persistence.Repositories.Users
 {
-    public class UserRepository : BaseRepository<Users, int>, IUserRepository
+    public class UserRepository : BaseRepository<User, int>, IUserRepository
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<ClientRepository> _logger;
@@ -21,7 +21,7 @@ namespace HRMS.Persistence.Repositories.Users
             _configuration = configuration;
         }
 
-        public async Task<Users> GetUserByName(string nombreCompleto)
+        public async Task<User> GetUserByName(string nombreCompleto)
         {
             ArgumentException.ThrowIfNullOrEmpty(nombreCompleto, nameof(nombreCompleto));
             var usuario = await _context.Users.FirstOrDefaultAsync(u => u.NombreCompleto == nombreCompleto)

@@ -17,7 +17,7 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         var result = new OperationResult();
         try
         {
-            var datos = await _Context.Set<Habitacion>()
+            var datos = await _context.Set<Habitacion>()
                 .Where(h => h.IdEstadoHabitacion == estado)
                 .ToListAsync();
             result.Data = datos;
@@ -35,7 +35,7 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         var result = new OperationResult();
         try
         {
-            var datos = await _Context.Set<Habitacion>()
+            var datos = await _context.Set<Habitacion>()
                 .Where(h => h.IdPiso == idPiso)
                 .ToListAsync();
             result.Data = datos;
@@ -53,7 +53,7 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         var result = new OperationResult();
         try
         {
-            var datos = await _Context.Set<Habitacion>()
+            var datos = await _context.Set<Habitacion>()
                 .Where(h => h.IdCategoria == idCategoria)
                 .ToListAsync();
             result.Data = datos;
@@ -71,7 +71,7 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         var result = new OperationResult();
         try
         {
-            var dato = await _Context.Set<Habitacion>()
+            var dato = await _context.Set<Habitacion>()
                 .FirstOrDefaultAsync(h => h.Numero == numero);
             result.Data = dato;
         }
