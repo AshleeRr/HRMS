@@ -1,10 +1,10 @@
 ﻿using HRMS.Domain.Base;
-using HRMS.Domain.Entities.Reservation;
 using HRMS.Domain.Entities.Users;
-using HRMS.Models.Models;
+using HRMS.Models.Models.UsersModels;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
+using HRMS.Persistence.Repositories.ValidationsRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -12,50 +12,120 @@ using System.Linq.Expressions;
 
 namespace HRMS.Persistence.Repositories.ClientRepository
 {
-    public class UserRepository : BaseRepository<Users, int>, IUserRepository
+    public class UserRepository : BaseRepository<User, int>, IUserRepository
     {
-        private readonly HRMSContext _context;
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserRepository> _logger;
 
         public UserRepository(HRMSContext context, ILogger<UserRepository> logger,
                                                      IConfiguration configuration) : base(context)
         {
-            _context = context;
             _logger = logger;
             _configuration = configuration;
         }
-
-        public async Task<Users> GetUserByName(string nombreCompleto)
+        public async Task<User> AuthenticateUserAsync(string correo, string clave) {
+           
+            if(string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(clave))
+            {
+                throw new ArgumentNullException("El correo y la clave no pueden estar vacíos");
+            }
+            var AuthenticatedUser =  await _context.Users.FirstOrDefaultAsync(u => u.Correo == correo && u.Clave == clave);
+            if(AuthenticatedUser == null)
+            {
+                _logger.LogWarning("No se encontró un usuario con ese correo y clave");
+            }
+            return AuthenticatedUser;
+        }
+        public async Task<OperationResult> UpdateEstadoAsync(User entity, bool nuevoEstado) { // no segura de este metodo
+            OperationResult result = new OperationResult();
+            try
+            {
+                if(!Validation.ValidateUser(entity, result))
+                    return result;
+                if (entity.Estado == nuevoEstado)
+                {
+                    result.IsSuccess = false;
+                    _logger.LogWarning("No se puede asignar el mismo estado al usuario");
+                    return result;
+                }
+                entity.Estado = nuevoEstado;
+                _context.Users.Update(entity);
+                await _context.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Estado del usuario actualizado correctamente";
+            }
+            catch(Exception e)
+            {
+                result.IsSuccess = false;
+                result.Message = _configuration["ErrorUserRepository: UpdateEstadoAsync"];
+                _logger.LogError(result.Message, e.ToString());
+            }
+            return result;
+        }
+        public async Task<OperationResult> AsignRolUserAsync (int idUsuario, int idRolUsuario) { 
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (!Validation.ValidateId(idUsuario, result))
+                    return result;
+                if (!Validation.ValidateId(idRolUsuario, result))
+                    return result;
+                var usuario = await _context.Users.FindAsync(idUsuario);
+                if (usuario == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontró un usuario con ese id";
+                    return result;
+                }
+                var userRol = await _context.UserRoles.FindAsync(idRolUsuario);
+                if (userRol == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontró un rol de usuario con ese id";
+                    return result;
+                }
+                usuario.IdRolUsuario = idRolUsuario;
+                _context.Users.Update(usuario);
+                await _context.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Rol asignado correctamente";
+            }
+            catch (Exception ex) { 
+                result.IsSuccess = false;
+                result.Message = _configuration["ErrorUserRepository: AsignRolUserAsync"];
+                _logger.LogError(result.Message, ex.ToString());
+            }
+            return result;
+        }
+        public async Task<User> GetUserByNameAsync (string nombreCompleto)
         {
             ArgumentException.ThrowIfNullOrEmpty(nombreCompleto, nameof(nombreCompleto));
             var usuario = await _context.Users.FirstOrDefaultAsync(u => u.NombreCompleto == nombreCompleto)
                           ?? throw new KeyNotFoundException("Error al encontrar el usuario por nombre");
             return usuario;
         }
-        public async Task<OperationResult> GetUsersByUserRolId(int idUsuario)
+        public async Task<OperationResult> GetUsersByUserRolIdAsync(int idUsuario)
         {
             OperationResult result = new OperationResult();
             try
             {
-                if (!ValidateUserId(idUsuario, result))
+                if (!Validation.ValidateId(idUsuario, result))
                     return result;
 
                 var query = await (from users in _context.Users
                                    join userRol in _context.UserRoles on users.IdRolUsuario equals userRol.IdRolUsuario
                                    where users.IdRolUsuario == idUsuario
                                    select new UserModel()
-                                   {
+                                   { 
                                        IdUsuario = users.IdUsuario,
                                        NombreCompleto = users.NombreCompleto,
                                        IdUserRol = userRol.IdRolUsuario,
+                                       Correo = users.Correo,
                                        UserRol = userRol.Descripcion,
                                        Email = users.Correo
                                    }).ToListAsync();
                 result.Data = query;
-
                 result.IsSuccess = true;
-
                 if (!query.Any())
                 {
                     result.IsSuccess = false;
@@ -72,13 +142,12 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return result;
         }
-
-        public async Task<OperationResult> UpdatePassword(int idUsuario, string nuevaClave)
+        public async Task<OperationResult> UpdatePasswordAsync(int idUsuario, string nuevaClave) //verificar que la contra sea larga y eso
         {
             OperationResult result = new OperationResult();
             try
             {
-                if (!ValidateUserId(idUsuario, result))
+                if (!Validation.ValidateId(idUsuario, result))
                     return result;
 
                 if (string.IsNullOrEmpty(nuevaClave))
@@ -108,7 +177,8 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             return result;
 
         }
-        public override async Task<bool> ExistsAsync(Expression<Func<Users, bool>> filter)
+        //metodos de baserepository
+        public override async Task<bool> ExistsAsync(Expression<Func<User, bool>> filter)
         {
             if (filter == null)
             {
@@ -116,7 +186,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return await base.ExistsAsync(filter);
         }
-        public override async Task<OperationResult> GetAllAsync(Expression<Func<Users, bool>> filter)
+        public override async Task<OperationResult> GetAllAsync(Expression<Func<User, bool>> filter)
         {
             OperationResult result = new OperationResult();
             try
@@ -135,90 +205,81 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return result;
         } 
-        public override async Task<Users> GetEntityByIdAsync(int id)
+        public override async Task<User> GetEntityByIdAsync(int id)
         {
-            var entity = await _context.Users.FindAsync(id);
-            if (entity == null)
+            var entityById = await _context.Users.FindAsync(id);
+            if (entityById == null)
             {
-                _logger.LogWarning("No se encontró un cliente con ese id");
+                _logger.LogWarning("No se encontró un usuario con ese id");
             }
-            return entity;
+            return entityById;
         }
-        public override async Task<OperationResult> SaveEntityAsync(Users entity)
+        public override async Task<OperationResult> SaveEntityAsync(User entity)
         {
             OperationResult result = new OperationResult();
             try
             {
-                if (!ValidateUser(entity, result))
+                if (!Validation.ValidateUser(entity, result))
+                    return result;
+                if (!Validation.ValidateId(entity.IdUsuario, result))
+                    return result;
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, result))
+                    return result;
+                if (!Validation.ValidateCorreo(entity.Correo, result))
+                    return result;
+                if (!Validation.ValidateClave(entity.Clave, result))
                     return result;
 
                 await _context.Users.AddAsync(entity);
                 await _context.SaveChangesAsync();
-
                 result.IsSuccess = true;
-                result.Message = "Usuario guardado correctamente.";
+
+                result.Message = "Usuario guardado correctamente";
                 _logger.LogInformation(result.Message);
             }
             catch (Exception ex)
             {
                 result.IsSuccess = false;
-                result.Message = "Ocurrió un error al guardar el usuario.";
+                result.Message = "Ocurrió un error al guardar el usuario";
                 _logger.LogError(ex, result.Message);
             }
-
             return result;
         }
-
-        public override async Task<OperationResult> UpdateEntityAsync(Users entity)
+        public override async Task<OperationResult> UpdateEntityAsync(User entity)
         {
             OperationResult result = new OperationResult();
             try
             {
-                if (!ValidateUser(entity, result))
+                if (!Validation.ValidateUser(entity, result))
                     return result;
+                if(!Validation.ValidateId(entity.IdUsuario, result))
+                    return result;
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, result))
+                    return result;
+                if(!Validation.ValidateCorreo(entity.Correo, result))
+                    return result;
+                if(!Validation.ValidateClave(entity.Clave, result))
+                    return result;
+                var ExistentUser = await _context.Users.FindAsync(entity.IdUsuario);
 
-                var usuarioExistente = await _context.Users.FindAsync(entity.IdUsuario);
-
-                if (usuarioExistente == null)
+                if (ExistentUser == null)
                 {
                     result.IsSuccess = false;
                     result.Message = "El usuario no existe en la base de datos.";
                     return result;
                 }
-
-                _context.Entry(usuarioExistente).CurrentValues.SetValues(entity);
+                _context.Entry(ExistentUser).CurrentValues.SetValues(entity);
                 await _context.SaveChangesAsync();
-
                 result.IsSuccess = true;
                 result.Message = "Usuario actualizado correctamente.";
             }
             catch (Exception ex)
             {
                 result.IsSuccess = false;
-                result.Message = "Ocurrió un error al actualizar el usuario.";
+                result.Message = "Ocurrió un error al actualizar el usuario";
                 _logger.LogError(ex, result.Message);
             }
-
             return result;
-        }
-        private bool ValidateUserId(int idUsuario, OperationResult result)
-        {
-            if (idUsuario < 1)
-            {
-                result.IsSuccess = false;
-                result.Message = "El id del usuario debe ser mayor que 0";
-                return false;
-            }
-            return true;
-        }
-
-        private bool ValidateUser(Users entity, OperationResult result)
-        {
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity), "El usuario no puede ser nulo.");
-            }
-            return true;
         }
     }
 }
