@@ -1,11 +1,9 @@
-
-﻿using HRMS.Domain.Entities.Servicio;
-
+using HRMS.Domain.Entities.Servicio;
 ﻿using HRMS.Domain.Entities.Reservation;
 using HRMS.Domain.Entities.RoomManagement;
-
 using HRMS.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
+using HRMS.Domain.Entities.Audit;
 
 namespace HRMS.Persistence.Context
 {
@@ -14,9 +12,9 @@ namespace HRMS.Persistence.Context
         public HRMSContext(DbContextOptions<HRMSContext> options) : base(options){}
 
         public DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<Users> Users { get; set; }
+        public DbSet<User> Users { get; set; } 
         public DbSet<Client> Clients { get; set; }
-
+        public DbSet<Auditoria> Auditorias { get; set; }
 
         public DbSet<Servicios> Servicios { get; set; }
 

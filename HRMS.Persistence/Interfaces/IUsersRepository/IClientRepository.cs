@@ -5,7 +5,15 @@ namespace HRMS.Persistence.Interfaces.IUsersRepository
 {
     public interface IClientRepository : IBaseRepository<Client, int>
     {
-        Task<Client> GetClientByCorreo(string correo);
-        Task<List<Client>> GetClientsByDocument(string documento);
+        
+        Task<Client> GetClientByEmailAsync(string correo);
+        Task<List<Client>> GetClientsByDocumentAsync(string documento);
+        // obtener reservas de un cliente (verhistorial)
+        Task<IEnumerable<Client>> GetAllActiveClientsAsync();
+        Task<Client> VerifyEmailAsync (string correo);
+
+
+
+
     }
 }
