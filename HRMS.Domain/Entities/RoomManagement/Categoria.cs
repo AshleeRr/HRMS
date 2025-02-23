@@ -8,7 +8,7 @@ namespace HRMS.Domain.Entities.RoomManagement;
 public  sealed class Categoria : AuditEntity
 {
     [Key]
-    public int Id { get; set; }
+    public int IdCategoria { get; set; }
     public string? Descripcion { get; set; }
     
     [ForeignKey("Servicio")]

@@ -6,8 +6,8 @@ namespace HRMS.Persistence.Interfaces.IRoomRepository;
 
 public interface IHabitacionRepository : IBaseRepository<Habitacion, int>
 {
-    Task<OperationResult>GetByEstadoAsync(int estado);
-    
+    Task<OperationResult>GetByEstadoAsync(bool estado);
+        
     Task<OperationResult> GetByPisoAsync(int idPiso);
     
     Task<OperationResult> GetByCategoriaAsync(int idCategoria);
