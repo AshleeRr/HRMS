@@ -1,6 +1,5 @@
-using HRMS.Domain.Base;
+using HRMS.Application.RoomManagementModel;
 using HRMS.Domain.Entities.RoomManagement;
-using HRMS.Models.Models.RoomManagementModel;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.AspNetCore.Mvc;
 

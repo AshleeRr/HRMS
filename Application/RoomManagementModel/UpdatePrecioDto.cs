@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HRMS.Models.Models.RoomManagementModel;
+namespace HRMS.Application.RoomManagementModel;
 
 public class PrecioUpdateDto
 {

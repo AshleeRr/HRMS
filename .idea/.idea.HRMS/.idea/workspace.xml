@@ -11,13 +11,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/HabitacionCreateDto.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/UpdateHabitacionDto.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/UpdatePrecioDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.APIs/Configuration/CorsExtension.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.APIs/Configuration/MiddlewareExtensions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.APIs/Configuration/ServiceExtension.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.APIs/Configuration/SwaggerExtension.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/HabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/HabitacionModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/HabitacionDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/WeatherForecastController.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/WeatherForecast.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/HabitacionCreateDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/RoomManagementModel/HabitacionCreateDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/HabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/RoomManagementModel/HabitacionDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/UpdateHabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/RoomManagementModel/UpdateHabitacionDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/UpdatePrecioDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/RoomManagementModel/UpdatePrecioDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/UpdateRoom.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Models/Models/RoomManagementModel/UpdateRoomPrice.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +66,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET Launch Settings Profile.HRMS.APIs: http.executor": "Run",
+    ".NET Launch Settings Profile.HRMS.APIs: http.executor": "Debug",
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -156,7 +165,7 @@
       <workItem from="1740229557844" duration="2893000" />
       <workItem from="1740232726165" duration="893000" />
       <workItem from="1740233753265" duration="1528000" />
-      <workItem from="1740244930102" duration="13149000" />
+      <workItem from="1740244930102" duration="17688000" />
     </task>
     <servers />
   </component>
