@@ -49,11 +49,10 @@ namespace HRMS.Persistence.Repositories.Reserv
         public override async Task<OperationResult> SaveEntityAsync(Reservation entity)
         {
             OperationResult result;
-            if (!await _validReservationForSaving(entity))
+            var validRes = await _validReservationForSaving(entity);
+            if (!validRes.IsSuccess)
             {
-                result = new OperationResult();
-                result.IsSuccess = false;
-                result.Message = "La reserva no es válida.";
+                return validRes;
             }
             else
             {
@@ -71,8 +70,8 @@ namespace HRMS.Persistence.Repositories.Reserv
 
         public override async Task<List<Reservation>> GetAllAsync()
             =>  await _context.Reservations.Where(r => r.Estado.Value).ToListAsync();
-        
 
+        /*
         private async Task<bool> _validReservationForSaving(Reservation resev)
             => (resev != null &&
                resev.idCliente != 0 &&
@@ -82,18 +81,116 @@ namespace HRMS.Persistence.Repositories.Reserv
                resev.FechaSalida > resev.FechaEntrada);
 
         private async Task<bool> _validReservationForUpdating(Reservation resev)
-            => (await _validReservationForSaving(resev)
+            => (resev != null &&
+               resev.idCliente != 0 &&
+               resev.idCliente != null &&
+               resev.FechaEntrada > DateTime.Now &&
+               resev.FechaSalida > resev.FechaEntrada
                 && (resev.Estado.Value)
                 );
+        */
 
+        private async Task<OperationResult> _validReservationForSaving(Reservation resev)
+        {
+            OperationResult operationResult = new OperationResult();
+            List<string> errors = new List<string>();
+
+            if (resev == null)
+            {
+                errors.Add("La reserva no puede ser nula");
+            }
+            else
+            {
+                if (resev.idCliente == 0)
+                {
+                    errors.Add("El ID del cliente no puede ser cero");
+                }
+                if (resev.idHabitacion == 0)
+                {
+                    errors.Add("El ID de la habitación no puede ser cero");
+                }
+                if (!resev.FechaEntrada.HasValue)
+                {
+                    errors.Add("La fecha de entrada no puede ser nula");
+                }
+                if (!resev.FechaSalida.HasValue)
+                {
+                    errors.Add("La fecha de salida no puede ser nula");
+                }
+                if (resev.FechaEntrada <= DateTime.Now)
+                {
+                    errors.Add("La fecha de entrada debe ser posterior a la fecha actual");
+                }
+                if (resev.FechaSalida <= resev.FechaEntrada)
+                {
+                    errors.Add("La fecha de salida debe ser posterior a la fecha de entrada");
+                }
+                /*
+                if (!await _isRoomDisponible(resev.idHabitacion, resev.FechaEntrada.Value, resev.FechaSalida.Value))
+                {
+                    errors.Add("La habitación no está disponible en las fechas seleccionadas");
+                }*/
+            }
+
+            if (errors.Count > 0)
+            {
+                operationResult.IsSuccess = false;
+                operationResult.Message = string.Join(Environment.NewLine, errors);
+            }
+            return operationResult;
+        }
+
+        private async Task<OperationResult> _validReservationForUpdating(Reservation resev)
+        {
+            OperationResult operationResult = new OperationResult();
+            List<string> errors = new List<string>();
+
+            if (resev == null)
+            {
+                errors.Add("La reserva no puede ser nula");
+            }
+            else
+            {
+                if (resev.idCliente == 0)
+                {
+                    errors.Add("El ID del cliente no puede ser cero");
+                }
+                if (!resev.FechaEntrada.HasValue)
+                {
+                    errors.Add("La fecha de entrada no puede ser nula");
+                }
+                if (!resev.FechaSalida.HasValue)
+                {
+                    errors.Add("La fecha de salida no puede ser nula");
+                }
+                if (resev.FechaEntrada <= DateTime.Now)
+                {
+                    errors.Add("La fecha de entrada debe ser posterior a la fecha actual");
+                }
+                if (resev.FechaSalida <= resev.FechaEntrada)
+                {
+                    errors.Add("La fecha de salida debe ser posterior a la fecha de entrada");
+                }
+                if (!resev.Estado.HasValue || !resev.Estado.Value)
+                {
+                    errors.Add("El estado de la reserva no es válido");
+                }
+            }
+
+            if (errors.Count > 0)
+            {
+                operationResult.IsSuccess = false;
+                operationResult.Message = string.Join(Environment.NewLine, errors);
+            }
+            return operationResult;
+        }
         public override async Task<OperationResult> UpdateEntityAsync(Reservation entity)
         {
             OperationResult result;
-            if (!await _validReservationForUpdating(entity))
+            var validRes = await _validReservationForUpdating(entity);
+            if (!validRes.IsSuccess)
             {
-                result = new OperationResult();
-                result.IsSuccess = false;
-                result.Message = "La reserva no es valida, para actualización";
+                return validRes;
             }
             else
             {
