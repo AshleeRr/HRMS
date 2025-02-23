@@ -1,10 +1,6 @@
 
 using HRMS.APIs.Configuration;
 
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
 namespace HRMS.APIs;
 
 public class Program

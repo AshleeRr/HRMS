@@ -164,11 +164,5 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         }
         return result;
     }
-
-    /*
-    public override  async Task<List<Habitacion>> GetAllAsync()
-    {
-        return await _context.Habitaciones.Where
-            (st => st.Estado == true).ToListAsync();
-    }*/
+    
 }

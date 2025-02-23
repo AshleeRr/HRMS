@@ -1,4 +1,3 @@
-using HRMS.Application.RoomManagementModel;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +25,7 @@ namespace HRMS.APIs.Controllers
             try
             {
                 var habitaciones = await _habitacionRepository.GetAllAsync();
-                return Ok(habitaciones.Select(MapToDto));
+                return Ok(habitaciones);
             }
             catch (Exception ex)
             {
@@ -42,8 +41,9 @@ namespace HRMS.APIs.Controllers
             {
                 var habitacion = await _habitacionRepository.GetEntityByIdAsync(id);
                 return habitacion != null
-                    ? Ok(MapToDto(habitacion))
+                    ? Ok(habitacion)
                     : NotFound("Habitación no encontrada");
+
             }
             catch (Exception ex)
             {
@@ -53,27 +53,13 @@ namespace HRMS.APIs.Controllers
         }
 
         [HttpPost("CreateHabitacion")]
-        public async Task<IActionResult> Create([FromBody] HabitacionCreateDto dto)
+        public async Task<IActionResult> Create([FromBody] Habitacion habitacion)
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(GetModelErrors());
-
-                var habitacion = new Habitacion
-                {
-                    Numero = dto.Numero,
-                    Detalle = dto.Detalle,
-                    Precio = dto.Precio,
-                    IdEstadoHabitacion = dto.IdEstadoHabitacion,
-                    IdPiso = dto.IdPiso,
-                    IdCategoria = dto.IdCategoria
-                };
-
                 var result = await _habitacionRepository.SaveEntityAsync(habitacion);
-
                 return result.IsSuccess
-                    ? CreatedAtAction(nameof(GetById), new { id = habitacion.IdHabitacion }, MapToDto(habitacion))
+                    ? Ok(result.Data)
                     : BadRequest(result.Message);
             }
             catch (Exception ex)
@@ -83,25 +69,15 @@ namespace HRMS.APIs.Controllers
             }
         }
 
-        [HttpPut("UpdateHabitacion/{id}")]  
-        public async Task<IActionResult> Update(int id, [FromBody] HabitacionUpdateDto dto)
+        [HttpPut("UpdateHabitacion/{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] Habitacion habitacion)
         {
             try
             {
-                var habitacion = await _habitacionRepository.GetEntityByIdAsync(id);
-                if (habitacion == null) return NotFound("Habitación no encontrada");
-
-                habitacion.Numero = dto.Numero;
-                habitacion.Detalle = dto.Detalle;
-                habitacion.Precio = dto.Precio;
-                habitacion.IdEstadoHabitacion = dto.IdEstadoHabitacion;
-                habitacion.IdPiso = dto.IdPiso;
-                habitacion.IdCategoria = dto.IdCategoria;
-
+                habitacion.IdHabitacion = id;
                 var result = await _habitacionRepository.UpdateEntityAsync(habitacion);
-
                 return result.IsSuccess
-                    ? Ok(MapToDto(habitacion))
+                    ? Ok(result.Data)
                     : BadRequest(result.Message);
             }
             catch (Exception ex)
@@ -110,45 +86,5 @@ namespace HRMS.APIs.Controllers
                 return StatusCode(500, "Error interno del servidor");
             }
         }
-
-        [HttpPatch("UpdateHabitacion/{id}/precio")]
-        public async Task<IActionResult> UpdatePrecio(int id, [FromBody] PrecioUpdateDto dto)
-        {
-            try
-            {
-                var habitacion = await _habitacionRepository.GetEntityByIdAsync(id);
-                if (habitacion == null) return NotFound("Habitación no encontrada");
-
-                habitacion.Precio = dto.Precio;
-
-                var result = await _habitacionRepository.UpdateEntityAsync(habitacion);
-
-                return result.IsSuccess
-                    ? Ok(MapToDto(habitacion))
-                    : BadRequest(result.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error actualizando precio de habitación {id}");
-                return StatusCode(500, "Error interno del servidor");
-            }
-        }
-
-        private static HabitacionDto MapToDto(Habitacion entity) => new()
-        {
-            IdHabitacion = entity.IdHabitacion,
-            Numero = entity.Numero,
-            Detalle = entity.Detalle,
-            Precio = entity.Precio ?? 0,
-            IdEstadoHabitacion = entity.IdEstadoHabitacion ?? 0,
-            IdPiso = entity.IdPiso ?? 0,
-            IdCategoria = entity.IdCategoria ?? 0
-        };
-
-        private List<string> GetModelErrors() =>
-            ModelState.Values
-                .SelectMany(v => v.Errors)
-                .Select(e => e.ErrorMessage)
-                .ToList();
     }
 }

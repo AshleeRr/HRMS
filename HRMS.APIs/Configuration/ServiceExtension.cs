@@ -10,6 +10,9 @@ public static class ServiceExtension
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IHabitacionRepository, HabitacionRepository>();
+        services.AddScoped<ICategoryRepository, CategoriaRepository>();
+        services.AddScoped<IPisoRepository, PisoRepository>();
+        services.AddScoped<IEstadoHabitacionRepository, EstadoHabitacionRepository>();
         //Añadir todos los servicios aqui
         return services;
     }

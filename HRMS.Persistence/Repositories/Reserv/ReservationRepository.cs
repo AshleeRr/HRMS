@@ -114,33 +114,38 @@ namespace HRMS.Persistence.Repositories.Reserv
         public async Task<OperationResult> GetReservationsByClientId(int clientId)
         {
             OperationResult result = new OperationResult();
-            try
-            {
-                var query = from r in _context.Reservations
-                            join c in _context.Clients on r.idCliente equals c.IdCliente
-                            join h in _context.Habitaciones on r.idHabitacion equals h.IdHabitacion
-                            join c in _context.Clients on r.idCliente equals c.idCliente
-                            join h in _context.Habitaciones on r.idHabitacion equals h.Id
-
-                            where r.idCliente == clientId
-                            select new ReservHabitClientModel
-                            {
-                                ReservationID = r.idRecepcion,
-                                In = r.FechaEntrada.Value,
-                                Out = r.FechaSalida.Value,
-                                Total = r.TotalPagado,
-                                RoomNumber = h.Numero,
-                                ClientID = c.idCliente,
-                                ClientName = c.NombreCompleto
-                            };
-
-                result.Data = await query.ToListAsync();
-            }
-            catch(Exception ex)
+            if (clientId == 0)
             {
                 result.IsSuccess = false;
-                result.Message = _getErrorMessage();
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = "No se ha especificado un cliente.";
+            }
+            else
+            {
+                try
+                {
+                    var query = from r in _context.Reservations
+                        join c in _context.Clients on r.idCliente equals c.idCliente
+                        join h in _context.Habitaciones on r.idHabitacion equals h.IdHabitacion
+                        where r.idCliente == clientId
+                        select new ReservHabitClientModel
+                        {
+                            ReservationID = r.idRecepcion,
+                            In = r.FechaEntrada.Value,
+                            Out = r.FechaSalida.Value,
+                            Total = r.TotalPagado,
+                            RoomNumber = h.Numero,
+                            ClientID = c.idCliente,
+                            ClientName = c.NombreCompleto
+                        };
+
+                    result.Data = await query.ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    result.IsSuccess = false;
+                    result.Message = _getErrorMessage();
+                    _logger.LogError(result.Message, ex.ToString());
+                }
             }
             return result;
         }
