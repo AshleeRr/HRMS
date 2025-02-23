@@ -1,4 +1,4 @@
-﻿namespace HRMS.Models.Models
+﻿namespace HRMS.Models.Models.UsersModels
 {
     public abstract class PersonModel
     {

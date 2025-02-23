@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HRMS.Domain.Entities.Users
 {
     [Table("Usuario")]
-    public class Users : UserAuditEntity
+    public class User : UserAuditEntity
     {
         [Key]
         public int IdUsuario { get; set; }
