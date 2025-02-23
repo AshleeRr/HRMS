@@ -125,11 +125,11 @@ namespace HRMS.Persistence.Repositories.Reserv
                 {
                     errors.Add("La fecha de salida debe ser posterior a la fecha de entrada");
                 }
-                /*
+                
                 if (!await _isRoomDisponible(resev.idHabitacion, resev.FechaEntrada.Value, resev.FechaSalida.Value))
                 {
                     errors.Add("La habitación no está disponible en las fechas seleccionadas");
-                }*/
+                }
             }
 
             if (errors.Count > 0)
@@ -290,15 +290,17 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-        private async Task<bool> _isRoomDisponible(int?  roomId, DateTime start, DateTime end)
+        private async Task<bool> _isRoomDisponible(int? roomId, DateTime start, DateTime end)
         {
-            return await _context.Habitaciones.Where(h => h.Id == roomId)
-                .Where(h => !_context.Reservations
-                    .Any(r => r.idHabitacion == h.Id &&
-                        (r.FechaEntrada <= start && r.FechaSalida >= start) ||
-                        (r.FechaEntrada <= end && r.FechaSalida >= end) ||
-                        (r.FechaEntrada >= start && r.FechaSalida <= end)))
-                .AnyAsync();
+            if (roomId == null) return false;
+
+            bool existeReserva = await _context.Reservations
+                .AnyAsync(r => r.idHabitacion == roomId &&
+                    ((r.FechaEntrada <= start && r.FechaSalida >= start) ||
+                     (r.FechaEntrada <= end && r.FechaSalida >= end) ||
+                     (r.FechaEntrada >= start && r.FechaSalida <= end)));
+
+            return !existeReserva;
         }
         private string? _getErrorMessage([CallerMemberName]string source ="")
             => _configuration["ErrorReservationRepository:" + source]; 
