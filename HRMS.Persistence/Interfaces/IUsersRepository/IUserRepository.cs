@@ -6,12 +6,10 @@ namespace HRMS.Persistence.Interfaces.IUsersRepository
 {
     public interface IUserRepository : IBaseRepository<User, int>
     {
-        Task<OperationResult> GetUsersByUserRolIdAsync(int idUsuario);
-        Task<User> GetUserByNameAsync(string nombreCompleto);
+        Task<OperationResult> GetUsersByUserRoleIdAsync(int id);
+        Task<List<User>> GetUsersByNameAsync(string nombreCompleto);
         Task<OperationResult> UpdatePasswordAsync(int idUsuario, string nuevaClave);
         Task<User> AuthenticateUserAsync(string correo, string clave);
         Task<OperationResult> UpdateEstadoAsync(User usuario, bool nuevoEstado); // no segura de este metodo
-        Task<OperationResult> AsignRolUserAsync(int idUsuario, int idRolUsuario);
-
     }
 }
