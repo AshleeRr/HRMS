@@ -1,11 +1,13 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Entities.Audit;
+using HRMS.Domain.Repository;
 namespace HRMS.Persistence.Interfaces.IAuditRepository
 {
-    public interface IAuditoriaRepository
+    public interface IAuditoriaRepository : IBaseRepository<Auditoria, int>
     {
-        Task<OperationResult> LogAuditAsync(string accion, int IdUsuario);
-        Task<OperationResult> GetAuditByUserIdAsync(int IdUsuario);
-        Task<OperationResult> GetAuditByDateTime(DateTime FechaRegistro);
+        Task<OperationResult> LogAuditAsync(string accion, int idUsuario);
+        Task<List<Auditoria>> GetAuditByUserIdAsync(int idUsuario);
+        Task<List<Auditoria>> GetAuditByDateTime(DateTime fechaRegistro);
     }
 }
 

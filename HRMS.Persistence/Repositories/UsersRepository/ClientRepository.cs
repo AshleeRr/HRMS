@@ -21,26 +21,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             _logger = logger;
             _configuration = configuration;
         }
-        public async Task<IEnumerable<Client>> GetAllActiveClientsAsync() { 
-            var clientes = await _context.Clients.Where(c => c.Estado == true).ToListAsync();
-            if(!clientes.Any())
-            {
-                _logger.LogWarning("No se encontraron clientes activos");
-            }
-            return clientes;
-        }
-        public async Task<Client> VerifyEmailAsync(string correo) {
-            if ( string.IsNullOrWhiteSpace(correo))
-            {
-                throw new ArgumentNullException(nameof(correo), "El correo no puede estar vacío");
-            }
-            var correoCliente = await _context.Clients.FirstOrDefaultAsync(c => c.Correo == correo);
-            if (correoCliente == null)
-            {
-                _logger.LogWarning("No se encontró un cliente con ese correo");
-            }
-            return correoCliente;
-        }
+       
         public async Task<Client> GetClientByEmailAsync(string correo) 
         {
             if (string.IsNullOrWhiteSpace(correo))
@@ -54,21 +35,35 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return cliente;
         }
-        public async Task<List<Client>> GetClientsByDocumentAsync(string documento)
+        public async Task<Client> GetClientByDocumentAsync(string documento)
         {
 
             if (string.IsNullOrWhiteSpace(documento))
             {
-                throw new ArgumentNullException(nameof(documento), "El correo no puede estar vacío");
+                throw new ArgumentNullException(nameof(documento), "El documento no puede estar vacío");
             }
-            var clientes = await _context.Clients.Where(c => c.Documento == documento).ToListAsync();
+            var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Documento == documento);
+            if (cliente == null)
+            {
+                _logger.LogWarning("No se encontró un cliente con ese correo");
+            }
+            return cliente;
+        }
+        public async Task<List<Client>> GetClientsByTypeDocumentAsync(string tipoDocumento)
+        {
+
+            if (string.IsNullOrWhiteSpace(tipoDocumento))
+            {
+                throw new ArgumentNullException(nameof(tipoDocumento), "El tipo de documento no puede estar vacío");
+            }
+            var clientes = await _context.Clients.Where(c => c.TipoDocumento == tipoDocumento).ToListAsync();
             if (!clientes.Any())
             {
-                _logger.LogWarning("No se encontraron clientes con ese documento");
+                _logger.LogWarning("No se encontraron clientes con ese tipo de documento");
             }
             return clientes;
         }
-        
+
         public override async Task<bool> ExistsAsync(Expression<Func<Client, bool>> filter)
         {
             if (filter == null)
@@ -77,15 +72,18 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return await base.ExistsAsync(filter);
         }
+        
         public override async Task<OperationResult> GetAllAsync(Expression<Func<Client, bool>> filter)
         {
             OperationResult result = new OperationResult();
             try
             {
-                if (filter != null)
+                var clientes = await _context.Clients.Where(c => c.Estado == true).ToListAsync();
+                if (!clientes.Any())
                 {
-                    return await base.GetAllAsync(filter);
+                    _logger.LogWarning("No se encontraron clientes activos");
                 }
+                result.Data = clientes; 
                 result.IsSuccess = true;
             }
             catch (Exception ex)
@@ -96,9 +94,10 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return result;
         }
+        
         public override async Task<Client> GetEntityByIdAsync(int id)
         {
-            if(id <= 0)
+            if(id < 1)
             {
                 throw new ArgumentNullException(nameof(id), "El id debe ser mayor que 0");
             }

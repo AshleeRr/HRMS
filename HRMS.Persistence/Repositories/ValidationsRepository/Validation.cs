@@ -123,6 +123,12 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
                 result.Message = "El correo no puede ser nulo o tener más de 50 caracteres";
                 return false;
             }
+            if (Correo.Any())
+            {
+                result.IsSuccess = false;
+                result.Message = "Este correo ya está registrado";
+                return false;
+            }
             return true;
         }
         
@@ -148,6 +154,12 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
             {
                 result.IsSuccess = false;
                 result.Message = "El documento no puede ser nulo o tener más de 15 caracteres";
+                return false;
+            }
+            if (Documento.Any())
+            {
+                result.IsSuccess = false;
+                result.Message = "Este documento de identidad ya está registrado";
                 return false;
             }
             return true;

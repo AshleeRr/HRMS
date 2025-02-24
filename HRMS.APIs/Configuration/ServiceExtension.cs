@@ -16,7 +16,7 @@ public static class ServiceExtension
         services.AddScoped<IHabitacionRepository, HabitacionRepository>();
         //Añadir todos los servicios aqui
         services.AddScoped<IClientRepository, ClientRepository>();
-        services.AddScoped<IUserRoleRepository, UserRolRepository>();
+        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
         return services;
