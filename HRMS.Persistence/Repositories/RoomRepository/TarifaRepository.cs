@@ -51,13 +51,10 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
         var result = new OperationResult();
         try
         {
-            var dato = await _context.Set<Tarifas>()
-                .Where(t => t.IdHabitacion == idHabitacion 
-                            && t.Estado == true 
-                            && t.FechaInicio <= DateTime.Now 
-                            && t.FechaFin >= DateTime.Now)
+            var datos = await _context.Set<Tarifas>()
+                .Where(t => t.IdHabitacion == idHabitacion && t.FechaInicio <= DateTime.Now && t.FechaFin >= DateTime.Now)
                 .FirstOrDefaultAsync();
-            result.Data = dato;
+            result.Data = datos;
         }
         catch (Exception)
         {

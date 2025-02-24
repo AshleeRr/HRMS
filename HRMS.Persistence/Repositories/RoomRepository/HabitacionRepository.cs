@@ -118,7 +118,6 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
 
         return result;
     }
-    // HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs
     public override async Task<OperationResult> UpdateEntityAsync(Habitacion entity)
     {
         var result = new OperationResult();
@@ -164,5 +163,4 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         }
         return result;
     }
-    
 }

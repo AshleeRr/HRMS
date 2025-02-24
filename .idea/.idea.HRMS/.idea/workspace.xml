@@ -12,15 +12,12 @@
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/RoomManagementModel/HabitacionCreateDto.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/RoomManagementModel/HabitacionDto.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/RoomManagementModel/UpdateHabitacionDto.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/RoomManagementModel/UpdatePrecioDto.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Configuration/ServiceExtension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Configuration/ServiceExtension.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/HabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/Reserv/ReservationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/Reserv/ReservationRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/EstadoHabitacion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/EstadoHabitacionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/Audit/Auditoria.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/Audit/Auditoria.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Context/HRMSContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Context/HRMSContext.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +43,7 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b741f17422844062bda644589ab84b32337fefcb677bc51957a62c3df8ad4d/AuthorizationAppBuilderExtensions.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
@@ -159,7 +157,8 @@
       <workItem from="1740232726165" duration="893000" />
       <workItem from="1740233753265" duration="1528000" />
       <workItem from="1740244930102" duration="19260000" />
-      <workItem from="1740272404374" duration="6983000" />
+      <workItem from="1740272404374" duration="14216000" />
+      <workItem from="1740365951511" duration="2040000" />
     </task>
     <servers />
   </component>
@@ -181,5 +180,24 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs</url>
+          <line>17</line>
+          <properties documentPath="C:\HRMS\HRMS.Persistence\Repositories\RoomRepository\EstadoHabitacionRepository.cs" containingFunctionPresentation="Method 'GetActivosAsync'">
+            <startOffsets>
+              <option value="543" />
+            </startOffsets>
+            <endOffsets>
+              <option value="544" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

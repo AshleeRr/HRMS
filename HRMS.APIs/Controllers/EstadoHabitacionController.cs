@@ -1,3 +1,4 @@
+using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -5,14 +6,14 @@ namespace HRMS.APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EstadoHabitacion : ControllerBase
+    public class EstadoHabitacionController : ControllerBase
     {
         private readonly IEstadoHabitacionRepository _estadoHabitacionRepository;
-        private readonly ILogger<EstadoHabitacion> _logger;
+        private readonly ILogger<EstadoHabitacionController> _logger;
 
-        public EstadoHabitacion(
+        public EstadoHabitacionController(
             IEstadoHabitacionRepository estadoHabitacionRepository,
-            ILogger<EstadoHabitacion> logger)
+            ILogger<EstadoHabitacionController> logger )
         {
             _estadoHabitacionRepository = estadoHabitacionRepository;
             _logger = logger;
@@ -50,5 +51,22 @@ namespace HRMS.APIs.Controllers
             }
         }
         
+        [HttpPut("UpdateEstadoHabitacion")]
+        public async Task<IActionResult> Update(int id , [FromBody] EstadoHabitacion estadoHabitacion)
+        {
+            try
+            {
+                estadoHabitacion.IdEstadoHabitacion = id;
+                var result = await _estadoHabitacionRepository.UpdateEntityAsync(estadoHabitacion);
+                return result.IsSuccess
+                    ? Ok(result)
+                    : StatusCode(StatusCodes.Status500InternalServerError, result.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error actualizando estado de habitación {estadoHabitacion.IdEstadoHabitacion}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error interno del servidor");
+            }
+        }
     }
 }
