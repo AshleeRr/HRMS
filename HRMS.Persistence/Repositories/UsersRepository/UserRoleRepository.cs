@@ -22,33 +22,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             _logger = logger;
             _configuration = configuration;
         }
-        public async Task<OperationResult> AsignDefaultRoleAsync(int idUsuario)
-        { // asigna un rol por defecto
-            OperationResult result = new OperationResult();
-            try
-            {
-               const int rolPredeterminado = 1; // el rol predeterminado debe ser cliente
-               var usuario = await _context.Users.FindAsync(idUsuario);
-                if(usuario == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se encontró un usuario con ese id";
-                    return result;
-                }
-                usuario.IdRolUsuario = rolPredeterminado;
-                await _context.SaveChangesAsync();
-                result.IsSuccess = true;
-                result.Message = "Rol predeterminado asignado";
-
-            }
-            catch (Exception ex)
-            {
-                result.Message = _configuration["ErrorUserRolRepository: AsignDefaultRoleAsync"];
-                result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
-            }
-            return result;
-        }
+        
         public async Task<UserRole> GetRoleByDescriptionAsync (string descripcion)
         {
             return await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.Descripcion == descripcion);
@@ -167,8 +141,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 if(!Validation.ValidateUserRole(entity, result))
                     return result;
-                if(!Validation.ValidateId(entity.IdRolUsuario, result))
-                    return result;
+                
                 if(!Validation.ValidateDescription(entity.Descripcion, result))
                     return result;
                 await _context.UserRoles.AddAsync(entity);

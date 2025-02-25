@@ -110,7 +110,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 return StatusCode(500, "Error interno del servidor");
             }
         }
-        [HttpGet("completeName")]
+        [HttpGet("ByCompleteName/{nombreCompleto}")]
         public async Task<IActionResult> GetUserByName(string nombreCompleto)
         {
             try
@@ -152,12 +152,12 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
         }
 
-        [HttpGet("GetUsersByRole/{id}")]
-        public async Task<IActionResult> GetUsersByUserRole(int id)
+        [HttpGet("GetUsersByRole/{idUserRole}")]
+        public async Task<IActionResult> GetUsersByUserRole(int idUserRole)
         {
             try
             {
-                var userByRole = await _userRepository.GetUsersByUserRoleIdAsync(id);
+                var userByRole = await _userRepository.GetUsersByUserRoleIdAsync(idUserRole);
                 return Ok(userByRole);
 
             }

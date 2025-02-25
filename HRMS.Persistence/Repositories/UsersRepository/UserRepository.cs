@@ -192,11 +192,10 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 if (!Validation.ValidateUser(entity, result))
                     return result;
-                if (!Validation.ValidateId(entity.IdUsuario, result))
-                    return result;
+                
                 if (!Validation.ValidateCompleteName(entity.NombreCompleto, result))
                     return result;
-                if (!Validation.ValidateCorreo(entity.Correo, result))
+                if (!await Validation.ValidateCorreo(entity.Correo, _context, result))
                     return result;
                 if (!Validation.ValidateClave(entity.Clave, result))
                     return result;
@@ -227,7 +226,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return result;
                 if (!Validation.ValidateCompleteName(entity.NombreCompleto, result))
                     return result;
-                if(!Validation.ValidateCorreo(entity.Correo, result))
+                if (!await Validation.ValidateCorreo(entity.Correo, _context, result))
                     return result;
                 if(!Validation.ValidateClave(entity.Clave, result))
                     return result;

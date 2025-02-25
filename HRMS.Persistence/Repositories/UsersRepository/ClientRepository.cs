@@ -45,7 +45,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Documento == documento);
             if (cliente == null)
             {
-                _logger.LogWarning("No se encontró un cliente con ese correo");
+                _logger.LogWarning("No se encontró un cliente con este documento");
             }
             return cliente;
         }
@@ -115,19 +115,31 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             try
             {
                 if (!Validation.ValidateClient(entity, resultSave))
+                {
+                    _logger.LogWarning("Falló ValidateClient: " + resultSave.Message);
                     return resultSave;
-                if(!Validation.ValidateId(entity.idCliente, resultSave))
+                }
+                if (!await Validation.ValidateCorreo(entity.Correo, _context, resultSave))
+                {
+                    _logger.LogWarning("Falló ValidateCorreo: " + resultSave.Message);
                     return resultSave;
-                if (!Validation.ValidateCorreo(entity.Correo, resultSave))
-                    return resultSave;
+                }
                 if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, resultSave))
+                {
+                    _logger.LogWarning("Falló ValidateTipoDocumento: " + resultSave.Message);
                     return resultSave;
-                if (!Validation.ValidateDocumento(entity.Documento, resultSave))
+                }
+                if (!await Validation.ValidateDocumento(entity.Documento, _context, resultSave))
+                {
+                    _logger.LogWarning("Falló ValidateDocumento: " + resultSave.Message);
                     return resultSave;
+                }
                 if (!Validation.ValidateCompleteName(entity.NombreCompleto, resultSave))
+                {
+                    _logger.LogWarning("Falló ValidateCompleteName: " + resultSave.Message);
                     return resultSave;
-                if (!Validation.ValidateId((int)entity.IdUsuario, resultSave))
-                    return resultSave;
+                }
+
                 await _context.Clients.AddAsync(entity);
                 await _context.SaveChangesAsync();
                 resultSave.IsSuccess = true;
@@ -138,11 +150,22 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 resultSave.Message = _configuration["ErrorClientRepository: SaveEntityAsync"];
                 resultSave.IsSuccess = false;
-                _logger.LogError(resultSave.Message, ex.ToString());
+
+                _logger.LogError($"Error en SaveEntityAsync: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError($"InnerException: {ex.InnerException.Message}");
+                }
+                _logger.LogError($"StackTrace: {ex.StackTrace}");
+                Console.WriteLine("mensaje que entro al catch");
             }
 
             return resultSave;
+
         }
+
+         
+        
         public override async Task<OperationResult> UpdateEntityAsync(Client entity)
         {
             OperationResult resultUpdate = new OperationResult();
@@ -150,16 +173,16 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 if (!Validation.ValidateClient(entity, resultUpdate))
                     return resultUpdate;
-                if (!Validation.ValidateCorreo(entity.Correo, resultUpdate))
+                if (!await Validation.ValidateCorreo(entity.Correo, _context, resultUpdate))
                     return resultUpdate;
                 if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, resultUpdate))
                     return resultUpdate;
-                if (!Validation.ValidateDocumento(entity.Documento, resultUpdate))
+                if (!await Validation.ValidateDocumento(entity.Documento, _context, resultUpdate))
                     return resultUpdate;
                 if (!Validation.ValidateCompleteName(entity.NombreCompleto, resultUpdate))
                     return resultUpdate;
 
-                var ExistingClient = await _context.Clients.FindAsync(entity.idCliente);
+                var ExistingClient = await _context.Clients.FindAsync(entity.IdCliente);
                 if (ExistingClient == null)
                 {
                     resultUpdate.IsSuccess = false;

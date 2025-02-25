@@ -1,5 +1,4 @@
-﻿using HRMS.Domain.Base;
-using HRMS.Domain.Entities.Users;
+﻿using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,8 +62,12 @@ namespace HRMS.APIs.Controllers.UsersControllers
         {
             try
             {
+                if(client == null)
+                {
+                    return BadRequest("El cliente no puede ser nulo");
+                }
                 var createdClient = await _clientRepository.SaveEntityAsync(client);
-                return Ok(client);
+                return Ok(createdClient);
             }catch(Exception e)
             {
                 _logger.LogError(e, "Error guardando cliente");
@@ -91,7 +94,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
         }
 
-        [HttpGet("ByEmail")]
+        [HttpGet("ByEmail/{email}")]
         public async Task<IActionResult> GetClientByEmail(string email) 
         {
             try
@@ -113,7 +116,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
         }
 
-        [HttpGet("ByDocument")]
+        [HttpGet("ByDocument/{document}")]
         public async Task<IActionResult> GetClientByDocument(string document)
         {
             try
@@ -136,7 +139,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
         }
 
-        [HttpGet("ByDocumentType")]
+        [HttpGet("ByDocumentType/{tipoDocumento}")]
         public async Task<IActionResult> GetClientByDocumentType(string tipoDocumento)
         {
             try

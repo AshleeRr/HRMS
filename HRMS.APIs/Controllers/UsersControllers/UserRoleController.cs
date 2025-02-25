@@ -91,33 +91,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
         }
 
-        [HttpPatch("AssignDefaultUserRole/{id}")] // asigna un rol por defecto a un user usando id
-        public async Task<IActionResult> AssignDefaultRole(int id, [FromBody] UserRole userRole)
-        {
-            try
-            {
-                var existingUser = await _userRepository.GetEntityByIdAsync(id);
-                if (existingUser == null)
-                {
-                    return NotFound("Usuario no encontrado");
-                }
-                var result = await _userRoleRepository.AsignDefaultRoleAsync(id);
-                if (!result.IsSuccess)
-                {
-                    return BadRequest(result.Message);
-                }
-                return Ok(id);
-
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Error agregando un usuario con rol predeterminado");
-                return StatusCode(500, "Error interno del servidor");
-            }
-
-        }
-
-        [HttpGet("descripcion")]
+        [HttpGet("ByDescripcion/{descripcion}")]
         public async Task<IActionResult> GetRoleByDescription(string descripcion)
         {
             try
