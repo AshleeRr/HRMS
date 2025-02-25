@@ -72,7 +72,8 @@ namespace HRMS.APIs.Controllers.UsersControllers
                     Estado = user.Estado,
                     Clave = user.Clave,
                     Correo = user.Correo,
-                    NombreCompleto = user.NombreCompleto
+                    NombreCompleto = user.NombreCompleto,
+                    IdRolUsuario = user.IdUserRole
                 };
             
                 var result = await _userRepository.SaveEntityAsync(userCreated);

@@ -67,7 +67,6 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
 
             return true;
         }
-        /// aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
         public static bool ValidateCompleteName(string NombreCompleto, int idCliente, OperationResult result)
         {
             if(NombreCompleto == null || NombreCompleto.Length > 50)
@@ -120,7 +119,7 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
                 result.Message = "El correo no puede ser nulo o tener más de 50 caracteres";
                 return false;
             }
-            bool exists = await context.Clients.AnyAsync(c => c.Correo == correo && c.IdCliente != idCliente);
+            bool exists = await context.Clients.AnyAsync(c => c.Correo == correo);
             if (exists)
             {
                 result.IsSuccess = false;
@@ -130,8 +129,7 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
             return true;
         }
         
-        //aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
-        public static bool ValidateTipoDocumento(string TipoDocumento, int idCliente, OperationResult result)
+       public static bool ValidateTipoDocumento(string TipoDocumento, int idCliente, OperationResult result)
         {
             if (TipoDocumento == null || TipoDocumento.Length > 15)
             {
@@ -155,7 +153,7 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
                 result.Message = "El documento no puede ser nulo o tener más de 15 caracteres";
                 return false;
             }
-            bool exists = await context.Clients.AnyAsync(c => c.Documento == documento && c.IdCliente != idCliente);
+            bool exists = await context.Clients.AnyAsync(c => c.Documento == documento);
             if (exists)
             {
                 result.IsSuccess = false;
@@ -166,7 +164,7 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
         }
         public static bool ValidateId(int id, OperationResult result)
         {
-            if (id < 0)
+            if (id <= 0)
             {
                 result.IsSuccess = false;
                 result.Message = "El id debe ser mayor que 0";

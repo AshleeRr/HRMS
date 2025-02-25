@@ -48,11 +48,23 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     _logger.LogWarning("No se puede asignar el mismo estado al usuario");
                     return result;
                 }
-                entity.Estado = nuevoEstado;
-                _context.Users.Update(entity);
-                await _context.SaveChangesAsync();
-                result.IsSuccess = true;
-                result.Message = "Estado del usuario actualizado correctamente";
+                var userExistente = await _context.Users.AnyAsync(u => u.IdUsuario == entity.IdUsuario);
+                if(!userExistente)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Este usuario no existe";
+                    return result;
+
+                }
+                else
+                {
+                    var user = await _context.Users.FindAsync(entity.IdUsuario);
+                    user.Estado = nuevoEstado;
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                    result.IsSuccess = true;
+                    result.Message = "Estado del usuario actualizado correctamente";
+                }
             }
             catch(Exception e)
             {
@@ -196,15 +208,19 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return result;
                 if (!await Validation.ValidateCorreo(entity.Correo, entity.IdUsuario, _context, result))
                     return result;
+                if (!Validation.ValidateId(entity.IdRolUsuario, result))
+                    return result;
                 if (!Validation.ValidateClave(entity.Clave, result))
                     return result;
+
                 entity.FechaCreacion = DateTime.Now;
+                result.IsSuccess = true;
                 await _context.Users.AddAsync(entity);
                 await _context.SaveChangesAsync();
-                result.IsSuccess = true;
 
                 result.Message = "Usuario guardado correctamente";
                 _logger.LogInformation(result.Message);
+                return result;
             }
             catch (Exception ex)
             {

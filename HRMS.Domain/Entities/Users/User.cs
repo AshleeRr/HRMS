@@ -12,7 +12,7 @@ namespace HRMS.Domain.Entities.Users
         public int IdUsuario { get; set; }
         public string? Clave { get; set; }
         [ForeignKey("UserRole")]
-        public int? IdRolUsuario { get; set; } // FK
+        public int IdRolUsuario { get; set; } // FK
 
     }
 }

@@ -144,20 +144,20 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         [HttpPatch("UpdateDescription/{id}")]
-        public async Task<IActionResult> UpdateRoleDescription (int idRolUsuario, string description)
+        public async Task<IActionResult> UpdateRoleDescription (int id, string description)
         {
             try
             {
-                if(idRolUsuario <1 || string.IsNullOrEmpty(description))
+                if(id <1 || string.IsNullOrEmpty(description))
                 {
                     return BadRequest("El id debe ser mayor que 0. La descripcion no puede estar vacia");
                 }
-                var existingRoleUser = await _userRoleRepository.GetEntityByIdAsync(idRolUsuario);
+                var existingRoleUser = await _userRoleRepository.GetEntityByIdAsync(id);
                 if(existingRoleUser == null)
                 {
-                    return BadRequest($"No se ha encontrado un rol con este id: {idRolUsuario}");
+                    return BadRequest($"No se ha encontrado un rol con este id: {id}");
                 }
-                var result = await _userRoleRepository.UpdateDescriptionAsync(idRolUsuario, description);
+                var result = await _userRoleRepository.UpdateDescriptionAsync(id, description);
                 return Ok(result);
 
             } catch (Exception e)

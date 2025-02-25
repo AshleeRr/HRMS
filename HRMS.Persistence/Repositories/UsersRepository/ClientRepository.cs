@@ -116,19 +116,19 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 if (!Validation.ValidateClient(entity, resultSave))
                     return resultSave;
-                
+
                 if (!await Validation.ValidateCorreo(entity.Correo, entity.IdCliente, _context, resultSave))
                     return resultSave;
-                
+
                 if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, entity.IdCliente, resultSave))
                     return resultSave;
-                
+
                 if (!await Validation.ValidateDocumento(entity.Documento, entity.IdCliente, _context, resultSave))
                     return resultSave;
-                
+
                 if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdCliente, resultSave))
                     return resultSave;
-                
+
                 entity.FechaCreacion = DateTime.Now;
                 resultSave.IsSuccess = true;
                 await _context.Clients.AddAsync(entity);
@@ -142,15 +142,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 resultSave.Message = _configuration["ErrorClientRepository: SaveEntityAsync"];
                 resultSave.IsSuccess = false;
 
-                _logger.LogError($"Error en SaveEntityAsync: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    _logger.LogError($"InnerException: {ex.InnerException.Message}");
-                }
-                _logger.LogError($"StackTrace: {ex.StackTrace}");
-                Console.WriteLine("mensaje que entro al catch");
             }
-
             return resultSave;
 
         }
