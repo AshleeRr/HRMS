@@ -143,6 +143,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 
                 if(!Validation.ValidateDescription(entity.Descripcion, result))
                     return result;
+                entity.FechaCreacion = DateTime.Now;
                 _context.UserRoles.Update(entity);
                 await _context.SaveChangesAsync();
                 result.IsSuccess = true;

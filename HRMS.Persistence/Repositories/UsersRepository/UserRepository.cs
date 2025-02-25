@@ -198,7 +198,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return result;
                 if (!Validation.ValidateClave(entity.Clave, result))
                     return result;
-
+                entity.FechaCreacion = DateTime.Now;
                 await _context.Users.AddAsync(entity);
                 await _context.SaveChangesAsync();
                 result.IsSuccess = true;

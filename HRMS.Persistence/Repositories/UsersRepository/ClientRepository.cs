@@ -115,31 +115,21 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             try
             {
                 if (!Validation.ValidateClient(entity, resultSave))
-                {
-                    _logger.LogWarning("Falló ValidateClient: " + resultSave.Message);
                     return resultSave;
-                }
+                
                 if (!await Validation.ValidateCorreo(entity.Correo, entity.IdCliente, _context, resultSave))
-                {
-                    _logger.LogWarning("Falló ValidateCorreo: " + resultSave.Message);
                     return resultSave;
-                }
+                
                 if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, entity.IdCliente, resultSave))
-                {
-                    _logger.LogWarning("Falló ValidateTipoDocumento: " + resultSave.Message);
                     return resultSave;
-                }
+                
                 if (!await Validation.ValidateDocumento(entity.Documento, entity.IdCliente, _context, resultSave))
-                {
-                    _logger.LogWarning("Falló ValidateDocumento: " + resultSave.Message);
                     return resultSave;
-                }
+                
                 if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdCliente, resultSave))
-                {
-                    _logger.LogWarning("Falló ValidateCompleteName: " + resultSave.Message);
                     return resultSave;
-                }
-
+                
+                entity.FechaCreacion = DateTime.Now;
                 resultSave.IsSuccess = true;
                 await _context.Clients.AddAsync(entity);
                 await _context.SaveChangesAsync();
