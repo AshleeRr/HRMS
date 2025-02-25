@@ -192,10 +192,9 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 if (!Validation.ValidateUser(entity, result))
                     return result;
-                
-                if (!Validation.ValidateCompleteName(entity.NombreCompleto, result))
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdUsuario, result))
                     return result;
-                if (!await Validation.ValidateCorreo(entity.Correo, _context, result))
+                if (!await Validation.ValidateCorreo(entity.Correo, entity.IdUsuario, _context, result))
                     return result;
                 if (!Validation.ValidateClave(entity.Clave, result))
                     return result;
@@ -220,13 +219,20 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             OperationResult result = new OperationResult();
             try
             {
+                var existingUser = await _context.Users.FindAsync(entity.IdUsuario);
+                if (existingUser == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Usuario no encontrado";
+                    return result;
+                }
                 if (!Validation.ValidateUser(entity, result))
                     return result;
                 if(!Validation.ValidateId(entity.IdUsuario, result))
                     return result;
-                if (!Validation.ValidateCompleteName(entity.NombreCompleto, result))
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdUsuario, result))
                     return result;
-                if (!await Validation.ValidateCorreo(entity.Correo, _context, result))
+                if (!await Validation.ValidateCorreo(entity.Correo, entity.IdUsuario, _context, result))
                     return result;
                 if(!Validation.ValidateClave(entity.Clave, result))
                     return result;
@@ -241,15 +247,6 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 result.Message = "Ocurrió un error al actualizar el usuario";
                 _logger.LogError(ex, result.Message);
                 _logger.LogError(result.Message, ex.ToString());
-
-
-                _logger.LogError($"Error en UpdateEntityUAsync: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    _logger.LogError($"InnerException: {ex.InnerException.Message}");
-                }
-                _logger.LogError($"StackTrace: {ex.StackTrace}");
-                Console.WriteLine("mensaje que entro al catch");
             }
             return result;
         }

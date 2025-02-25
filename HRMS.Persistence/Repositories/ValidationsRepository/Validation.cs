@@ -73,7 +73,8 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
 
             return true;
         }
-        public static bool ValidateCompleteName(string NombreCompleto, OperationResult result)
+        /// aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+        public static bool ValidateCompleteName(string NombreCompleto, int idCliente, OperationResult result)
         {
             if(NombreCompleto == null || NombreCompleto.Length > 50)
             {
@@ -111,13 +112,13 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
             }
             if (!Descripcion.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
             {
-                result.Message = "La descripción solo puede contener letras y espacios.";
+                result.Message = "La descripción solo puede contener letras y espacios";
                 result.IsSuccess = false;
                 return false;
             }
             return true;
         }
-        public static async Task<bool> ValidateCorreo(string correo, HRMSContext context, OperationResult result)
+        public static async Task<bool> ValidateCorreo(string correo, int idCliente, HRMSContext context, OperationResult result)
         {
             if(string.IsNullOrEmpty(correo) || correo.Length > 50)
             {
@@ -125,7 +126,7 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
                 result.Message = "El correo no puede ser nulo o tener más de 50 caracteres";
                 return false;
             }
-            bool exists = await context.Clients.AnyAsync(c => c.Correo == correo);
+            bool exists = await context.Clients.AnyAsync(c => c.Correo == correo && c.IdCliente != idCliente);
             if (exists)
             {
                 result.IsSuccess = false;
@@ -135,7 +136,8 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
             return true;
         }
         
-        public static bool ValidateTipoDocumento(string TipoDocumento, OperationResult result)
+        //aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+        public static bool ValidateTipoDocumento(string TipoDocumento, int idCliente, OperationResult result)
         {
             if (TipoDocumento == null || TipoDocumento.Length > 15)
             {
@@ -151,7 +153,7 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
             }
             return true;
         }
-        public static async Task<bool> ValidateDocumento(string documento, HRMSContext context, OperationResult result)
+        public static async Task<bool> ValidateDocumento(string documento, int idCliente, HRMSContext context, OperationResult result)
         {
             if (string.IsNullOrEmpty(documento) || documento.Length > 15)
             {
@@ -159,7 +161,7 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
                 result.Message = "El documento no puede ser nulo o tener más de 15 caracteres";
                 return false;
             }
-            bool exists = await context.Clients.AnyAsync(c => c.Documento == documento);
+            bool exists = await context.Clients.AnyAsync(c => c.Documento == documento && c.IdCliente != idCliente);
             if (exists)
             {
                 result.IsSuccess = false;

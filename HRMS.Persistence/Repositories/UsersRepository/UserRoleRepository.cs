@@ -171,19 +171,16 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 if(!Validation.ValidateDescription(entity.Descripcion, result))
                     return result;
                 var rolUsuarioExistente = await _context.UserRoles.FindAsync(entity.IdRolUsuario);
-
                 if (rolUsuarioExistente == null)
                 {
                     result.IsSuccess = false;
                     result.Message = "Este rol no existe";
                     return result;
                 }
-                _context.Entry(rolUsuarioExistente).CurrentValues.SetValues(entity);
+                rolUsuarioExistente.Descripcion = entity.Descripcion;
+                rolUsuarioExistente.Estado = entity.Estado;
+                _context.UserRoles.Update(rolUsuarioExistente);
                 await _context.SaveChangesAsync();
-
-                result.IsSuccess = true;
-                result.Message = "Rol de usuario actualizado correctamente.";
-                _logger.LogInformation(result.Message);
             }
             catch (Exception ex)
             {
@@ -191,15 +188,6 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 result.IsSuccess = false;
                 _logger.LogError(result.Message, ex.ToString());
                 _logger.LogError(result.Message, ex.ToString());
-
-
-                _logger.LogError($"Error en UpdateEntityAsync: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    _logger.LogError($"InnerException: {ex.InnerException.Message}");
-                }
-                _logger.LogError($"StackTrace: {ex.StackTrace}");
-                Console.WriteLine("mensaje que entro al catch");
             }
             return result;
         }

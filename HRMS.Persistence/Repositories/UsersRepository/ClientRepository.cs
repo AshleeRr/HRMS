@@ -119,22 +119,22 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     _logger.LogWarning("Falló ValidateClient: " + resultSave.Message);
                     return resultSave;
                 }
-                if (!await Validation.ValidateCorreo(entity.Correo, _context, resultSave))
+                if (!await Validation.ValidateCorreo(entity.Correo, entity.IdCliente, _context, resultSave))
                 {
                     _logger.LogWarning("Falló ValidateCorreo: " + resultSave.Message);
                     return resultSave;
                 }
-                if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, resultSave))
+                if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, entity.IdCliente, resultSave))
                 {
                     _logger.LogWarning("Falló ValidateTipoDocumento: " + resultSave.Message);
                     return resultSave;
                 }
-                if (!await Validation.ValidateDocumento(entity.Documento, _context, resultSave))
+                if (!await Validation.ValidateDocumento(entity.Documento, entity.IdCliente, _context, resultSave))
                 {
                     _logger.LogWarning("Falló ValidateDocumento: " + resultSave.Message);
                     return resultSave;
                 }
-                if (!Validation.ValidateCompleteName(entity.NombreCompleto, resultSave))
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdCliente, resultSave))
                 {
                     _logger.LogWarning("Falló ValidateCompleteName: " + resultSave.Message);
                     return resultSave;
@@ -169,15 +169,23 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             OperationResult resultUpdate = new OperationResult();
             try
             {
+                var existingClient = await _context.Clients.FindAsync(entity.IdCliente);
+                if(existingClient == null)
+                {
+                    resultUpdate.IsSuccess = false;
+                    resultUpdate.Message = "Cliente no encontrado";
+                    return resultUpdate; ;
+                }
+                
                 if (!Validation.ValidateClient(entity, resultUpdate))
                     return resultUpdate;
-                if (!await Validation.ValidateCorreo(entity.Correo, _context, resultUpdate))
+                if (!await Validation.ValidateCorreo(entity.Correo, entity.IdCliente, _context, resultUpdate))
                     return resultUpdate;
-                if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, resultUpdate))
+                if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, entity.IdCliente, resultUpdate))
                     return resultUpdate;
-                if (!await Validation.ValidateDocumento(entity.Documento, _context, resultUpdate))
+                if (!await Validation.ValidateDocumento(entity.Documento, entity.IdCliente, _context, resultUpdate))
                     return resultUpdate;
-                if (!Validation.ValidateCompleteName(entity.NombreCompleto, resultUpdate))
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdCliente, resultUpdate))
                     return resultUpdate;
                 _context.Clients.Update(entity);
                 await _context.SaveChangesAsync();
@@ -189,15 +197,6 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 resultUpdate.Message = _configuration["ErrorClientRepository: UpdateEntityAsync"];
                 resultUpdate.IsSuccess = false;
                 _logger.LogError(resultUpdate.Message, ex.ToString());
-                
-
-                _logger.LogError($"Error en UpdateEntityAsync: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    _logger.LogError($"InnerException: {ex.InnerException.Message}");
-                }
-                _logger.LogError($"StackTrace: {ex.StackTrace}");
-                Console.WriteLine("mensaje que entro al catch");
             }
             return resultUpdate;
         }

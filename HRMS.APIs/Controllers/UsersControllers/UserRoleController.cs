@@ -74,21 +74,8 @@ namespace HRMS.APIs.Controllers.UsersControllers
         [HttpPut("{id}")] // actualiza un rol usando su id
         public async Task<IActionResult> UpdateUserRole(int id, [FromBody] UserRole userRole)
         {
-            try
-            {
-                var existingUserRole = await _userRoleRepository.GetEntityByIdAsync(id);
-                if (existingUserRole == null)
-                {
-                    return NotFound("Rol de usuario no encontrado");
-                }
-                var updatedUserRole = await _userRoleRepository.UpdateEntityAsync(existingUserRole);
-                return Ok(updatedUserRole);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Error actualizando el rol de usuario {id}");
-                return StatusCode(500, "Error interno del servidor");
-            }
+                await _userRoleRepository.UpdateEntityAsync(userRole);
+                return Ok(userRole);
         }
 
         [HttpGet("ByDescripcion/{descripcion}")]
