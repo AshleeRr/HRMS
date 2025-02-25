@@ -81,7 +81,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 {
                     return NotFound("Rol de usuario no encontrado");
                 }
-                var updatedUserRole = await _userRoleRepository.UpdateEntityAsync(userRole);
+                var updatedUserRole = await _userRoleRepository.UpdateEntityAsync(existingUserRole);
                 return Ok(updatedUserRole);
             }
             catch (Exception e)

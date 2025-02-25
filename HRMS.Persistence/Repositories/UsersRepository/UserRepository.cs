@@ -230,15 +230,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return result;
                 if(!Validation.ValidateClave(entity.Clave, result))
                     return result;
-                var ExistentUser = await _context.Users.FindAsync(entity.IdUsuario);
-
-                if (ExistentUser == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "El usuario no existe en la base de datos.";
-                    return result;
-                }
-                _context.Entry(ExistentUser).CurrentValues.SetValues(entity);
+                _context.Users.Update(entity);
                 await _context.SaveChangesAsync();
                 result.IsSuccess = true;
                 result.Message = "Usuario actualizado correctamente.";
@@ -248,6 +240,16 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 result.IsSuccess = false;
                 result.Message = "Ocurrió un error al actualizar el usuario";
                 _logger.LogError(ex, result.Message);
+                _logger.LogError(result.Message, ex.ToString());
+
+
+                _logger.LogError($"Error en UpdateEntityUAsync: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError($"InnerException: {ex.InnerException.Message}");
+                }
+                _logger.LogError($"StackTrace: {ex.StackTrace}");
+                Console.WriteLine("mensaje que entro al catch");
             }
             return result;
         }

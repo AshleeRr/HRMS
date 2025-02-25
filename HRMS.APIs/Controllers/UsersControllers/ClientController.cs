@@ -56,7 +56,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 return StatusCode(500, "Error interno del servidor");
             }
         }
-
+        
         [HttpPost("SaveClient")]
         public async Task<IActionResult> SaveCLient([FromBody] Client client)
         {
@@ -74,7 +74,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 return StatusCode(500, "Error interno del servidor");
             }
         }
-
+        
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateClient(int id, [FromBody] Client client)
         {
@@ -85,7 +85,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 {
                     return NotFound("Cliente no encontrado");
                 }
-                var updatedClient = await _clientRepository.UpdateEntityAsync(client);
+                var updatedClient = await _clientRepository.UpdateEntityAsync(existingClient);
                 return Ok(updatedClient);
             } catch(Exception e)
             {

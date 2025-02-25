@@ -140,10 +140,11 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return resultSave;
                 }
 
+                resultSave.IsSuccess = true;
                 await _context.Clients.AddAsync(entity);
                 await _context.SaveChangesAsync();
-                resultSave.IsSuccess = true;
-                _logger.LogInformation("Cliente guardado correctamente");
+
+                resultSave.Message = "Cliente guardado existosamente";
                 return resultSave;
             }
             catch (Exception ex)
@@ -163,9 +164,6 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             return resultSave;
 
         }
-
-         
-        
         public override async Task<OperationResult> UpdateEntityAsync(Client entity)
         {
             OperationResult resultUpdate = new OperationResult();
@@ -181,16 +179,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return resultUpdate;
                 if (!Validation.ValidateCompleteName(entity.NombreCompleto, resultUpdate))
                     return resultUpdate;
-
-                var ExistingClient = await _context.Clients.FindAsync(entity.IdCliente);
-                if (ExistingClient == null)
-                {
-                    resultUpdate.IsSuccess = false;
-                    resultUpdate.Message = "Este cliente no existe";
-                    return resultUpdate;
-                }
-                _context.Entry(ExistingClient).CurrentValues.SetValues(entity);
-                
+                _context.Clients.Update(entity);
                 await _context.SaveChangesAsync();
                 resultUpdate.IsSuccess = true;
                 resultUpdate.Message = "Cliente actualizado correctamente";
@@ -200,6 +189,15 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 resultUpdate.Message = _configuration["ErrorClientRepository: UpdateEntityAsync"];
                 resultUpdate.IsSuccess = false;
                 _logger.LogError(resultUpdate.Message, ex.ToString());
+                
+
+                _logger.LogError($"Error en UpdateEntityAsync: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError($"InnerException: {ex.InnerException.Message}");
+                }
+                _logger.LogError($"StackTrace: {ex.StackTrace}");
+                Console.WriteLine("mensaje que entro al catch");
             }
             return resultUpdate;
         }

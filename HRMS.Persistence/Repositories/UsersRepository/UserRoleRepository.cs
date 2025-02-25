@@ -144,9 +144,8 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 
                 if(!Validation.ValidateDescription(entity.Descripcion, result))
                     return result;
-                await _context.UserRoles.AddAsync(entity);
+                _context.UserRoles.Update(entity);
                 await _context.SaveChangesAsync();
-
                 result.IsSuccess = true;
                 result.Message = "Rol de usuario guardado correctamente.";
                 _logger.LogInformation(result.Message);
@@ -191,6 +190,16 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 result.Message = _configuration["ErrorUserRolRepository: UpdateEntityAsync"];
                 result.IsSuccess = false;
                 _logger.LogError(result.Message, ex.ToString());
+                _logger.LogError(result.Message, ex.ToString());
+
+
+                _logger.LogError($"Error en UpdateEntityAsync: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError($"InnerException: {ex.InnerException.Message}");
+                }
+                _logger.LogError($"StackTrace: {ex.StackTrace}");
+                Console.WriteLine("mensaje que entro al catch");
             }
             return result;
         }

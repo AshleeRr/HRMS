@@ -87,7 +87,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 {
                     return NotFound($"No se ha encontrado un usuario con id: {id}");
                 }
-                var uptadedUser = await _userRepository.UpdateEntityAsync(user);
+                var uptadedUser = await _userRepository.UpdateEntityAsync(existingUser);
                 return Ok(uptadedUser);
             }
             catch (Exception e)
