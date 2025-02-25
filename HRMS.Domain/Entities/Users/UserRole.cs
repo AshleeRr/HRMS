@@ -1,8 +1,6 @@
 ﻿using HRMS.Domain.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-
 namespace HRMS.Domain.Entities.Users
 {
     [Table("RolUsuario")]
@@ -10,7 +8,6 @@ namespace HRMS.Domain.Entities.Users
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [JsonIgnore]
         public int IdRolUsuario { get; set; }
         public string? Descripcion { get; set; }
     }

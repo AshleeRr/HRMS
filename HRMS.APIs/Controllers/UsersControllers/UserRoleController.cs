@@ -1,4 +1,5 @@
 ﻿using HRMS.Domain.Entities.Users;
+using HRMS.Models.Models.UsersModels.UsersModels;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -58,12 +59,17 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         [HttpPost("SaveUserRole")]
-        public async Task<IActionResult> SaveUserRole([FromBody] UserRole userRole)
+        public async Task<IActionResult> SaveUserRole([FromBody] UserRolUpdateModel userRole)
         {
             try
             {
-                var createdUserRole = await _userRoleRepository.SaveEntityAsync(userRole);
-                return Ok(createdUserRole);
+                var userRoleCreated = new UserRole()
+                {
+                    Descripcion = userRole.Descripcion,
+                    Estado = userRole.Estado
+                };
+                var result = await _userRoleRepository.SaveEntityAsync(userRoleCreated);
+                return Ok(result);
             } catch (Exception e)
             {
                 _logger.LogError(e, "Error creando rol de usuario");
@@ -72,10 +78,23 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         [HttpPut("{id}")] // actualiza un rol usando su id
-        public async Task<IActionResult> UpdateUserRole(int id, [FromBody] UserRole userRole)
+        public async Task<IActionResult> UpdateUserRole(int id, [FromBody] UserRolUpdateModel userRole)
         {
-                await _userRoleRepository.UpdateEntityAsync(userRole);
-                return Ok(userRole);
+            try
+            {
+                var userRoleUpdated = new UserRole()
+                {
+                    IdRolUsuario = id,
+                    Descripcion = userRole.Descripcion,
+                    Estado = userRole.Estado
+                };
+                var result = await _userRoleRepository.UpdateEntityAsync(userRoleUpdated);
+                return Ok(result);
+            } catch (Exception e)
+            {
+                _logger.LogError(e, "Error actualizando el rol de usuario");
+                return StatusCode(500, "Error interno del servidor");
+            }
         }
 
         [HttpGet("ByDescripcion/{descripcion}")]

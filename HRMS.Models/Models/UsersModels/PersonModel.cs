@@ -2,7 +2,7 @@
 {
     public abstract class PersonModel
     {
-        public string? NombreCompleto { get; set; }
-        public string? Correo { get; set; }
+        public string NombreCompleto { get; set; }
+        public string Correo { get; set; }
     }
 }

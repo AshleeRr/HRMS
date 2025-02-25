@@ -219,13 +219,6 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             OperationResult result = new OperationResult();
             try
             {
-                var existingUser = await _context.Users.FindAsync(entity.IdUsuario);
-                if (existingUser == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "Usuario no encontrado";
-                    return result;
-                }
                 if (!Validation.ValidateUser(entity, result))
                     return result;
                 if(!Validation.ValidateId(entity.IdUsuario, result))
@@ -236,10 +229,24 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return result;
                 if(!Validation.ValidateClave(entity.Clave, result))
                     return result;
-                _context.Users.Update(entity);
-                await _context.SaveChangesAsync();
-                result.IsSuccess = true;
-                result.Message = "Usuario actualizado correctamente.";
+                var userExistente = await _context.Users.AnyAsync(u => u.IdRolUsuario == entity.IdRolUsuario);
+                if (!userExistente)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Este usuario no existe";
+                }
+                else
+                {
+                    var usuario = await _context.Users.FindAsync(entity.IdUsuario);
+                    usuario.Estado = entity.Estado;
+                    usuario.Clave = entity.Clave;
+                    usuario.NombreCompleto = entity.NombreCompleto;
+                    usuario.Correo = entity.Correo;
+                    _context.Users.Update(usuario);
+                    await _context.SaveChangesAsync();
+                    result.Message = "Usuario actualizado correctamente";
+
+                }
             }
             catch (Exception ex)
             {

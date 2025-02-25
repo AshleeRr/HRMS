@@ -1,7 +1,6 @@
 ﻿using HRMS.Domain.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace HRMS.Domain.Entities.Users
 {
@@ -10,7 +9,6 @@ namespace HRMS.Domain.Entities.Users
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [JsonIgnore]
         public int IdUsuario { get; set; }
         public string? Clave { get; set; }
         [ForeignKey("UserRole")]

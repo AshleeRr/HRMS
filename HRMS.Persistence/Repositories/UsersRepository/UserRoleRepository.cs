@@ -1,6 +1,5 @@
 ﻿using HRMS.Domain.Base;
 using HRMS.Domain.Entities.Users;
-using HRMS.Models.Models.UsersModels;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -170,17 +169,21 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return result;
                 if(!Validation.ValidateDescription(entity.Descripcion, result))
                     return result;
-                var rolUsuarioExistente = await _context.UserRoles.FindAsync(entity.IdRolUsuario);
-                if (rolUsuarioExistente == null)
+                var rolUsuarioExistente = await _context.UserRoles.AnyAsync(u => u.IdRolUsuario == entity.IdRolUsuario);
+                if (!rolUsuarioExistente )
                 {
                     result.IsSuccess = false;
                     result.Message = "Este rol no existe";
                     return result;
                 }
-                rolUsuarioExistente.Descripcion = entity.Descripcion;
-                rolUsuarioExistente.Estado = entity.Estado;
-                _context.UserRoles.Update(rolUsuarioExistente);
-                await _context.SaveChangesAsync();
+                else
+                {
+                    var rolUsuario = await _context.UserRoles.FindAsync(entity.IdRolUsuario);
+                    rolUsuario.Estado = entity.Estado;
+                    rolUsuario.Descripcion = entity.Descripcion;
+                    _context.UserRoles.Update(rolUsuario);
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {

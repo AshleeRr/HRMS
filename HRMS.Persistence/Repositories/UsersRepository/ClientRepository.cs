@@ -166,39 +166,50 @@ namespace HRMS.Persistence.Repositories.ClientRepository
         }
         public override async Task<OperationResult> UpdateEntityAsync(Client entity)
         {
-            OperationResult resultUpdate = new OperationResult();
+            OperationResult result = new OperationResult();
             try
             {
-                var existingClient = await _context.Clients.FindAsync(entity.IdCliente);
-                if(existingClient == null)
+                if (!Validation.ValidateClient(entity, result))
+                    return result;
+                if(!Validation.ValidateId(entity.IdCliente, result))
+                    return result;
+                if (!await Validation.ValidateCorreo(entity.Correo, entity.IdCliente, _context, result))
+                    return result;
+                if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, entity.IdCliente, result))
+                    return result;
+                if (!await Validation.ValidateDocumento(entity.Documento, entity.IdCliente, _context, result))
+                    return result;
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdCliente, result))
+                    return result;
+                var clienteExistente = await _context.Clients.AnyAsync(c => c.IdCliente == entity.IdCliente);
+                if (!clienteExistente)
                 {
-                    resultUpdate.IsSuccess = false;
-                    resultUpdate.Message = "Cliente no encontrado";
-                    return resultUpdate; ;
+                    result.IsSuccess = false;
+                    result.Message = "Este cliente no existe";
+                    return result;
+
                 }
-                
-                if (!Validation.ValidateClient(entity, resultUpdate))
-                    return resultUpdate;
-                if (!await Validation.ValidateCorreo(entity.Correo, entity.IdCliente, _context, resultUpdate))
-                    return resultUpdate;
-                if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, entity.IdCliente, resultUpdate))
-                    return resultUpdate;
-                if (!await Validation.ValidateDocumento(entity.Documento, entity.IdCliente, _context, resultUpdate))
-                    return resultUpdate;
-                if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdCliente, resultUpdate))
-                    return resultUpdate;
-                _context.Clients.Update(entity);
-                await _context.SaveChangesAsync();
-                resultUpdate.IsSuccess = true;
-                resultUpdate.Message = "Cliente actualizado correctamente";
+                else
+                {
+                    var cliente = await _context.Clients.FindAsync(entity.IdCliente);
+                    cliente.Estado = entity.Estado;
+                    cliente.TipoDocumento = entity.TipoDocumento;
+                    cliente.Documento = entity.Documento;
+                    cliente.Correo = entity.Correo;
+                    cliente.NombreCompleto = entity.NombreCompleto;
+                    cliente.Estado = entity.Estado;
+                    _context.Clients.Update(cliente);
+                    await _context.SaveChangesAsync();
+                    result.Message = "Cliente actualizado correctamente";
+                }
             }
             catch (Exception ex)
             {
-                resultUpdate.Message = _configuration["ErrorClientRepository: UpdateEntityAsync"];
-                resultUpdate.IsSuccess = false;
-                _logger.LogError(resultUpdate.Message, ex.ToString());
+                result.Message = _configuration["ErrorClientRepository: UpdateEntityAsync"];
+                result.IsSuccess = false;
+                _logger.LogError(result.Message, ex.ToString());
             }
-            return resultUpdate;
+            return result;
         }
     }
 }

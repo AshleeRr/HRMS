@@ -1,4 +1,5 @@
 ﻿using HRMS.Domain.Entities.Users;
+using HRMS.Models.Models.UsersModels.UsersModels;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -58,16 +59,19 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
         
         [HttpPost("SaveClient")]
-        public async Task<IActionResult> SaveCLient([FromBody] Client client)
+        public async Task<IActionResult> SaveCLient([FromBody] ClientUpdatedModel client)
         {
             try
             {
-                if(client == null)
+                var clientCreated = new Client()
                 {
-                    return BadRequest("El cliente no puede ser nulo");
-                }
-                var createdClient = await _clientRepository.SaveEntityAsync(client);
-                return Ok(createdClient);
+                    Documento = client.Documento,
+                    TipoDocumento = client.TipoDocumento,
+                    Correo = client.Correo,
+                    NombreCompleto = client.NombreCompleto
+                };
+                var result = await _clientRepository.SaveEntityAsync(clientCreated);
+                return Ok(result);
             }catch(Exception e)
             {
                 _logger.LogError(e, "Error guardando cliente");
@@ -76,17 +80,21 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
         
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateClient(int id, [FromBody] Client client)
+        public async Task<IActionResult> UpdateClient(int id, [FromBody] ClientUpdatedModel client)
         {
             try
             {
-                var existingClient = await _clientRepository.GetEntityByIdAsync(id);
-                if (existingClient == null)
+                var clientUpdated = new Client()
                 {
-                    return NotFound("Cliente no encontrado");
-                }
-                var updatedClient = await _clientRepository.UpdateEntityAsync(existingClient);
-                return Ok(updatedClient);
+                    IdCliente = id,
+                    Documento = client.Documento,
+                    TipoDocumento = client.TipoDocumento,
+                    Correo = client.Correo,
+                    Estado = client.Estado,
+                    NombreCompleto = client.NombreCompleto
+                };
+                var result = await _clientRepository.UpdateEntityAsync(clientUpdated);
+                return Ok(result);
             } catch(Exception e)
             {
                 _logger.LogError(e, "Error actualizando el cliente");

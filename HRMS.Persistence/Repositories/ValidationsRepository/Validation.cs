@@ -47,12 +47,6 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
                 result.Message = "La clave debe contener al menos una letra minúscula para ser segura";
                 return false;
             }
-            if(!clave.Any(char.IsSymbol))
-            {
-                result.IsSuccess = false;
-                result.Message = "La clave debe contener al menos un caracter especial para ser segura";
-                return false;
-            }
             result.IsSuccess = true;
             return true;
         }
@@ -201,15 +195,6 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
             if (entity == null)
             {
                 throw new ArgumentNullException(nameof(entity), "El rol del usuario no puede ser nulo");
-            }
-            return true;
-        }
-        // y eso??
-        public static bool ValidateAudit(Auditoria entity, OperationResult result)
-        {
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity), "La auditoria no puede ser nula");
             }
             return true;
         }
