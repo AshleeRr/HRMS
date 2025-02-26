@@ -10,7 +10,8 @@ namespace HRMS.Domain.Entities.Reservation
     public class Reservation : AuditEntity
     {
         [Key]
-        public int idRecepcion { get; set; }
+        [Column("IdRecepcion")]
+        public int IdRecepcion { get; set; }
 
         public DateTime? FechaEntrada { get; set; }
         public DateTime? FechaSalida { get; set; }
@@ -30,9 +31,9 @@ namespace HRMS.Domain.Entities.Reservation
         }
 
         [ForeignKey("idCliente")]
-        public int? idCliente { get; set; }
+        public int? IdCliente { get; set; }
 
         [ForeignKey("idHabitacion")]
-        public int? idHabitacion { get; set; }
+        public int? IdHabitacion { get; set; }
     }
 }

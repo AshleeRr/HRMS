@@ -109,7 +109,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             return entity;
         }
 
-        public override async Task<OperationResult> SaveEntityAsync(Client entity) 
+        public override async Task<OperationResult> SaveEntityAsync(Client entity)
         {
             OperationResult resultSave = new OperationResult();
             try
@@ -153,6 +153,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 if (!Validation.ValidateClient(entity, result))
                     return result;
+
                 if(!Validation.ValidateId(entity.IdCliente, result))
                     return result;
                 if (!await Validation.ValidateCorreo(entity.Correo, entity.IdCliente, _context, result))

@@ -15,10 +15,10 @@ namespace HRMS.Persistence.Repositories.Reserv
 {
     public class ReservationRepository : BaseRepository<Reservation, int>, IReservationRepository
     {
-        private ILogger _logger;
+        private ILogger<ReservationRepository> _logger;
         private IConfiguration _configuration;
         
-        public ReservationRepository(HRMSContext context,ILogger logger, IConfiguration configuration) : base(context)
+        public ReservationRepository(HRMSContext context, ILogger<ReservationRepository> logger, IConfiguration configuration) : base(context)
         {
             _logger = logger;
             _configuration = configuration;
@@ -37,7 +37,7 @@ namespace HRMS.Persistence.Repositories.Reserv
         {
             if(filter != null)
             {
-                return await base.GetAllAsync(filter);
+                return await base.GetAllAsync(r => r.Estado.Value && filter.Compile()(r));
             }
             var res = new OperationResult();
             res.IsSuccess = false;
@@ -49,15 +49,14 @@ namespace HRMS.Persistence.Repositories.Reserv
         public override async Task<OperationResult> SaveEntityAsync(Reservation entity)
         {
             OperationResult result;
-            if (!_validReservationForSaving(entity))
+            var validRes = await _validReservationForSaving(entity);
+            if (!validRes.IsSuccess)
             {
-                result = new OperationResult();
-                result.IsSuccess = false;
-                result.Message = "La reserva no es válida.";
+                return validRes;
             }
             else
             {
-                result = await base.UpdateEntityAsync(entity);
+                result = await base.SaveEntityAsync(entity);
                 if (!result.IsSuccess)
                 {
                     string? message = _getErrorMessage();
@@ -69,24 +68,129 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-        private bool _validReservationForSaving(Reservation resev)
-            => (resev.idCliente != 0 &&
+        public override async Task<List<Reservation>> GetAllAsync()
+            =>  await _context.Reservations.Where(r => r.Estado.Value).ToListAsync();
+
+        /*
+        private async Task<bool> _validReservationForSaving(Reservation resev)
+            => (resev != null &&
+               resev.idCliente != 0 &&
+               await _isRoomDisponible(resev.idHabitacion, resev.FechaEntrada.Value, resev.FechaSalida.Value) &&
                resev.idCliente != null &&
                resev.FechaEntrada > DateTime.Now &&
                resev.FechaSalida > resev.FechaEntrada);
 
-        private bool _validReservationForUpdating(Reservation resev)
-            => (_validReservationForSaving(resev) &&
-                (resev.Estado?? false));
+        private async Task<bool> _validReservationForUpdating(Reservation resev)
+            => (resev != null &&
+               resev.idCliente != 0 &&
+               resev.idCliente != null &&
+               resev.FechaEntrada > DateTime.Now &&
+               resev.FechaSalida > resev.FechaEntrada
+                && (resev.Estado.Value)
+                );
+        */
 
+        private async Task<OperationResult> _validReservationForSaving(Reservation resev)
+        {
+            OperationResult operationResult = new OperationResult();
+            List<string> errors = new List<string>();
+
+            if (resev == null)
+            {
+                errors.Add("La reserva no puede ser nula");
+            }
+            else
+            {
+                if (resev.IdCliente == 0)
+                {
+                    errors.Add("El ID del cliente no puede ser cero");
+                }
+                if (resev.IdHabitacion == 0)
+                {
+                    errors.Add("El ID de la habitación no puede ser cero");
+                }
+                if (!resev.FechaEntrada.HasValue)
+                {
+                    errors.Add("La fecha de entrada no puede ser nula");
+                }
+                if (!resev.FechaSalida.HasValue)
+                {
+                    errors.Add("La fecha de salida no puede ser nula");
+                }
+                if (resev.FechaEntrada <= DateTime.Now)
+                {
+                    errors.Add("La fecha de entrada debe ser posterior a la fecha actual");
+                }
+                if (resev.FechaSalida <= resev.FechaEntrada)
+                {
+                    errors.Add("La fecha de salida debe ser posterior a la fecha de entrada");
+                }
+                
+                if (!await _isRoomDisponible(resev.IdHabitacion, resev.FechaEntrada.Value, resev.FechaSalida.Value))
+                {
+                    errors.Add("La habitación no está disponible en las fechas seleccionadas");
+                }
+            }
+
+            if (errors.Count > 0)
+            {
+                operationResult.IsSuccess = false;
+                operationResult.Message = string.Join(Environment.NewLine, errors);
+            }
+            return operationResult;
+        }
+
+        private async Task<OperationResult> _validReservationForUpdating(Reservation resev)
+        {
+            OperationResult operationResult = new OperationResult();
+            List<string> errors = new List<string>();
+
+            if (resev == null)
+            {
+                errors.Add("La reserva no puede ser nula");
+            }
+            else
+            {
+                if (resev.IdCliente == 0)
+                {
+                    errors.Add("El ID del cliente no puede ser cero");
+                }
+                if (!resev.FechaEntrada.HasValue)
+                {
+                    errors.Add("La fecha de entrada no puede ser nula");
+                }
+                if (!resev.FechaSalida.HasValue)
+                {
+                    errors.Add("La fecha de salida no puede ser nula");
+                }
+                if (resev.FechaEntrada <= DateTime.Now)
+                {
+                    errors.Add("La fecha de entrada debe ser posterior a la fecha actual");
+                }
+                if (resev.FechaSalida <= resev.FechaEntrada)
+                {
+                    errors.Add("La fecha de salida debe ser posterior a la fecha de entrada");
+                }
+                if (!resev.Estado.HasValue || !resev.Estado.Value)
+                {
+                    errors.Add("El estado de la reserva no es válido");
+                }
+            }
+
+            if (errors.Count > 0)
+            {
+                operationResult.IsSuccess = false;
+                operationResult.Message = string.Join(Environment.NewLine, errors);
+            }
+            return operationResult;
+        }
         public override async Task<OperationResult> UpdateEntityAsync(Reservation entity)
         {
             OperationResult result;
-            if (!_validReservationForUpdating(entity))
+            var validRes = await _validReservationForUpdating(entity);
+            if (!validRes.IsSuccess)
             {
-                result = new OperationResult();
-                result.IsSuccess = false;
-                result.Message = "La reserva no es valida, para actualización";
+                return validRes;
             }
             else
             {
@@ -102,7 +206,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-        public virtual async Task<Reservation> GetEntityByIdAsync(int id)
+        public override async Task<Reservation> GetEntityByIdAsync(int id)
         {
             if (id != 0)
             {
@@ -114,55 +218,92 @@ namespace HRMS.Persistence.Repositories.Reserv
         public async Task<OperationResult> GetReservationsByClientId(int clientId)
         {
             OperationResult result = new OperationResult();
-            try
-            {
-                var query = from r in _context.Reservations
-                            join c in _context.Clients on r.idCliente equals c.IdCliente
-                            join h in _context.Habitaciones on r.idHabitacion equals h.IdHabitacion
-                            join cl in _context.Clients on r.idCliente equals cl.IdCliente
-                            join hb in _context.Habitaciones on r.idHabitacion equals hb.IdHabitacion
 
-                            where r.idCliente == clientId
-                            select new ReservHabitClientModel
-                            {
-                                ReservationID = r.idRecepcion,
-                                In = r.FechaEntrada.Value,
-                                Out = r.FechaSalida.Value,
-                                Total = r.TotalPagado,
-                                RoomNumber = h.Numero,
-                                ClientID = c.IdCliente,
-                                ClientName = c.NombreCompleto
-                            };
-
-                result.Data = await query.ToListAsync();
-            }
-            catch(Exception ex)
+            if (clientId == 0)
             {
                 result.IsSuccess = false;
-                result.Message = _getErrorMessage();
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = "No se ha especificado un cliente.";
+            }
+            else
+            {
+                try
+                {
+                    var query = from r in _context.Reservations
+                                join c in _context.Clients on r.IdCliente equals c.IdCliente
+                                join h in _context.Habitaciones on r.IdHabitacion equals h.Id
+                                where r.IdCliente == clientId
+                                select new ReservHabitClientModel
+                                {
+                                    ReservationID = r.IdRecepcion,
+                                    In = r.FechaEntrada.Value,
+                                    Out = r.FechaSalida.Value,
+                                    Total = r.TotalPagado,
+                                    RoomNumber = h.Numero,
+                                    ClientID = c.IdCliente,
+                                    ClientName = c.NombreCompleto
+                                };
+
+                    result.Data = await query.ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    result.IsSuccess = false;
+                    result.Message = _getErrorMessage();
+                    _logger.LogError(result.Message, ex.ToString());
+                }
             }
             return result;
         }
 
-        public async Task<OperationResult> GetReservationsInTimeLapse(DateTime start, DateTime end)
+        public async Task<OperationResult> GetDisponibleRoomsOfCategoryInTimeLapse(DateTime start, DateTime end, int categoriaId)
         {
             OperationResult result = new OperationResult();
-            try
-            {
-                var query = _context.Reservations.Where(r => r.FechaEntrada >= start && r.FechaSalida <= end);
-                result.Data = await query.ToListAsync();
-            }
-            catch (Exception ex)
+            if (start > end)
             {
                 result.IsSuccess = false;
-                result.Message = _getErrorMessage();
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = "La fecha de inicio no puede ser mayor a la fecha de fin.";
+            }
+            else if (categoriaId == 0)
+            {
+                result.IsSuccess = false;
+                result.Message = "No se ha especificado una categoría.";
+            }
+            else
+            {
+                try
+                {
+                    var query = _context.Habitaciones
+                                    .Where(h => h.IdCategoria == categoriaId &&
+                                        !_context.Reservations.Any(r =>
+                                            r.IdHabitacion == h.Id &&
+                                            !(r.FechaSalida < start || r.FechaEntrada > end)   
+                                        ))
+                                    .Select(h => h.Id);
+                    result.Data = await query.ToListAsync();
+                }
+                catch (Exception ex)
+                {
+                    result.IsSuccess = false;
+                    result.Message = _getErrorMessage();
+                    _logger.LogError(result.Message, ex.ToString());
+                }
             }
             return result;
         }
 
+        private async Task<bool> _isRoomDisponible(int? roomId, DateTime start, DateTime end)
+        {
+            if (roomId == null) return false;
+
+            bool existeReserva = await _context.Reservations
+                .AnyAsync(r => r.IdHabitacion == roomId &&
+                    ((r.FechaEntrada <= start && r.FechaSalida >= start) ||
+                     (r.FechaEntrada <= end && r.FechaSalida >= end) ||
+                     (r.FechaEntrada >= start && r.FechaSalida <= end)));
+
+            return !existeReserva;
+        }
         private string? _getErrorMessage([CallerMemberName]string source ="")
-            => _configuration["ErrorMessages:ReservationRepository:" + source]; 
+            => _configuration["ErrorReservationRepository:" + source]; 
     }
 }

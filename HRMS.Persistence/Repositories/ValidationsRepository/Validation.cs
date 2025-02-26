@@ -23,19 +23,19 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
                 result.Message = "La clave es muy corta, no es segura";
                 return false;
             }
-            if(clave.Length > 50)
+            if (clave.Length > 50)
             {
                 result.IsSuccess = false;
                 result.Message = "La clave es muy larga";
                 return false;
             }
-            if(!clave.Any(char.IsDigit))
+            if (!clave.Any(char.IsDigit))
             {
                 result.IsSuccess = false;
                 result.Message = "La clave debe contener al menos un número para ser segura";
                 return false;
             }
-            if(!clave.Any(char.IsUpper))
+            if (!clave.Any(char.IsUpper))
             {
                 result.IsSuccess = false;
                 result.Message = "La clave debe contener al menos una letra mayúscula para ser segura";
@@ -69,11 +69,11 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
         }
         public static bool ValidateCompleteName(string NombreCompleto, int idCliente, OperationResult result)
         {
-            if(NombreCompleto == null || NombreCompleto.Length > 50)
+            if (NombreCompleto == null || NombreCompleto.Length > 50)
             {
-            result.IsSuccess = false;
-            result.Message = "El nombre no puede ser nulo o tener más de 50 caracteres";
-            return false;
+                result.IsSuccess = false;
+                result.Message = "El nombre no puede ser nulo o tener más de 50 caracteres";
+                return false;
             }
             if (!NombreCompleto.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
             {
@@ -83,9 +83,9 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
             }
             return true;
         }
-        public static bool ValidateDescription(string Descripcion, OperationResult result) 
+        public static bool ValidateDescription(string Descripcion, OperationResult result)
         {
-            if(string.IsNullOrEmpty(Descripcion))
+            if (string.IsNullOrEmpty(Descripcion))
             {
                 result.IsSuccess = false;
                 result.Message = "La descripción no puede estar vacía";
@@ -113,7 +113,9 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
         }
         public static async Task<bool> ValidateCorreo(string correo, int idCliente, HRMSContext context, OperationResult result)
         {
+
             if(string.IsNullOrEmpty(correo) || correo.Length > 50)
+
             {
                 result.IsSuccess = false;
                 result.Message = "El correo no puede ser nulo o tener más de 50 caracteres";
@@ -128,8 +130,10 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
             }
             return true;
         }
+
         
        public static bool ValidateTipoDocumento(string TipoDocumento, int idCliente, OperationResult result)
+
         {
             if (TipoDocumento == null || TipoDocumento.Length > 15)
             {

@@ -19,6 +19,7 @@ namespace HRMS.Persistence.Base
         public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter) 
         {
             return await Entity.AnyAsync(filter);
+
         }
         public virtual async Task<List<TEntity>> GetAllAsync()
         {
