@@ -1,43 +1,38 @@
-using HRMS.Domain.Repository;
-using HRMS.Persistence.Context;
-using HRMS.Persistence.Repositories.Reserv;
-using Microsoft.EntityFrameworkCore;
+using HRMS.APIs.Configuration;
 
-namespace HRMS.APIs
+namespace HRMS.APIs;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddDbContext<HRMSContext>(options => {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("HRMSBD"));
-            });
-            builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
-            builder.Services.AddControllers();
+        // Configuración de servicios
+        ConfigureServices(builder.Services, builder.Configuration);
+
+        var app = builder.Build();
 
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+        // Configuración del middleware
+        ConfigureMiddleware(app, app.Environment);
 
-            var app = builder.Build();
+        app.Run();
+    }
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+    private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddPersistenceServices(configuration)
+            .AddApplicationServices()
+            .AddApiServices()
+            .AddSwaggerConfiguration()
+            .AddCorsConfiguration();
+    }
 
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
-        }
+    private static void ConfigureMiddleware(WebApplication app, IWebHostEnvironment env)
+    {
+        app.UseCustomMiddleware(env);
+        app.MapControllers();
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace HRMS.Models.Models
+﻿namespace HRMS.Models.Models.UsersModels
 {
-    public class UserRolModel
+    public class UserRoleModel
     {
         int IdUserRol { get; set; }
         string? Descripcion { get; set; }

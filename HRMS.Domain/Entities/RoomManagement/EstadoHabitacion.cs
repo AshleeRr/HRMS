@@ -7,6 +7,6 @@ namespace HRMS.Domain.Entities.RoomManagement;
 public sealed class EstadoHabitacion : AuditEntity
 {
     [Key]
-    public int Id { get; set; }
+    public int IdEstadoHabitacion { get; set; }
     public string? Descripcion { get; set; }
 }
