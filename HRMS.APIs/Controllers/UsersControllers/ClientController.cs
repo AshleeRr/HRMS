@@ -1,5 +1,5 @@
-﻿using HRMS.Domain.Base;
-using HRMS.Domain.Entities.Users;
+﻿using HRMS.Domain.Entities.Users;
+using HRMS.Models.Models.UsersModels.UsersModels;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,33 +57,44 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 return StatusCode(500, "Error interno del servidor");
             }
         }
-
+        
         [HttpPost("SaveClient")]
-        public async Task<IActionResult> SaveCLient([FromBody] Client client)
+        public async Task<IActionResult> SaveCLient([FromBody] ClientUpdatedModel client)
         {
             try
             {
-                var createdClient = await _clientRepository.SaveEntityAsync(client);
-                return Ok(client);
+                var clientCreated = new Client()
+                {
+                    Documento = client.Documento,
+                    TipoDocumento = client.TipoDocumento,
+                    Correo = client.Correo,
+                    NombreCompleto = client.NombreCompleto
+                };
+                var result = await _clientRepository.SaveEntityAsync(clientCreated);
+                return Ok(result);
             }catch(Exception e)
             {
                 _logger.LogError(e, "Error guardando cliente");
                 return StatusCode(500, "Error interno del servidor");
             }
         }
-
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateClient(int id, [FromBody] Client client)
+        public async Task<IActionResult> UpdateClient(int id, [FromBody] ClientUpdatedModel client)
         {
             try
             {
-                var existingClient = await _clientRepository.GetEntityByIdAsync(id);
-                if (existingClient == null)
+                var clientUpdated = new Client()
                 {
-                    return NotFound("Cliente no encontrado");
-                }
-                var updatedClient = await _clientRepository.UpdateEntityAsync(client);
-                return Ok(updatedClient);
+                    IdCliente = id,
+                    Documento = client.Documento,
+                    TipoDocumento = client.TipoDocumento,
+                    Correo = client.Correo,
+                    Estado = client.Estado,
+                    NombreCompleto = client.NombreCompleto
+                };
+                var result = await _clientRepository.UpdateEntityAsync(clientUpdated);
+                return Ok(result);
             } catch(Exception e)
             {
                 _logger.LogError(e, "Error actualizando el cliente");
@@ -91,7 +102,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
         }
 
-        [HttpGet("ByEmail")]
+        [HttpGet("ByEmail/{email}")]
         public async Task<IActionResult> GetClientByEmail(string email) 
         {
             try
@@ -113,7 +124,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
         }
 
-        [HttpGet("ByDocument")]
+        [HttpGet("ByDocument/{document}")]
         public async Task<IActionResult> GetClientByDocument(string document)
         {
             try
@@ -136,7 +147,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
         }
 
-        [HttpGet("ByDocumentType")]
+        [HttpGet("ByDocumentType/{tipoDocumento}")]
         public async Task<IActionResult> GetClientByDocumentType(string tipoDocumento)
         {
             try

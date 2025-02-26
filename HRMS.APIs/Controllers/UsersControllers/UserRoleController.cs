@@ -1,4 +1,5 @@
 ﻿using HRMS.Domain.Entities.Users;
+using HRMS.Models.Models.UsersModels.UsersModels;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -58,12 +59,17 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         [HttpPost("SaveUserRole")]
-        public async Task<IActionResult> SaveUserRole([FromBody] UserRole userRole)
+        public async Task<IActionResult> SaveUserRole([FromBody] UserRolUpdateModel userRole)
         {
             try
             {
-                var createdUserRole = await _userRoleRepository.SaveEntityAsync(userRole);
-                return Ok(createdUserRole);
+                var userRoleCreated = new UserRole()
+                {
+                    Descripcion = userRole.Descripcion,
+                    Estado = userRole.Estado
+                };
+                var result = await _userRoleRepository.SaveEntityAsync(userRoleCreated);
+                return Ok(result);
             } catch (Exception e)
             {
                 _logger.LogError(e, "Error creando rol de usuario");
@@ -72,52 +78,26 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         [HttpPut("{id}")] // actualiza un rol usando su id
-        public async Task<IActionResult> UpdateUserRole(int id, [FromBody] UserRole userRole)
+        public async Task<IActionResult> UpdateUserRole(int id, [FromBody] UserRolUpdateModel userRole)
         {
             try
             {
-                var existingUserRole = await _userRoleRepository.GetEntityByIdAsync(id);
-                if (existingUserRole == null)
+                var userRoleUpdated = new UserRole()
                 {
-                    return NotFound("Rol de usuario no encontrado");
-                }
-                var updatedUserRole = await _userRoleRepository.UpdateEntityAsync(userRole);
-                return Ok(updatedUserRole);
-            }
-            catch (Exception e)
+                    IdRolUsuario = id,
+                    Descripcion = userRole.Descripcion,
+                    Estado = userRole.Estado
+                };
+                var result = await _userRoleRepository.UpdateEntityAsync(userRoleUpdated);
+                return Ok(result);
+            } catch (Exception e)
             {
-                _logger.LogError(e, $"Error actualizando el rol de usuario {id}");
+                _logger.LogError(e, "Error actualizando el rol de usuario");
                 return StatusCode(500, "Error interno del servidor");
             }
         }
 
-        [HttpPatch("AssignDefaultUserRole/{id}")] // asigna un rol por defecto a un user usando id
-        public async Task<IActionResult> AssignDefaultRole(int id, [FromBody] UserRole userRole)
-        {
-            try
-            {
-                var existingUser = await _userRepository.GetEntityByIdAsync(id);
-                if (existingUser == null)
-                {
-                    return NotFound("Usuario no encontrado");
-                }
-                var result = await _userRoleRepository.AsignDefaultRoleAsync(id);
-                if (!result.IsSuccess)
-                {
-                    return BadRequest(result.Message);
-                }
-                return Ok(id);
-
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Error agregando un usuario con rol predeterminado");
-                return StatusCode(500, "Error interno del servidor");
-            }
-
-        }
-
-        [HttpGet("descripcion")]
+        [HttpGet("ByDescripcion/{descripcion}")]
         public async Task<IActionResult> GetRoleByDescription(string descripcion)
         {
             try
@@ -164,20 +144,20 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         [HttpPatch("UpdateDescription/{id}")]
-        public async Task<IActionResult> UpdateRoleDescription (int idRolUsuario, string description)
+        public async Task<IActionResult> UpdateRoleDescription (int id, string description)
         {
             try
             {
-                if(idRolUsuario <1 || string.IsNullOrEmpty(description))
+                if(id <1 || string.IsNullOrEmpty(description))
                 {
                     return BadRequest("El id debe ser mayor que 0. La descripcion no puede estar vacia");
                 }
-                var existingRoleUser = await _userRoleRepository.GetEntityByIdAsync(idRolUsuario);
+                var existingRoleUser = await _userRoleRepository.GetEntityByIdAsync(id);
                 if(existingRoleUser == null)
                 {
-                    return BadRequest($"No se ha encontrado un rol con este id: {idRolUsuario}");
+                    return BadRequest($"No se ha encontrado un rol con este id: {id}");
                 }
-                var result = await _userRoleRepository.UpdateDescriptionAsync(idRolUsuario, description);
+                var result = await _userRoleRepository.UpdateDescriptionAsync(id, description);
                 return Ok(result);
 
             } catch (Exception e)

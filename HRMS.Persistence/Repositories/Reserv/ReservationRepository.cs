@@ -117,9 +117,9 @@ namespace HRMS.Persistence.Repositories.Reserv
             try
             {
                 var query = from r in _context.Reservations
-                            join c in _context.Clients on r.idCliente equals c.idCliente
+                            join c in _context.Clients on r.idCliente equals c.IdCliente
                             join h in _context.Habitaciones on r.idHabitacion equals h.IdHabitacion
-                            join cl in _context.Clients on r.idCliente equals cl.idCliente
+                            join cl in _context.Clients on r.idCliente equals cl.IdCliente
                             join hb in _context.Habitaciones on r.idHabitacion equals hb.IdHabitacion
 
                             where r.idCliente == clientId
@@ -130,7 +130,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                                 Out = r.FechaSalida.Value,
                                 Total = r.TotalPagado,
                                 RoomNumber = h.Numero,
-                                ClientID = c.idCliente,
+                                ClientID = c.IdCliente,
                                 ClientName = c.NombreCompleto
                             };
 

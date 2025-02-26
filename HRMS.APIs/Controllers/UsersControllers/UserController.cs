@@ -1,4 +1,5 @@
 ﻿using HRMS.Domain.Entities.Users;
+using HRMS.Models.Models.UsersModels.UsersModels;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,12 +63,21 @@ namespace HRMS.APIs.Controllers.UsersControllers
 
         // POST api/<UserController>
         [HttpPost("SaveUser")]
-        public async Task<IActionResult> SaveUser ([FromBody] User user)
+        public async Task<IActionResult> SaveUser ([FromBody] UserUpdatedModel user)
         {
             try
-            {
-                var createdUser = await _userRepository.SaveEntityAsync(user);
-                return Ok(createdUser);
+            { 
+                var userCreated = new User()
+                {
+                    Estado = user.Estado,
+                    Clave = user.Clave,
+                    Correo = user.Correo,
+                    NombreCompleto = user.NombreCompleto,
+                    IdRolUsuario = user.IdUserRole
+                };
+            
+                var result = await _userRepository.SaveEntityAsync(userCreated);
+                return Ok(result);
 
             } catch(Exception e)
             {
@@ -78,17 +88,22 @@ namespace HRMS.APIs.Controllers.UsersControllers
 
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdatedModel user)
         {
             try
             {
-                var existingUser = await _userRepository.GetEntityByIdAsync(id);
-                if(existingUser == null)
+                var userUpdated = new User()
                 {
-                    return NotFound($"No se ha encontrado un usuario con id: {id}");
-                }
-                var uptadedUser = await _userRepository.UpdateEntityAsync(user);
-                return Ok(uptadedUser);
+                    IdUsuario = id,
+                    Estado = user.Estado,
+                    Clave = user.Clave,
+                    Correo = user.Correo,
+                    NombreCompleto = user.NombreCompleto,
+                    IdRolUsuario = user.IdUserRole
+                };
+
+                var result = await _userRepository.UpdateEntityAsync(userUpdated);
+                return Ok(result);
             }
             catch (Exception e)
             {
@@ -110,7 +125,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 return StatusCode(500, "Error interno del servidor");
             }
         }
-        [HttpGet("completeName")]
+        [HttpGet("ByCompleteName/{nombreCompleto}")]
         public async Task<IActionResult> GetUserByName(string nombreCompleto)
         {
             try
@@ -152,12 +167,12 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
         }
 
-        [HttpGet("GetUsersByRole/{id}")]
-        public async Task<IActionResult> GetUsersByUserRole(int id)
+        [HttpGet("GetUsersByRole/{idUserRole}")]
+        public async Task<IActionResult> GetUsersByUserRole(int idUserRole)
         {
             try
             {
-                var userByRole = await _userRepository.GetUsersByUserRoleIdAsync(id);
+                var userByRole = await _userRepository.GetUsersByUserRoleIdAsync(idUserRole);
                 return Ok(userByRole);
 
             }

@@ -48,11 +48,23 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     _logger.LogWarning("No se puede asignar el mismo estado al usuario");
                     return result;
                 }
-                entity.Estado = nuevoEstado;
-                _context.Users.Update(entity);
-                await _context.SaveChangesAsync();
-                result.IsSuccess = true;
-                result.Message = "Estado del usuario actualizado correctamente";
+                var userExistente = await _context.Users.AnyAsync(u => u.IdUsuario == entity.IdUsuario);
+                if(!userExistente)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Este usuario no existe";
+                    return result;
+
+                }
+                else
+                {
+                    var user = await _context.Users.FindAsync(entity.IdUsuario);
+                    user.Estado = nuevoEstado;
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                    result.IsSuccess = true;
+                    result.Message = "Estado del usuario actualizado correctamente";
+                }
             }
             catch(Exception e)
             {
@@ -192,21 +204,23 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 if (!Validation.ValidateUser(entity, result))
                     return result;
-                if (!Validation.ValidateId(entity.IdUsuario, result))
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdUsuario, result))
                     return result;
-                if (!Validation.ValidateCompleteName(entity.NombreCompleto, result))
+                if (!await Validation.ValidateCorreo(entity.Correo, entity.IdUsuario, _context, result))
                     return result;
-                if (!Validation.ValidateCorreo(entity.Correo, result))
+                if (!Validation.ValidateId(entity.IdRolUsuario, result))
                     return result;
                 if (!Validation.ValidateClave(entity.Clave, result))
                     return result;
 
+                entity.FechaCreacion = DateTime.Now;
+                result.IsSuccess = true;
                 await _context.Users.AddAsync(entity);
                 await _context.SaveChangesAsync();
-                result.IsSuccess = true;
 
                 result.Message = "Usuario guardado correctamente";
                 _logger.LogInformation(result.Message);
+                return result;
             }
             catch (Exception ex)
             {
@@ -225,30 +239,37 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return result;
                 if(!Validation.ValidateId(entity.IdUsuario, result))
                     return result;
-                if (!Validation.ValidateCompleteName(entity.NombreCompleto, result))
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdUsuario, result))
                     return result;
-                if(!Validation.ValidateCorreo(entity.Correo, result))
+                if (!await Validation.ValidateCorreo(entity.Correo, entity.IdUsuario, _context, result))
                     return result;
                 if(!Validation.ValidateClave(entity.Clave, result))
                     return result;
-                var ExistentUser = await _context.Users.FindAsync(entity.IdUsuario);
-
-                if (ExistentUser == null)
+                var userExistente = await _context.Users.AnyAsync(u => u.IdRolUsuario == entity.IdRolUsuario);
+                if (!userExistente)
                 {
                     result.IsSuccess = false;
-                    result.Message = "El usuario no existe en la base de datos.";
-                    return result;
+                    result.Message = "Este usuario no existe";
                 }
-                _context.Entry(ExistentUser).CurrentValues.SetValues(entity);
-                await _context.SaveChangesAsync();
-                result.IsSuccess = true;
-                result.Message = "Usuario actualizado correctamente.";
+                else
+                {
+                    var usuario = await _context.Users.FindAsync(entity.IdUsuario);
+                    usuario.Estado = entity.Estado;
+                    usuario.Clave = entity.Clave;
+                    usuario.NombreCompleto = entity.NombreCompleto;
+                    usuario.Correo = entity.Correo;
+                    _context.Users.Update(usuario);
+                    await _context.SaveChangesAsync();
+                    result.Message = "Usuario actualizado correctamente";
+
+                }
             }
             catch (Exception ex)
             {
                 result.IsSuccess = false;
                 result.Message = "Ocurrió un error al actualizar el usuario";
                 _logger.LogError(ex, result.Message);
+                _logger.LogError(result.Message, ex.ToString());
             }
             return result;
         }
