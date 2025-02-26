@@ -70,8 +70,8 @@ namespace HRMS.APIs.Controllers
             if (reservOrigin == null)
                 return BadRequest("La reservación a Actualizar es Inexistente");
 
-            reservOrigin.idCliente = reser.idCliente;
-            reservOrigin.idHabitacion = reser.idHabitacion;
+            reservOrigin.IdCliente = reser.IdCliente;
+            reservOrigin.IdHabitacion = reser.IdHabitacion;
             reservOrigin.Adelanto = reser.Adelanto;
             reservOrigin.CostoPenalidad = reser.CostoPenalidad;
             reservOrigin.TotalPagado = reser.TotalPagado;
@@ -106,11 +106,11 @@ namespace HRMS.APIs.Controllers
         {
             OperationResult operationResult = new OperationResult();
             List<string> errors = new List<string>(); 
-            if(r.idCliente == 0)
+            if(r.IdCliente == 0)
             {
                 errors.Add("El ID del cliente no puede ser cero");
             }
-            if (r.idHabitacion == 0)
+            if (r.IdHabitacion == 0)
             {
                 errors.Add("El ID de la habitación no puede ser cero");
             }
