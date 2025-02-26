@@ -109,76 +109,89 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             return entity;
         }
 
-        public override async Task<OperationResult> SaveEntityAsync(Client entity) 
+        public override async Task<OperationResult> SaveEntityAsync(Client entity)
         {
             OperationResult resultSave = new OperationResult();
             try
             {
                 if (!Validation.ValidateClient(entity, resultSave))
                     return resultSave;
-                if(!Validation.ValidateId(entity.idCliente, resultSave))
+
+                if (!await Validation.ValidateCorreo(entity.Correo, entity.IdCliente, _context, resultSave))
                     return resultSave;
-                if (!Validation.ValidateCorreo(entity.Correo, resultSave))
+
+                if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, entity.IdCliente, resultSave))
                     return resultSave;
-                if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, resultSave))
+
+                if (!await Validation.ValidateDocumento(entity.Documento, entity.IdCliente, _context, resultSave))
                     return resultSave;
-                if (!Validation.ValidateDocumento(entity.Documento, resultSave))
+
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdCliente, resultSave))
                     return resultSave;
-                if (!Validation.ValidateCompleteName(entity.NombreCompleto, resultSave))
-                    return resultSave;
-                if (!Validation.ValidateId((int)entity.IdUsuario, resultSave))
-                    return resultSave;
+
+                entity.FechaCreacion = DateTime.Now;
+                resultSave.IsSuccess = true;
                 await _context.Clients.AddAsync(entity);
                 await _context.SaveChangesAsync();
-                resultSave.IsSuccess = true;
-                _logger.LogInformation("Cliente guardado correctamente");
+
+                resultSave.Message = "Cliente guardado existosamente";
                 return resultSave;
             }
             catch (Exception ex)
             {
                 resultSave.Message = _configuration["ErrorClientRepository: SaveEntityAsync"];
                 resultSave.IsSuccess = false;
-                _logger.LogError(resultSave.Message, ex.ToString());
-            }
 
+            }
             return resultSave;
+
         }
         public override async Task<OperationResult> UpdateEntityAsync(Client entity)
         {
-            OperationResult resultUpdate = new OperationResult();
+            OperationResult result = new OperationResult();
             try
             {
-                if (!Validation.ValidateClient(entity, resultUpdate))
-                    return resultUpdate;
-                if (!Validation.ValidateCorreo(entity.Correo, resultUpdate))
-                    return resultUpdate;
-                if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, resultUpdate))
-                    return resultUpdate;
-                if (!Validation.ValidateDocumento(entity.Documento, resultUpdate))
-                    return resultUpdate;
-                if (!Validation.ValidateCompleteName(entity.NombreCompleto, resultUpdate))
-                    return resultUpdate;
-
-                var ExistingClient = await _context.Clients.FindAsync(entity.idCliente);
-                if (ExistingClient == null)
+                if (!Validation.ValidateClient(entity, result))
+                    return result;
+                if (!Validation.ValidateId(entity.IdCliente, result))
+                    return result;
+                if (!await Validation.ValidateCorreo(entity.Correo, entity.IdCliente, _context, result))
+                    return result;
+                if (!Validation.ValidateTipoDocumento(entity.TipoDocumento, entity.IdCliente, result))
+                    return result;
+                if (!await Validation.ValidateDocumento(entity.Documento, entity.IdCliente, _context, result))
+                    return result;
+                if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdCliente, result))
+                    return result;
+                var clienteExistente = await _context.Clients.AnyAsync(c => c.IdCliente == entity.IdCliente);
+                if (!clienteExistente)
                 {
-                    resultUpdate.IsSuccess = false;
-                    resultUpdate.Message = "Este cliente no existe";
-                    return resultUpdate;
+                    result.IsSuccess = false;
+                    result.Message = "Este cliente no existe";
+                    return result;
+
                 }
-                _context.Entry(ExistingClient).CurrentValues.SetValues(entity);
-                
-                await _context.SaveChangesAsync();
-                resultUpdate.IsSuccess = true;
-                resultUpdate.Message = "Cliente actualizado correctamente";
+                else
+                {
+                    var cliente = await _context.Clients.FindAsync(entity.IdCliente);
+                    cliente.Estado = entity.Estado;
+                    cliente.TipoDocumento = entity.TipoDocumento;
+                    cliente.Documento = entity.Documento;
+                    cliente.Correo = entity.Correo;
+                    cliente.NombreCompleto = entity.NombreCompleto;
+                    cliente.Estado = entity.Estado;
+                    _context.Clients.Update(cliente);
+                    await _context.SaveChangesAsync();
+                    result.Message = "Cliente actualizado correctamente";
+                }
             }
             catch (Exception ex)
             {
-                resultUpdate.Message = _configuration["ErrorClientRepository: UpdateEntityAsync"];
-                resultUpdate.IsSuccess = false;
-                _logger.LogError(resultUpdate.Message, ex.ToString());
+                result.Message = _configuration["ErrorClientRepository: UpdateEntityAsync"];
+                result.IsSuccess = false;
+                _logger.LogError(result.Message, ex.ToString());
             }
-            return resultUpdate;
+            return result;
         }
     }
 }
