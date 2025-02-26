@@ -37,7 +37,7 @@ namespace HRMS.Persistence.Repositories.Reserv
         {
             if(filter != null)
             {
-                return await base.GetAllAsync(filter);
+                return await base.GetAllAsync(r => r.Estado.Value && filter.Compile()(r));
             }
             var res = new OperationResult();
             res.IsSuccess = false;
