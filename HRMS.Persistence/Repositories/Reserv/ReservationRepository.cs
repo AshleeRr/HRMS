@@ -101,11 +101,11 @@ namespace HRMS.Persistence.Repositories.Reserv
             }
             else
             {
-                if (resev.idCliente == 0)
+                if (resev.IdCliente == 0)
                 {
                     errors.Add("El ID del cliente no puede ser cero");
                 }
-                if (resev.idHabitacion == 0)
+                if (resev.IdHabitacion == 0)
                 {
                     errors.Add("El ID de la habitación no puede ser cero");
                 }
@@ -126,7 +126,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                     errors.Add("La fecha de salida debe ser posterior a la fecha de entrada");
                 }
                 
-                if (!await _isRoomDisponible(resev.idHabitacion, resev.FechaEntrada.Value, resev.FechaSalida.Value))
+                if (!await _isRoomDisponible(resev.IdHabitacion, resev.FechaEntrada.Value, resev.FechaSalida.Value))
                 {
                     errors.Add("La habitación no está disponible en las fechas seleccionadas");
                 }
@@ -151,7 +151,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             }
             else
             {
-                if (resev.idCliente == 0)
+                if (resev.IdCliente == 0)
                 {
                     errors.Add("El ID del cliente no puede ser cero");
                 }
@@ -228,12 +228,12 @@ namespace HRMS.Persistence.Repositories.Reserv
                 try
                 {
                     var query = from r in _context.Reservations
-                                join c in _context.Clients on r.idCliente equals c.IdCliente
-                                join h in _context.Habitaciones on r.idHabitacion equals h.Id
-                                where r.idCliente == clientId
+                                join c in _context.Clients on r.IdCliente equals c.IdCliente
+                                join h in _context.Habitaciones on r.IdHabitacion equals h.Id
+                                where r.IdCliente == clientId
                                 select new ReservHabitClientModel
                                 {
-                                    ReservationID = r.idRecepcion,
+                                    ReservationID = r.IdRecepcion,
                                     In = r.FechaEntrada.Value,
                                     Out = r.FechaSalida.Value,
                                     Total = r.TotalPagado,
@@ -274,7 +274,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                     var query = _context.Habitaciones
                                     .Where(h => h.IdCategoria == categoriaId &&
                                         !_context.Reservations.Any(r =>
-                                            r.idHabitacion == h.Id &&
+                                            r.IdHabitacion == h.Id &&
                                             !(r.FechaSalida < start || r.FechaEntrada > end)   
                                         ))
                                     .Select(h => h.Id);
@@ -295,7 +295,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             if (roomId == null) return false;
 
             bool existeReserva = await _context.Reservations
-                .AnyAsync(r => r.idHabitacion == roomId &&
+                .AnyAsync(r => r.IdHabitacion == roomId &&
                     ((r.FechaEntrada <= start && r.FechaSalida >= start) ||
                      (r.FechaEntrada <= end && r.FechaSalida >= end) ||
                      (r.FechaEntrada >= start && r.FechaSalida <= end)));
