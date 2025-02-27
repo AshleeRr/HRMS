@@ -45,7 +45,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Documento == documento);
             if (cliente == null)
             {
-                _logger.LogWarning("No se encontró un cliente con este documento");
+                _logger.LogWarning("No se encontró un cliente con ese correo");
             }
             return cliente;
         }
@@ -153,8 +153,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 if (!Validation.ValidateClient(entity, result))
                     return result;
-
-                if(!Validation.ValidateId(entity.IdCliente, result))
+                if (!Validation.ValidateId(entity.IdCliente, result))
                     return result;
                 if (!await Validation.ValidateCorreo(entity.Correo, entity.IdCliente, _context, result))
                     return result;

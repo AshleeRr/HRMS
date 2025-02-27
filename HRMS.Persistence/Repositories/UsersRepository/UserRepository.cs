@@ -1,4 +1,5 @@
-﻿using HRMS.Domain.Base;
+﻿
+using HRMS.Domain.Base;
 using HRMS.Domain.Entities.Users;
 using HRMS.Models.Models.UsersModels;
 using HRMS.Persistence.Base;
@@ -11,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace HRMS.Persistence.Repositories.ClientRepository
-{ 
+{
     public class UserRepository : BaseRepository<User, int>, IUserRepository
     {
         private readonly IConfiguration _configuration;
@@ -23,24 +24,26 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             _logger = logger;
             _configuration = configuration;
         }
-        public async Task<User> AuthenticateUserAsync(string correo, string clave) {
-           
-            if(string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(clave))
+        public async Task<User> AuthenticateUserAsync(string correo, string clave)
+        {
+
+            if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(clave))
             {
                 throw new ArgumentNullException("El correo y la clave no pueden estar vacíos");
             }
-            var AuthenticatedUser =  await _context.Users.FirstOrDefaultAsync(u => u.Correo == correo && u.Clave == clave);
-            if(AuthenticatedUser == null)
+            var AuthenticatedUser = await _context.Users.FirstOrDefaultAsync(u => u.Correo == correo && u.Clave == clave);
+            if (AuthenticatedUser == null)
             {
                 _logger.LogWarning("No se encontró un usuario con ese correo y clave");
             }
             return AuthenticatedUser;
         }
-        public async Task<OperationResult> UpdateEstadoAsync(User entity, bool nuevoEstado) {
+        public async Task<OperationResult> UpdateEstadoAsync(User entity, bool nuevoEstado)
+        {
             OperationResult result = new OperationResult();
             try
             {
-                if(!Validation.ValidateUser(entity, result))
+                if (!Validation.ValidateUser(entity, result))
                     return result;
                 if (entity.Estado == nuevoEstado)
                 {
@@ -49,7 +52,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return result;
                 }
                 var userExistente = await _context.Users.AnyAsync(u => u.IdUsuario == entity.IdUsuario);
-                if(!userExistente)
+                if (!userExistente)
                 {
                     result.IsSuccess = false;
                     result.Message = "Este usuario no existe";
@@ -66,7 +69,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     result.Message = "Estado del usuario actualizado correctamente";
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 result.IsSuccess = false;
                 result.Message = _configuration["ErrorUserRepository: UpdateEstadoAsync"];
@@ -74,7 +77,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return result;
         }
-        
+
         public async Task<List<User>> GetUsersByNameAsync(string nombreCompleto)
         {
             ArgumentException.ThrowIfNullOrEmpty(nombreCompleto, nameof(nombreCompleto));
@@ -97,7 +100,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                                    join userRol in _context.UserRoles on users.IdRolUsuario equals userRol.IdRolUsuario
                                    where users.IdRolUsuario == id
                                    select new UserModel()
-                                   { 
+                                   {
                                        IdUsuario = users.IdUsuario,
                                        NombreCompleto = users.NombreCompleto,
                                        IdUserRol = userRol.IdRolUsuario,
@@ -123,7 +126,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return result;
         }
-        public async Task<OperationResult> UpdatePasswordAsync(int idUsuario, string nuevaClave) 
+        public async Task<OperationResult> UpdatePasswordAsync(int idUsuario, string nuevaClave)
         {
             OperationResult result = new OperationResult();
             try
@@ -187,7 +190,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                 _logger.LogError(result.Message, ex.ToString());
             }
             return result;
-        } 
+        }
         public override async Task<User> GetEntityByIdAsync(int id)
         {
             var entityById = await _context.Users.FindAsync(id);
@@ -237,13 +240,13 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 if (!Validation.ValidateUser(entity, result))
                     return result;
-                if(!Validation.ValidateId(entity.IdUsuario, result))
+                if (!Validation.ValidateId(entity.IdUsuario, result))
                     return result;
                 if (!Validation.ValidateCompleteName(entity.NombreCompleto, entity.IdUsuario, result))
                     return result;
                 if (!await Validation.ValidateCorreo(entity.Correo, entity.IdUsuario, _context, result))
                     return result;
-                if(!Validation.ValidateClave(entity.Clave, result))
+                if (!Validation.ValidateClave(entity.Clave, result))
                     return result;
                 var userExistente = await _context.Users.AnyAsync(u => u.IdRolUsuario == entity.IdRolUsuario);
                 if (!userExistente)

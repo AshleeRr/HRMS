@@ -8,6 +8,7 @@ namespace HRMS.Persistence.Interfaces.IUsersRepository
     {
         Task<UserRole> GetRoleByDescriptionAsync(string descripcion);
         Task<OperationResult> UpdateDescriptionAsync(int idRolUsuario, string nuevaDescripcion);
+        Task<OperationResult> AsignDefaultRoleAsync(int idUsuario);
         Task<OperationResult> AsignRolUserAsync(int idUsuario, int idRolUsuario);
     }
 }

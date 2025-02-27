@@ -1,5 +1,6 @@
 ﻿using HRMS.Domain.Base;
 using HRMS.Domain.Entities.Users;
+using HRMS.Models.Models.UsersModels;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -21,7 +22,33 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             _logger = logger;
             _configuration = configuration;
         }
-        
+        public async Task<OperationResult> AsignDefaultRoleAsync(int idUsuario)
+        { // asigna un rol por defecto
+            OperationResult result = new OperationResult();
+            try
+            {
+               const int rolPredeterminado = 1; // el rol predeterminado debe ser cliente
+               var usuario = await _context.Users.FindAsync(idUsuario);
+                if(usuario == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontró un usuario con ese id";
+                    return result;
+                }
+                usuario.IdRolUsuario = rolPredeterminado;
+                await _context.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Rol predeterminado asignado";
+
+            }
+            catch (Exception ex)
+            {
+                result.Message = _configuration["ErrorUserRolRepository: AsignDefaultRoleAsync"];
+                result.IsSuccess = false;
+                _logger.LogError(result.Message, ex.ToString());
+            }
+            return result;
+        }
         public async Task<UserRole> GetRoleByDescriptionAsync (string descripcion)
         {
             return await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.Descripcion == descripcion);
@@ -140,12 +167,13 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             {
                 if(!Validation.ValidateUserRole(entity, result))
                     return result;
-                
+                if(!Validation.ValidateId(entity.IdRolUsuario, result))
+                    return result;
                 if(!Validation.ValidateDescription(entity.Descripcion, result))
                     return result;
-                entity.FechaCreacion = DateTime.Now;
-                _context.UserRoles.Update(entity);
+                await _context.UserRoles.AddAsync(entity);
                 await _context.SaveChangesAsync();
+
                 result.IsSuccess = true;
                 result.Message = "Rol de usuario guardado correctamente.";
                 _logger.LogInformation(result.Message);
@@ -170,27 +198,25 @@ namespace HRMS.Persistence.Repositories.ClientRepository
                     return result;
                 if(!Validation.ValidateDescription(entity.Descripcion, result))
                     return result;
-                var rolUsuarioExistente = await _context.UserRoles.AnyAsync(u => u.IdRolUsuario == entity.IdRolUsuario);
-                if (!rolUsuarioExistente )
+                var rolUsuarioExistente = await _context.UserRoles.FindAsync(entity.IdRolUsuario);
+
+                if (rolUsuarioExistente == null)
                 {
                     result.IsSuccess = false;
                     result.Message = "Este rol no existe";
                     return result;
                 }
-                else
-                {
-                    var rolUsuario = await _context.UserRoles.FindAsync(entity.IdRolUsuario);
-                    rolUsuario.Estado = entity.Estado;
-                    rolUsuario.Descripcion = entity.Descripcion;
-                    _context.UserRoles.Update(rolUsuario);
-                    await _context.SaveChangesAsync();
-                }
+                _context.Entry(rolUsuarioExistente).CurrentValues.SetValues(entity);
+                await _context.SaveChangesAsync();
+
+                result.IsSuccess = true;
+                result.Message = "Rol de usuario actualizado correctamente.";
+                _logger.LogInformation(result.Message);
             }
             catch (Exception ex)
             {
                 result.Message = _configuration["ErrorUserRolRepository: UpdateEntityAsync"];
                 result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
                 _logger.LogError(result.Message, ex.ToString());
             }
             return result;
