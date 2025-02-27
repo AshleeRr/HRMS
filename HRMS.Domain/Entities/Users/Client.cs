@@ -1,4 +1,5 @@
-﻿using HRMS.Domain.Base;
+﻿
+using HRMS.Domain.Base;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,10 +9,9 @@ namespace HRMS.Domain.Entities.Users
     public class Client : UserAuditEntity
     {
         [Key]
-        public int idCliente { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int IdCliente { get; set; }
         public string? TipoDocumento { get; set; }
         public string? Documento { get; set; }
-        [ForeignKey("IdUsuario")]
-        public int? IdUsuario { get; set; } // FK
     }
 }
