@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace HRMS.Persistence.Repositories.ClientRepository
-{
+{ 
     public class UserRepository : BaseRepository<User, int>, IUserRepository
     {
         private readonly IConfiguration _configuration;
