@@ -16,4 +16,8 @@
     <ProjectReference Include="..\HRMS.Models\HRMS.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repositories\Users\" />
+  </ItemGroup>
+
 </Project>
