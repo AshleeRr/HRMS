@@ -1,6 +1,7 @@
-﻿namespace HRMS.Domain.Base.Validator;
+﻿using HRMS.Domain.Base;
 
-public interface IValidator
+
+namespace MyValidator.Validator
 {
     public interface IValidator<T>
     {

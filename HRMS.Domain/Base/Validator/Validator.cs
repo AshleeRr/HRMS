@@ -1,8 +1,9 @@
-﻿using MyValidator.Validator;
+﻿using HRMS.Domain.Base;
 
-namespace HRMS.Domain.Base   .Validator
+
+namespace MyValidator.Validator
 {
-    public class Validator<T> : IValidator.IValidator<T>
+    public class Validator<T> : IValidator<T>
     {
         public List<RuleValidation<T>> Rules { get; set; }
         private RuleValidation<T> _selectedRule;

@@ -13,6 +13,7 @@ public class Program
 
         var app = builder.Build();
 
+
         // Configuración del middleware
         ConfigureMiddleware(app, app.Environment);
 

@@ -11,7 +11,7 @@ namespace HRMS.Domain.Entities.Reservation
     {
         [Key]
         [Column("IdRecepcion")]
-        public int idRecepcion { get; set; }
+        public int IdRecepcion { get; set; }
 
         public DateTime? FechaEntrada { get; set; }
         public DateTime? FechaSalida { get; set; }
