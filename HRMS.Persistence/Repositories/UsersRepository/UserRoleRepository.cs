@@ -1,5 +1,6 @@
 ﻿using HRMS.Domain.Base;
 using HRMS.Domain.Entities.Users;
+using HRMS.Models.Models.UsersModels;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -11,19 +12,18 @@ using System.Linq.Expressions;
 
 namespace HRMS.Persistence.Repositories.ClientRepository
 {
-    public class UserRolRepository : BaseRepository<UserRole, int>, IUserRoleRepository
+    public class UserRoleRepository : BaseRepository<UserRole, int>, IUserRoleRepository
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger<UserRolRepository> _logger;
-        public UserRolRepository(HRMSContext context, ILogger<UserRolRepository> logger,
+        private readonly ILogger<UserRoleRepository> _logger;
+        public UserRoleRepository(HRMSContext context, ILogger<UserRoleRepository> logger,
                                                      IConfiguration configuration) : base(context)
         {
             _logger = logger;
             _configuration = configuration;
         }
-
         public async Task<OperationResult> AsignDefaultRoleAsync(int idUsuario)
-        {
+        { // asigna un rol por defecto
             OperationResult result = new OperationResult();
             try
             {
@@ -97,10 +97,12 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             OperationResult result = new OperationResult();
             try
             {
-                if (filter != null)
+                var roles = await _context.UserRoles.Where(ur => ur.Estado == true).ToListAsync();
+                if (!roles.Any())
                 {
-                    return await base.GetAllAsync(filter);
+                    _logger.LogWarning("No se encontraron usuarios activos");
                 }
+                result.Data = roles;
                 result.IsSuccess = true;
             }
             catch (Exception ex)
@@ -121,7 +123,43 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return entity;
         }
-
+        public async Task<OperationResult> AsignRolUserAsync(int idUsuario, int idRolUsuario)
+        { // asigna un rol a un usuario
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (!Validation.ValidateId(idUsuario, result))
+                    return result;
+                if (!Validation.ValidateId(idRolUsuario, result))
+                    return result;
+                var usuario = await _context.Users.FindAsync(idUsuario);
+                if (usuario == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontró un usuario con ese id";
+                    return result;
+                }
+                var userRol = await _context.UserRoles.FindAsync(idRolUsuario);
+                if (userRol == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontró un rol de usuario con ese id";
+                    return result;
+                }
+                usuario.IdRolUsuario = idRolUsuario;
+                _context.Users.Update(usuario);
+                await _context.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Rol asignado correctamente";
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = _configuration["ErrorUserRepository: AsignRolUserAsync"];
+                _logger.LogError(result.Message, ex.ToString());
+            }
+            return result;
+        }
         public override async Task<OperationResult> SaveEntityAsync(UserRole entity)
         {
             OperationResult result = new OperationResult();

@@ -1,5 +1,9 @@
 ﻿using HRMS.Persistence.Context;
+using HRMS.Persistence.Interfaces.IAuditRepository;
 using HRMS.Persistence.Interfaces.IRoomRepository;
+using HRMS.Persistence.Interfaces.IUsersRepository;
+using HRMS.Persistence.Repositories.AuditRepository;
+using HRMS.Persistence.Repositories.ClientRepository;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +18,10 @@ public static class ServiceExtension
         services.AddScoped<IPisoRepository, PisoRepository>();
         services.AddScoped<IEstadoHabitacionRepository, EstadoHabitacionRepository>();
         //Añadir todos los servicios aqui
+        services.AddScoped<IClientRepository, ClientRepository>();
+        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
         return services;
     }
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)

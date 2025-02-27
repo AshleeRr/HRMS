@@ -1,4 +1,3 @@
-
 using HRMS.APIs.Configuration;
 
 namespace HRMS.APIs;
@@ -8,13 +7,13 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-            
-        // Configuración de servicios
+
+        // Configuración de servicios
         ConfigureServices(builder.Services, builder.Configuration);
 
         var app = builder.Build();
-            
-        // Configuración del middleware
+
+        // Configuración del middleware
         ConfigureMiddleware(app, app.Environment);
 
         app.Run();

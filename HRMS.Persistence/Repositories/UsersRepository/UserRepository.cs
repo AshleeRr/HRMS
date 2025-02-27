@@ -36,7 +36,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return AuthenticatedUser;
         }
-        public async Task<OperationResult> UpdateEstadoAsync(User entity, bool nuevoEstado) { // no segura de este metodo
+        public async Task<OperationResult> UpdateEstadoAsync(User entity, bool nuevoEstado) {
             OperationResult result = new OperationResult();
             try
             {
@@ -62,59 +62,28 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return result;
         }
-        public async Task<OperationResult> AsignRolUserAsync (int idUsuario, int idRolUsuario) { 
-            OperationResult result = new OperationResult();
-            try
-            {
-                if (!Validation.ValidateId(idUsuario, result))
-                    return result;
-                if (!Validation.ValidateId(idRolUsuario, result))
-                    return result;
-                var usuario = await _context.Users.FindAsync(idUsuario);
-                if (usuario == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se encontró un usuario con ese id";
-                    return result;
-                }
-                var userRol = await _context.UserRoles.FindAsync(idRolUsuario);
-                if (userRol == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se encontró un rol de usuario con ese id";
-                    return result;
-                }
-                usuario.IdRolUsuario = idRolUsuario;
-                _context.Users.Update(usuario);
-                await _context.SaveChangesAsync();
-                result.IsSuccess = true;
-                result.Message = "Rol asignado correctamente";
-            }
-            catch (Exception ex) { 
-                result.IsSuccess = false;
-                result.Message = _configuration["ErrorUserRepository: AsignRolUserAsync"];
-                _logger.LogError(result.Message, ex.ToString());
-            }
-            return result;
-        }
-        public async Task<User> GetUserByNameAsync (string nombreCompleto)
+        
+        public async Task<List<User>> GetUsersByNameAsync(string nombreCompleto)
         {
             ArgumentException.ThrowIfNullOrEmpty(nombreCompleto, nameof(nombreCompleto));
-            var usuario = await _context.Users.FirstOrDefaultAsync(u => u.NombreCompleto == nombreCompleto)
-                          ?? throw new KeyNotFoundException("Error al encontrar el usuario por nombre");
-            return usuario;
+            var usuarios = await _context.Users.Where(u => u.NombreCompleto == nombreCompleto).ToListAsync();
+            if (!usuarios.Any())
+            {
+                _logger.LogWarning("No se encontraron usuarios activos");
+            }
+            return usuarios;
         }
-        public async Task<OperationResult> GetUsersByUserRolIdAsync(int idUsuario)
+        public async Task<OperationResult> GetUsersByUserRoleIdAsync(int id)
         {
             OperationResult result = new OperationResult();
             try
             {
-                if (!Validation.ValidateId(idUsuario, result))
+                if (!Validation.ValidateId(id, result))
                     return result;
 
                 var query = await (from users in _context.Users
                                    join userRol in _context.UserRoles on users.IdRolUsuario equals userRol.IdRolUsuario
-                                   where users.IdRolUsuario == idUsuario
+                                   where users.IdRolUsuario == id
                                    select new UserModel()
                                    { 
                                        IdUsuario = users.IdUsuario,
@@ -142,7 +111,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return result;
         }
-        public async Task<OperationResult> UpdatePasswordAsync(int idUsuario, string nuevaClave) //verificar que la contra sea larga y eso
+        public async Task<OperationResult> UpdatePasswordAsync(int idUsuario, string nuevaClave) 
         {
             OperationResult result = new OperationResult();
             try
@@ -191,10 +160,12 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             OperationResult result = new OperationResult();
             try
             {
-                if (filter != null)
+                var usuarios = await _context.Users.Where(u => u.Estado == true).ToListAsync();
+                if (!usuarios.Any())
                 {
-                    return await base.GetAllAsync(filter);
+                    _logger.LogWarning("No se encontraron usuarios activos");
                 }
+                result.Data = usuarios;
                 result.IsSuccess = true;
             }
             catch (Exception ex)

@@ -131,18 +131,6 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
                 return result;
             }
 
-            // Solo validamos el precio si se está actualizando
-            if (entity.Precio.HasValue)
-            {
-                if (entity.Precio <= 0)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "El precio de la habitación no puede ser negativo o igual a 0.";
-                    return result;
-                }
-                habitacion.Precio = entity.Precio;
-            }
-
             if (!string.IsNullOrEmpty(entity.Numero)) habitacion.Numero = entity.Numero;
             if (!string.IsNullOrEmpty(entity.Detalle)) habitacion.Detalle = entity.Detalle;
             if (entity.IdEstadoHabitacion.HasValue) habitacion.IdEstadoHabitacion = entity.IdEstadoHabitacion;

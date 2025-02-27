@@ -15,13 +15,8 @@ namespace HRMS.Persistence.Context
         public DbSet<User> Users { get; set; } 
         public DbSet<Client> Clients { get; set; }
         public DbSet<Auditoria> Auditorias { get; set; }
-
         public DbSet<Servicios> Servicios { get; set; }
-
-
         public DbSet<Reservation> Reservations { get; set; }
-
-        
         public DbSet<Habitacion> Habitaciones { get; set; }
         public DbSet<EstadoHabitacion> EstadoHabitaciones { get; set; }
         public DbSet<Piso> Pisos { get; set; }

@@ -36,10 +36,12 @@ namespace HRMS.Persistence.Repositories.AuditRepository
             OperationResult result = new OperationResult();
             try
             {
-                if (filter != null)
+                var auditorias = await _context.Users.Where(a => a.Estado == true).ToListAsync();
+                if (!auditorias.Any())
                 {
-                    return await base.GetAllAsync(filter);
+                    _logger.LogWarning("No se encontraron auditorias oficiales");
                 }
+                result.Data = auditorias;
                 result.IsSuccess = true;
             }
             catch (Exception ex)
@@ -60,35 +62,13 @@ namespace HRMS.Persistence.Repositories.AuditRepository
             }
             return entity;
         }
-        public override async Task<OperationResult> SaveEntityAsync(Auditoria entity)
-        {
-            OperationResult resultSave = new OperationResult();
-            try
-            {
-                if(!Validation.ValiateAudit(entity, resultSave))
-                _context.Add(entity);
-                if(!Validation.ValidateId(entity.IdAuditoria, resultSave))
-                    return resultSave;
-                if (!Validation.ValidateId(entity.IdUsuario, resultSave))
-                    return resultSave;
-                if(!Validation.ValidateAction(entity.Accion, resultSave))
-                    return resultSave;
-                await _context.SaveChangesAsync();
-
-            }
-            catch (Exception ex)
-            {
-                resultSave.IsSuccess = false;
-                resultSave.Message = "Ocurrió un error guardando los datos.";
-            }
-            return resultSave;
-
-        }
         public async Task<OperationResult> LogAuditAsync(string accion, int idUsuario)
         {
             OperationResult result = new OperationResult();
             try
             {
+                if (!Validation.ValidateAction(accion, result))
+                    return result;
                 var registroAutoria = new Auditoria
                 {
                     Accion = accion,
@@ -108,45 +88,25 @@ namespace HRMS.Persistence.Repositories.AuditRepository
             }
             return result;
         }
-        public async Task<OperationResult> GetAuditByUserIdAsync(int IdUsuario)
+        public async Task<List<Auditoria>> GetAuditByUserIdAsync(int idUsuario)
         {
-            OperationResult result = new OperationResult();
-            try
-            {
-                var auditoriasByUserId = await _context.Auditorias.Where(adt => adt.IdUsuario == IdUsuario).ToListAsync();
-                if (!auditoriasByUserId.Any())
-                {
-                    _logger.LogWarning("No se encontraron registros de auditoria para el usuario solicitado");
-                }
-
-            } catch(Exception ex)
-            {
-                result.IsSuccess = false;
-                result.Message = _configuration["ErrorAuditoriaRepository: GetAuditByUserIdAsync"];
-                _logger.LogError(result.Message, ex.ToString());
-            }
-            return result;
+           var auditoriasByUserId = await _context.Auditorias.Where(adt => adt.IdUsuario == idUsuario).ToListAsync();
+           if (!auditoriasByUserId.Any())
+           {
+                _logger.LogWarning("No se encontraron registros de auditoria para el usuario solicitado");
+           }
+            return auditoriasByUserId;
         }
 
-        public async Task<OperationResult> GetAuditByDateTime(DateTime FechaRegistro)
+        public async Task<List<Auditoria>> GetAuditByDateTime(DateTime fechaRegistro)
         {
-            OperationResult result = new OperationResult();
-            try
+            var auditorias = await _context.Auditorias.Where(adt => adt.FechaRegistro.Date == fechaRegistro.Date).ToListAsync();
+           
+            if (!auditorias.Any())
             {
-                var auditorias = await _context.Auditorias.Where(adt => adt.FechaRegistro == FechaRegistro).ToListAsync();
-                if (!auditorias.Any())
-                {
-                    _logger.LogWarning("No se encontraron registros de auditoria para la fecha solicitada");
-                }
-
+                _logger.LogWarning("No se encontraron registros de auditoria para la fecha solicitada");
             }
-            catch (Exception ex)
-            {
-                result.IsSuccess = false;
-                result.Message = _configuration["ErrorAuditoriaRepository: GetAuditByDateTime"];
-                _logger.LogError(result.Message, ex.ToString());
-            }
-            return result;
+            return auditorias;
         }
     }
 }

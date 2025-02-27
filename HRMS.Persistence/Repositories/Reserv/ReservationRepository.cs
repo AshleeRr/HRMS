@@ -70,8 +70,8 @@ namespace HRMS.Persistence.Repositories.Reserv
         }
 
         private bool _validReservationForSaving(Reservation resev)
-            => (resev.idCliente != 0 &&
-               resev.idCliente != null &&
+            => (resev.IdCliente != 0 &&
+               resev.IdCliente != null &&
                resev.FechaEntrada > DateTime.Now &&
                resev.FechaSalida > resev.FechaEntrada);
 
@@ -124,9 +124,9 @@ namespace HRMS.Persistence.Repositories.Reserv
                 try
                 {
                     var query = from r in _context.Reservations
-                        join c in _context.Clients on r.idCliente equals c.idCliente
-                        join h in _context.Habitaciones on r.idHabitacion equals h.IdHabitacion
-                        where r.idCliente == clientId
+                        join c in _context.Clients on r.IdCliente equals c.idCliente
+                        join h in _context.Habitaciones on r.IdHabitacion equals h.IdHabitacion
+                        where r.IdCliente == clientId
                         select new ReservHabitClientModel
                         {
                             ReservationID = r.idRecepcion,

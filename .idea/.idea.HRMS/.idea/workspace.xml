@@ -11,13 +11,40 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/AuditController/AuditoriaController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/ClientController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserRoleController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/IValidator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/Reservation/ReservationValidator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/CategoriaValidator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/EstadoHabitacion.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/HabitacionValidator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidation.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/RuleValidation.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/Validator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependency/HabitacionDependency.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/EstadoHabitacion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/EstadoHabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/Audit/Auditoria.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/Audit/Auditoria.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Configuration/ServiceExtension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Configuration/ServiceExtension.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/FloorsController/CategoriaController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/FloorsController/EstadoHabitacionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/FloorsController/HabitacionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/PisoController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/FloorsController/PisoController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/Reservation/Reservation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/Reservation/Reservation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Models/Models/UsersModels/UserRolModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Models/Models/UsersModels/UserRoleModel.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Context/HRMSContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Context/HRMSContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IAuditRepository/IAuditoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IAuditRepository/IAuditoriaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IUsersRepository/IClientRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IUsersRepository/IClientRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IUsersRepository/IUserRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IUsersRepository/IUserRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IUsersRepository/IUserRoleRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IUsersRepository/IUserRoleRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/AuditRepository/AuditoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/AuditRepository/AuditoriaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/ClientRepository/ClientRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/UsersRepository/ClientRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/ClientRepository/UserRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/UsersRepository/UserRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/ClientRepository/UserRolRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/UsersRepository/UserRoleRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/Reserv/ReservationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/Reserv/ReservationRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/ValidationsRepository/Validation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/ValidationsRepository/Validation.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +70,8 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock://C:/HRMS/HRMS.Persistence/Repositories/Reserv/ReservationRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/HRMS.Persistence/Repositories/Reserv/ReservationRepository.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b741f17422844062bda644589ab84b32337fefcb677bc51957a62c3df8ad4d/AuthorizationAppBuilderExtensions.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -55,21 +84,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.HRMS.APIs: http.executor&quot;: &quot;Run&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;HabitFloors-20240045&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.HRMS.APIs: http.executor": "Run",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "HabitFloors-20240045",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.APIs: http">
     <configuration name="HRMS.APIs: IIS Express" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" />
@@ -158,7 +187,10 @@
       <workItem from="1740233753265" duration="1528000" />
       <workItem from="1740244930102" duration="19260000" />
       <workItem from="1740272404374" duration="14216000" />
-      <workItem from="1740365951511" duration="2040000" />
+      <workItem from="1740365951511" duration="2087000" />
+      <workItem from="1740435382016" duration="766000" />
+      <workItem from="1740523526471" duration="3185000" />
+      <workItem from="1740581140216" duration="9929000" />
     </task>
     <servers />
   </component>
