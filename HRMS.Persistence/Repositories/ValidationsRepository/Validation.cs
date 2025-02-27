@@ -113,7 +113,9 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
         }
         public static async Task<bool> ValidateCorreo(string correo, int idCliente, HRMSContext context, OperationResult result)
         {
-            if (string.IsNullOrEmpty(correo) || correo.Length > 50)
+
+            if(string.IsNullOrEmpty(correo) || correo.Length > 50)
+
             {
                 result.IsSuccess = false;
                 result.Message = "El correo no puede ser nulo o tener más de 50 caracteres";
@@ -129,7 +131,9 @@ namespace HRMS.Persistence.Repositories.ValidationsRepository
             return true;
         }
 
-        public static bool ValidateTipoDocumento(string TipoDocumento, int idCliente, OperationResult result)
+        
+       public static bool ValidateTipoDocumento(string TipoDocumento, int idCliente, OperationResult result)
+
         {
             if (TipoDocumento == null || TipoDocumento.Length > 15)
             {

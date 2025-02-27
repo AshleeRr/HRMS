@@ -156,6 +156,7 @@ namespace HRMS.Persistence.Repositories.Reserv
         public async Task<OperationResult> GetReservationsByClientId(int clientId)
         {
             OperationResult result = new OperationResult();
+
             if (clientId == 0)
             {
                 result.IsSuccess = false;
