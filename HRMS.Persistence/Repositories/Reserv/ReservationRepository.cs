@@ -20,10 +20,11 @@ namespace HRMS.Persistence.Repositories.Reserv
         private ILogger<ReservationRepository> _logger;
         private IValidator<Reservation> _validator;
         private IConfiguration _configuration;
-        
-        public ReservationRepository(HRMSContext context, ILogger<ReservationRepository> logger, IConfiguration configuration) : base(context)
+         
+        public ReservationRepository(HRMSContext context, ILogger<ReservationRepository> logger, IConfiguration configuration, IValidator<Reservation> validator) : base(context)
         {
             _logger = logger;
+            _validator = validator;
             _configuration = configuration;
         }
 

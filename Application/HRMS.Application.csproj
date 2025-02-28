@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Reservation_2023-0731\" />
+    <Folder Include="Services\Reservation_2023-0731\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HRMS.Persistence\HRMS.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -19,7 +19,6 @@ namespace HRMS.APIs.Controllers.UsersControllers
             _logger = logger;
         }
 
-
         // GET: api/<UserController>
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetAllUsers()
