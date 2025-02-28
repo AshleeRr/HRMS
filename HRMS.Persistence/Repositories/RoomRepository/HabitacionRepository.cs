@@ -118,7 +118,6 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
 
         return result;
     }
-    // HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs
     public override async Task<OperationResult> UpdateEntityAsync(Habitacion entity)
     {
         var result = new OperationResult();
@@ -130,18 +129,6 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
                 result.IsSuccess = false;
                 result.Message = "Habitación no encontrada.";
                 return result;
-            }
-
-            // Solo validamos el precio si se está actualizando
-            if (entity.Precio.HasValue)
-            {
-                if (entity.Precio <= 0)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "El precio de la habitación no puede ser negativo o igual a 0.";
-                    return result;
-                }
-                habitacion.Precio = entity.Precio;
             }
 
             if (!string.IsNullOrEmpty(entity.Numero)) habitacion.Numero = entity.Numero;
@@ -164,11 +151,4 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         }
         return result;
     }
-
-    /*
-    public override  async Task<List<Habitacion>> GetAllAsync()
-    {
-        return await _context.Habitaciones.Where
-            (st => st.Estado == true).ToListAsync();
-    }*/
 }

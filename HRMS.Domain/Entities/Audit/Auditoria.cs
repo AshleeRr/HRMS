@@ -11,6 +11,5 @@ namespace HRMS.Domain.Entities.Audit
         public DateTime FechaRegistro { get; set; }
         [ForeignKey ("IdUsuario")]
         public int IdUsuario { get; set; }
-
     }
 }
