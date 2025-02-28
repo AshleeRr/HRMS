@@ -11,23 +11,6 @@ namespace HRMS.Persistence.Repositories.ServiciosRepository
     {
         public ServicioRepository(HRMSContext context) : base(context) {}
         
-        public async Task<OperationResult> GetServicioByIdAsync(short id)
-        {
-            var result = new OperationResult();
-            try
-            {
-                var dato = await _context.Set<Servicios>().FindAsync(id);
-                result.Data = dato;
-            }
-            catch (Exception ex)
-            {
-                result.IsSuccess = false;
-                result.Message = "Ocurrió un error obteniendo el servicio por ID.";
-               
-            }
-            return result;
-        }
-
         public async Task<OperationResult> AddServicioAsync(Servicios servicio)
         {
             var result = new OperationResult();
