@@ -29,7 +29,7 @@ namespace HRMS.Domain.Base.Validator.ReservationValidator
                 .WithErrorMessage("El precio restante no  es una cantidad valida");
             AddRule(r => isMoreThanCero(r.TotalPagado) && isValidForDecimal10_2(r.TotalPagado))
                 .WithErrorMessage("El Total pagado no es una cantidad valida");
-            AddRule(r => r.CostoPenalidad > 0 && isValidForDecimal10_2(r.CostoPenalidad))
+            AddRule(r => r.CostoPenalidad >=  0 && isValidForDecimal10_2(r.CostoPenalidad))
                 .WithErrorMessage("El costo penalidad no es una cantidad valida");
 
         }

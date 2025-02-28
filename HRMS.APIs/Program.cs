@@ -10,7 +10,6 @@ public class Program
 
         // Configuración de servicios
         ConfigureServices(builder.Services, builder.Configuration);
-
         var app = builder.Build();
 
 
