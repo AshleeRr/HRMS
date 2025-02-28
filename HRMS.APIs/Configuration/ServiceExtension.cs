@@ -1,4 +1,5 @@
-﻿using HRMS.Persistence.Context;
+﻿using HRMS.IOC.ReservationDepedencies;
+using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IAuditRepository;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -19,6 +20,7 @@ public static class ServiceExtension
         services.AddScoped<IUserRoleRepository, UserRoleRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuditoriaRepository, AuditoriaRepository>();
+        services.AddReceptionDependencies();
         return services;
     }
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
