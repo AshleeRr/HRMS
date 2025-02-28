@@ -7,7 +7,7 @@ namespace HRMS.Domain.Entities.Servicio;
 public sealed class Servicios
 {
     [Key]
-    public short Id { get; set; }
+    public short IdSercicio { get; set; }
     public string Nombre { get; set; } = string.Empty;
     public string Descripcion { get; set; } = string.Empty;
 }

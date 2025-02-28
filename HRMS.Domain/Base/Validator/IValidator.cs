@@ -1,7 +1,4 @@
-﻿using HRMS.Domain.Base;
-
-
-namespace MyValidator.Validator
+﻿namespace HRMS.Domain.Base.Validator
 {
     public interface IValidator<T>
     {

@@ -1,5 +1,6 @@
-﻿namespace HRMS.Domain.Base.Validator.Reservation;
+﻿using MyValidator.Validator;
 
+namespace HRMS.Domain.Base.Validator.RoomValidations;
 public class HabitacionValidator : Validator<Entities.RoomManagement.Habitacion>
 {
    public HabitacionValidator()

@@ -10,22 +10,12 @@ namespace HRMS.Persistence.Repositories.RoomRepository;
 public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacionRepository
 {
     public HabitacionRepository(HRMSContext context) : base(context) {}
-    public async Task<OperationResult> GetByEstadoAsync(bool estado)
+
+    public override Task<List<Habitacion>> GetAllAsync()
     {
-        var result = new OperationResult();
-        try
-        {
-            var datos = await _context.Set<Habitacion>()
-                .Where(h => h.Estado == estado)
-                .ToListAsync(); 
-            result.Data = datos;
-        }
-        catch (Exception)
-        {
-            result.IsSuccess = false;
-            result.Message = "Ocurrió un error obteniendo las habitaciones por estado.";
-        }
-        return result;
+        return _context.Habitaciones.
+            Where(h => h.Estado == true)
+            .ToListAsync();
     }
 
     public async Task<OperationResult> GetByPisoAsync(int idPiso)
@@ -45,6 +35,43 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         }
         return result;
     }
+
+    public async Task<OperationResult> GetInfoHabitacionesAsync()
+    {
+        var result = new OperationResult();
+        try
+        {
+            var query = from h in _context.Habitaciones
+                join p in _context.Pisos on h.IdPiso equals p.IdPiso
+                join c in _context.Categorias on h.IdCategoria equals c.IdCategoria
+                join t in _context.Tarifas on h.IdHabitacion equals t.IdHabitacion
+                where h.Estado == true && (t.FechaInicio <= DateTime.Now && t.FechaFin >= DateTime.Now)
+                select new
+                {
+                    h.IdHabitacion,
+                    h.Numero,
+                    h.Detalle,
+                    h.Estado,
+                    h.FechaCreacion,
+                    t.PrecioPorNoche,
+                    DescripcionPiso = p.Descripcion,
+                    DescripcionCategoria = c.Descripcion,
+                };
+            
+            var habitaciones = await query.ToListAsync();
+            result.Data = habitaciones;
+            result.IsSuccess = true;
+        
+            return result;
+        }
+        catch (Exception e)
+        {
+            result.IsSuccess = false;
+            result.Message = "Ocurrió un error obteniendo la información de las habitaciones.";
+            return result;
+        }
+    }
+    
 
     public async Task<OperationResult> GetByCategoriaAsync(int idCategoria)
     {

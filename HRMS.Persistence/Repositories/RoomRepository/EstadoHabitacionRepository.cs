@@ -31,4 +31,25 @@ public class EstadoHabitacionRepository : BaseRepository<EstadoHabitacion, int>,
         }
         return result;
     }
+    public async Task<OperationResult> GetByEstadoDescripcionAsync(string descripcionEstado)
+    {
+        var result = new OperationResult();
+        try
+        {
+            var query = from h in _context.Habitaciones
+                join e in _context.EstadoHabitaciones 
+                    on h.IdEstadoHabitacion equals e.IdEstadoHabitacion
+                where e.Descripcion == descripcionEstado && h.Estado == true
+                select h;
+                    
+            result.Data = await query.ToListAsync();
+            result.IsSuccess = true;
+        }
+        catch (Exception)
+        {
+            result.IsSuccess = false;
+            result.Message = "Ocurrió un error obteniendo habitaciones por estado.";
+        }
+        return result;
+    } 
 }

@@ -6,6 +6,6 @@ namespace HRMS.Persistence.Interfaces.IRoomRepository;
 
 public interface ICategoryRepository : IBaseRepository<Categoria,int>
 {
-    Task<OperationResult> GetByServiciosAsync(int idServicio);
-    Task<OperationResult>GetActivasAsync();
+    Task<OperationResult> GetByServiciosAsync(string nombre);
+    Task<OperationResult> GetServiciosByDescripcionAsync(string nombre);
 }

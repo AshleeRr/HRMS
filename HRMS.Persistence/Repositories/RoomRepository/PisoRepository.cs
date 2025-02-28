@@ -12,22 +12,31 @@ public class PisoRepository : BaseRepository<Piso , int> , IPisoRepository
     public PisoRepository(HRMSContext context) : base(context)
     {
     }
-    
-    public async Task<OperationResult> GetByActivoAsync()
+
+    public override async Task<List<Piso>> GetAllAsync()
+    {
+        return  _context.Pisos.Where(p =>
+                p.Estado == true)
+            .ToList();
+    }
+    public async Task<OperationResult> GetPisoByDescripcion(string descripcion)
     {
         var result = new OperationResult();
         try
         {
-            var data = await _context.Pisos
-                .Where(x => x.Estado == true)
-                .ToListAsync();
-            result.Data = data;
+            var query = from p in _context.Pisos
+                where p.Descripcion.Contains(descripcion)
+                select p;
+                   
+            var pisos = await query.ToListAsync();
+        
+            result.Data = pisos;
+            result.IsSuccess = true;
         }
         catch (Exception)
         {
             result.IsSuccess = false;
-            result.Message = "Ocurrió un error obteniendo los pisos activos.";
-            
+            result.Message = "Ocurrió un error obteniendo el piso por descripción.";
         }
         return result;
     }

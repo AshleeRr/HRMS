@@ -1,6 +1,4 @@
-﻿
-
-using HRMS.Domain.Base;
+﻿using HRMS.Domain.Base;
 using HRMS.Domain.Entities.Servicio;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
@@ -11,27 +9,8 @@ namespace HRMS.Persistence.Repositories.ServiciosRepository
 {
     public class ServicioRepository : BaseRepository<Servicios, int>, IServicioRepository
     {
-        public ServicioRepository(HRMSContext context) : base(context)
-        {
-        }
-
-        public async Task<OperationResult> GetAllServiciosAsync()
-        {
-            var result = new OperationResult();
-            try
-            {
-                var datos = await _context.Set<Servicios>().ToListAsync();
-                result.Data = datos;
-            }
-            catch (Exception ex)
-            {
-                result.IsSuccess = false;
-                result.Message = "Ocurrió un error obteniendo todos los servicios.";
-               
-            }
-            return result;
-        }
-
+        public ServicioRepository(HRMSContext context) : base(context) {}
+        
         public async Task<OperationResult> GetServicioByIdAsync(short id)
         {
             var result = new OperationResult();
