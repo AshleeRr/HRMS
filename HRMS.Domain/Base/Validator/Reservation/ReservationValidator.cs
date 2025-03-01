@@ -1,9 +1,8 @@
 ﻿using MyValidator.Validator;
-using HRMS.Domain.Entities.Reservation;
 
 namespace HRMS.Domain.Base.Validator.ReservationValidator
 {
-    public class ReservationValidator : Validator<Reservation>
+    public class ReservationValidator : Validator<Entities.Reservation.Reservation>
     {
         public ReservationValidator()
         {

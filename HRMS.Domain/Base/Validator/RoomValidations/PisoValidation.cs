@@ -1,5 +1,4 @@
-﻿using HRMS.Domain.Entities.RoomManagement;
-using MyValidator.Validator;
+﻿using MyValidator.Validator;
 
 namespace HRMS.Domain.Base.Validator.RoomValidations;
 

@@ -18,7 +18,7 @@ public static class SwaggerExtension
                     Name = "HRMS",
                     Email = string.Join(", ", new[]
                     {
-                        "ashleeramirezrosario@gmail.com", "ajeromepuente@gmail.com" 
+                        "Ashleeramirezrosario@gmail.com", "ajeromepuente@gmail.com" 
                         ,"Supremeyunior008@gmail.com", "Cristopherxanderazadiaz19111@gmail.com"
                     })
                 }

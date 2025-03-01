@@ -9,41 +9,65 @@ namespace HRMS.Persistence.Repositories.RoomRepository;
 
 public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepository
 {
+    
     public CategoriaRepository(HRMSContext context) : base(context) { }
-
-    public async Task<OperationResult> GetByServiciosAsync(int idServicio)
+    
+    public override async Task<List<Categoria>> GetAllAsync()
     {
-        var result = new OperationResult();
+        return await _context.Categorias
+            .Where(c => c.Estado == true)
+            .ToListAsync();
+    }
+
+    public async Task<OperationResult> GetByServiciosAsync(string nombre)
+    {
+        OperationResult result = new OperationResult();
+        
         try
         {
-            var datos = await _context.Set<Categoria>()
-                .Where(c => c.IdServicio == idServicio)
-                .ToListAsync();
-            result.Data = datos;
+            var query = from c in _context.Categorias
+                join s in _context.Servicios on c.IdServicio equals s.IdSercicio
+                where s.Descripcion.Contains(nombre)
+                select c;
+            var categorias = await query.ToListAsync();
+            result.Data = categorias;
+            result.IsSuccess = true;
+            return result;
         }
         catch (Exception)
         {
             result.IsSuccess = false;
             result.Message = "Ocurrió un error obteniendo las categorías por servicio.";
+            return result;
         }
-        return result;
     }
 
-    public async Task<OperationResult> GetActivasAsync()
+    public async Task<OperationResult> GetServiciosByDescripcionAsync(string nombre)
     {
-        var result = new OperationResult();
+        OperationResult result = new OperationResult();
         try
         {
-            var datos = await _context.Set<Categoria>()
-                .Where(c => c.Estado == true)
-                .ToListAsync();
-            result.Data = datos;
+            var query = from c in _context.Categorias
+                join s in _context.Servicios on c.IdServicio equals s.IdSercicio
+                where s.Descripcion.Contains(nombre)
+                select s;
+            
+            var servicios = await query.ToListAsync();
+            result.Data = servicios;
+            result.IsSuccess = true;
+            
+            return result;
         }
         catch (Exception)
         {
             result.IsSuccess = false;
-            result.Message = "Ocurrió un error obteniendo las categorías activas.";
+            result.Message = "Ocurrió un error obteniendo los servicios por descripción.";
+            return result;
         }
-        return result;
+    }
+
+    public Task<OperationResult> GetHabitacionByCapacidad(int capacidad)
+    {
+        throw new NotImplementedException();
     }
 }
