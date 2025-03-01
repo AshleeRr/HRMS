@@ -1,4 +1,6 @@
-﻿using HRMS.Domain.Base;
+﻿using System.ComponentModel.DataAnnotations;
+using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator.RoomValidations;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Interfaces.IRoomRepository;
@@ -16,6 +18,16 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         return _context.Habitaciones.
             Where(h => h.Estado == true)
             .ToListAsync();
+    }
+
+    public override async Task<Habitacion> GetEntityByIdAsync(int id)
+    {
+        if (id != 0)
+        {
+            return (await _context.Set<Habitacion>().FindAsync(id))!;
+        }
+
+        return null;
     }
 
     public async Task<OperationResult> GetByPisoAsync(int idPiso)
@@ -61,14 +73,14 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
             result.Data = habitaciones;
             result.IsSuccess = true;
         
-            return result;
         }
         catch (Exception e)
         {
             result.IsSuccess = false;
             result.Message = "Ocurrió un error obteniendo la información de las habitaciones.";
-            return result;
         }
+
+        return result;
     }
 
     public async Task<OperationResult> GetByCategoriaAsync(string categoria)
@@ -83,13 +95,13 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
            var habitaciones = query.ToListAsync();
             result.Data = habitaciones; 
             result.IsSuccess = true;
-            return result;
         }catch (Exception)
         {
             result.IsSuccess = false;
             result.Message = "Ocurrió un error obteniendo las habitaciones por categoría.";
-            return result;
         }
+
+        return result;
     }
 
 
@@ -110,74 +122,103 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
         return result;
     }
 
-    public override async Task<OperationResult> SaveEntityAsync(Habitacion entity)
+    public override async Task<OperationResult> SaveEntityAsync(Habitacion habitacion)
     {
         var result = new OperationResult();
         try
         {
-            if (string.IsNullOrEmpty(entity.Numero))
+            var validator = new HabitacionValidator();
+            var validation = validator.Validate(habitacion);
+            if (!validation.IsSuccess)
             {
-                result.IsSuccess = false;
-                result.Message = "El número de habitación es requerido.";
-                return result;
+                return validation;
             }
-            var existingRoom = await GetByNumeroAsync(entity.Numero);
-            
-            if (((OperationResult)existingRoom).Data != null)
-            {
-                result.IsSuccess = false;
-                result.Message = "Ya existe una habitación con ese número.";
-                return result;
-            }
-            entity.FechaCreacion = DateTime.Now;
-            entity.Estado = true;
 
-            await _context.Habitaciones.AddAsync(entity);
+            var existingRoom = await _context.Habitaciones
+                .FirstOrDefaultAsync(h => h.Numero == habitacion.Numero);
+
+            if (existingRoom != null)
+            {
+                result.IsSuccess = false;
+                result.Message = $"Ya existe una habitación con el número '{habitacion.Numero}'.";
+            }
+
+            await _context.Habitaciones.AddAsync(habitacion);
             await _context.SaveChangesAsync();
 
-            result.Data = entity;
             result.IsSuccess = true;
-            result.Message = "Habitación creada exitosamente.";
+            result.Message = "Habitación guardada exitosamente.";
+            result.Data = habitacion; 
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             result.IsSuccess = false;
-            result.Message = "Ocurrió un error guardando la habitación.";
+            result.Message = $"Error al guardar la habitación: {ex.Message}";
         }
 
         return result;
     }
-    public override async Task<OperationResult> UpdateEntityAsync(Habitacion entity)
+
+    public override async Task<OperationResult> UpdateEntityAsync(Habitacion habitacion)
     {
         var result = new OperationResult();
         try
         {
-            var habitacion = await _context.Habitaciones.FindAsync(entity.IdHabitacion);
-            if (habitacion == null)
+            var validator = new HabitacionValidator();
+            var validation = validator.Validate(habitacion);
+            if (!validation.IsSuccess)
+            {
+                return validation;
+            }
+
+            var existingRoom = await _context.Habitaciones
+                .FirstOrDefaultAsync(h => h.IdHabitacion == habitacion.IdHabitacion);
+
+            if (existingRoom == null)
             {
                 result.IsSuccess = false;
-                result.Message = "Habitación no encontrada.";
+                result.Message = "La habitación no existe.";
                 return result;
             }
 
-            if (!string.IsNullOrEmpty(entity.Numero)) habitacion.Numero = entity.Numero;
-            if (!string.IsNullOrEmpty(entity.Detalle)) habitacion.Detalle = entity.Detalle;
-            if (entity.IdEstadoHabitacion.HasValue) habitacion.IdEstadoHabitacion = entity.IdEstadoHabitacion;
-            if (entity.IdPiso.HasValue) habitacion.IdPiso = entity.IdPiso;
-            if (entity.IdCategoria.HasValue) habitacion.IdCategoria = entity.IdCategoria;
-            if (entity.Estado.HasValue) habitacion.Estado = entity.Estado;
+            if (habitacion.Numero != existingRoom.Numero)
+            {
+                var duplicateRoom = await _context.Habitaciones
+                    .FirstOrDefaultAsync(
+                        h => h.Numero == habitacion.Numero && h.IdHabitacion != habitacion.IdHabitacion);
+
+                if (duplicateRoom != null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = $"Ya existe otra habitación con el número '{habitacion.Numero}'.";
+                    return result;
+                }
+            }
+
+            existingRoom.Numero = habitacion.Numero;
+            existingRoom.Detalle = habitacion.Detalle;
+            existingRoom.Precio = habitacion.Precio;
+            existingRoom.IdPiso = habitacion.IdPiso;
+            existingRoom.IdCategoria = habitacion.IdCategoria;
+            existingRoom.IdEstadoHabitacion = habitacion.IdEstadoHabitacion;
 
             await _context.SaveChangesAsync();
-        
+
             result.IsSuccess = true;
-            result.Message = "Habitación actualizada exitosamente.";
-            result.Data = habitacion;
-        }     
-        catch (Exception)
+            result.Message = "Habitación actualizada correctamente.";
+            result.Data = existingRoom;
+        }
+        catch (DbUpdateConcurrencyException)
         {
             result.IsSuccess = false;
-            result.Message = "Error al actualizar la habitación.";
+            result.Message = "La habitación ha sido modificada por otro usuario. Por favor, vuelva a intentarlo.";
         }
+        catch (Exception ex)
+        {
+            result.IsSuccess = false;
+            result.Message = $"Error al actualizar la habitación: {ex.Message}";
+        }
+
         return result;
     }
 }

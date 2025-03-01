@@ -1,4 +1,5 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator.ServiceValidations;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
@@ -12,7 +13,39 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
     public TarifaRepository(HRMSContext context) : base(context)
     {
     }
-    
+
+    public async override Task<OperationResult> SaveEntityAsync(Tarifas tarifas)
+    {
+        OperationResult result = new OperationResult();
+        try
+        {
+            var validator = new TarifasValidator();
+            var validation = validator.Validate(tarifas);
+            if (!validation.IsSuccess)
+            {
+                result.IsSuccess = false;
+                result.Message = "Datos incorrectos.";
+            }
+            var exists = ExistsAsync(t => t.IdHabitacion == tarifas.IdHabitacion && t.FechaInicio == tarifas.FechaInicio);
+            if (exists.Result)
+            {
+                result.IsSuccess = false;
+                result.Message = "La tarifa ya existe.";
+            }
+            _context.Tarifas.Add(tarifas);
+            _context.SaveChanges();
+            result.IsSuccess = true;
+            result.Message = "Tarifa guardada correctamente.";
+        }
+        catch (Exception)
+        {
+            result.IsSuccess = false;
+            result.Message = "Ocurrió un error guardando la tarifa.";
+        }
+
+        return result;
+    }
+
     public async Task<OperationResult> GetHabitacionByPrecioAsync(decimal precio)
     {
         var result = new OperationResult();
@@ -36,6 +69,44 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
             return result;
         }
     }
+    
+    public override async Task<OperationResult> UpdateEntityAsync(Tarifas tarifas)
+    {
+        OperationResult result = new OperationResult();
+        try
+        {
+            var validator = new TarifasValidator();
+            var validation = validator.Validate(tarifas);
+            if (!validation.IsSuccess)
+            {
+                result.IsSuccess = false;
+                result.Message = "Datos incorrectos.";
+            }
+            var exists = await ExistsAsync(t => t.IdHabitacion == tarifas.IdHabitacion && t.FechaInicio == tarifas.FechaInicio);
+            if (!exists)
+            {
+                result.IsSuccess = false;
+                result.Message = "La tarifa no existe.";
+            }
+            _context.Tarifas.Update(tarifas);
+            await _context.SaveChangesAsync();
+            result.IsSuccess = true;
+            result.Message = "Tarifa actualizada correctamente.";
+        }
+        catch (Exception)
+        {
+            result.IsSuccess = false;
+            result.Message = "Ocurrió un error actualizando la tarifa.";
+        }
+
+        return result;
+    }
+
+    public override async Task<List<Tarifas>> GetAllAsync()
+    {
+        return await _context.Tarifas.Where(t => t.Estado == true).ToListAsync();
+    }
+
     public async Task<OperationResult> GetTarifasVigentesAsync(DateTime fecha)
     {
         var result = new OperationResult();
@@ -53,21 +124,13 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
         }
         return result;
     }
-    public async Task<OperationResult> GetTarifasPorHabitacionAsync(int idHabitacion)
+
+    public override async Task<Tarifas> GetEntityByIdAsync(int id)
     {
-        var result = new OperationResult();
-        try
+        if (id != 0)
         {
-            var datos = await _context.Set<Tarifas>()
-                .Where(t => t.IdHabitacion == idHabitacion)
-                .ToListAsync();
-            result.Data = datos;
+            return(await _context.Tarifas.FindAsync(id))!; 
         }
-        catch (Exception)
-        {
-            result.IsSuccess = false;
-            result.Message = "Ocurrió un error obteniendo las tarifas por habitación.";
-        }   
-        return result;
+        return null;
     }
 }

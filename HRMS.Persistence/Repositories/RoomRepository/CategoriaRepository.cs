@@ -5,7 +5,6 @@ using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.EntityFrameworkCore;
-using MyValidator.Validator;
 
 namespace HRMS.Persistence.Repositories.RoomRepository;
 
@@ -32,14 +31,12 @@ public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepo
             {
                 result.IsSuccess = false;
                 result.Message = "Datos incorrectos.";
-                return result;
             }
             var exists = await ExistsAsync(c => c.Descripcion == categoria.Descripcion);
             if (exists)
             {
                 result.IsSuccess = false;
                 result.Message = "La categoría ya existe.";
-                return result;
             }
             await _context.Categorias.AddAsync(categoria);
             await _context.SaveChangesAsync();
@@ -55,7 +52,39 @@ public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepo
         return result;
     }
 
-    public async Task<OperationResult> GetByServiciosAsync(string nombre)
+    public override async Task<OperationResult> UpdateEntityAsync(Categoria categoria)
+    {
+        OperationResult result = new OperationResult();
+        try
+        {
+            var validator = new CategoriaValidator();
+            var validation = validator.Validate(categoria);
+            if (!validation.IsSuccess)
+            {
+                result.IsSuccess = false;
+                result.Message = "Datos incorrectos.";
+            }
+            var exists = await ExistsAsync(c => c.Descripcion == categoria.Descripcion);
+            if (exists)
+            {
+                result.IsSuccess = false;
+                result.Message = "La categoría ya existe.";
+            }
+            _context.Categorias.Update(categoria);
+            await _context.SaveChangesAsync();
+            result.IsSuccess = true;
+            result.Message = "Categoría actualizada correctamente.";
+        }
+        catch (Exception)
+        {
+            result.IsSuccess = false;
+            result.Message = "Ocurrió un error actualizando la categoría.";
+        }
+
+        return result;
+    }
+
+    public async Task<OperationResult> GetCategoriaByServiciosAsync(string nombre)
     {
         OperationResult result = new OperationResult();
         
@@ -68,14 +97,13 @@ public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepo
             var categorias = await query.ToListAsync();
             result.Data = categorias;
             result.IsSuccess = true;
-            return result;
         }
         catch (Exception)
         {
             result.IsSuccess = false;
             result.Message = "Ocurrió un error obteniendo las categorías por servicio.";
-            return result;
         }
+        return result;
     }
 
     public async Task<OperationResult> GetServiciosByDescripcionAsync(string descripcion)
@@ -92,14 +120,14 @@ public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepo
             result.Data = servicios;
             result.IsSuccess = true;
             
-            return result;
         }
         catch (Exception)
         {
             result.IsSuccess = false;
             result.Message = "Ocurrió un error obteniendo los servicios por descripción.";
-            return result;
         }
+
+        return result;
     }
     
     public  async Task<OperationResult> GetHabitacionByCapacidad(int capacidad)
@@ -114,13 +142,13 @@ public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepo
             var habitaciones = await query.ToListAsync();
             result.Data = habitaciones;
             result.IsSuccess = true;
-            return result;
         }
         catch (Exception)
         {
             result.IsSuccess = false;
             result.Message = "Ocurrió un error obteniendo las habitaciones por capacidad.";
-            return result;
         }
+
+        return result;
     }
 }

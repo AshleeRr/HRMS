@@ -42,7 +42,6 @@ public class EstadoHabitacionRepository : BaseRepository<EstadoHabitacion, int>,
             {
                 result.IsSuccess = false;
                 result.Message = "Datos incorrectos.";
-                return result;
             }
             
             var exists = await ExistsAsync(e => e.Descripcion == entity.Descripcion);
@@ -50,7 +49,6 @@ public class EstadoHabitacionRepository : BaseRepository<EstadoHabitacion, int>,
             {
                 result.IsSuccess = false;
                 result.Message = "El estado de habitación ya existe.";
-                return result;
             }
             
             await _context.EstadoHabitaciones.AddAsync(entity);
@@ -78,21 +76,20 @@ public class EstadoHabitacionRepository : BaseRepository<EstadoHabitacion, int>,
             {
                 result.IsSuccess = false;
                 result.Message = "No se encontró el estado de habitación.";
-                return result;
             }
             result.Data = estado;
             result.IsSuccess = true;
-            return result;
         }
         catch (Exception)
         {
             result.IsSuccess = false;
             result.Message = "Ocurrió un error obteniendo el estado de habitación.";
-            return result;
         }
+
+        return result;
     }
 
-    public override Task<OperationResult> UpdateEntityAsync(EstadoHabitacion estadoHabitacion)
+    public override async Task<OperationResult> UpdateEntityAsync(EstadoHabitacion estadoHabitacion)
     {
         OperationResult result = new OperationResult();
         try
@@ -103,7 +100,6 @@ public class EstadoHabitacionRepository : BaseRepository<EstadoHabitacion, int>,
             {
                 result.IsSuccess = false;
                 result.Message = "Datos incorrectos.";
-                return Task.FromResult(result);
             }
             var existingEstado = _context.EstadoHabitaciones
                 .FirstOrDefault(e => e.Descripcion == estadoHabitacion.Descripcion && e.IdEstadoHabitacion != estadoHabitacion.IdEstadoHabitacion);
@@ -111,19 +107,18 @@ public class EstadoHabitacionRepository : BaseRepository<EstadoHabitacion, int>,
             {
                 result.IsSuccess = false;
                 result.Message = "Ya existe un estado de habitación con el mismo nombre.";
-                return Task.FromResult(result);
             }
             _context.EstadoHabitaciones.Update(estadoHabitacion);
             _context.SaveChanges();
             result.IsSuccess = true;
             result.Message = "Estado de habitación actualizado correctamente.";
-            return Task.FromResult(result);
         }
         catch (Exception)
         {
             result.IsSuccess = false;
             result.Message = "Ocurrió un error actualizando el estado de habitación.";
-            return Task.FromResult(result);
         }
+
+        return result;
     }
 }
