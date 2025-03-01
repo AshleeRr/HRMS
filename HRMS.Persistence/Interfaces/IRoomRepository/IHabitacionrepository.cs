@@ -8,11 +8,10 @@ public interface IHabitacionRepository : IBaseRepository<Habitacion, int>
 {
     Task<OperationResult> GetByPisoAsync(int idPiso);
     
-    Task<OperationResult> GetByCategoriaAsync(int idCategoria);
-    
     Task<OperationResult> GetByNumeroAsync(string numero);
     
     Task<OperationResult> GetInfoHabitacionesAsync();
     
+    Task<OperationResult> GetByCategoriaAsync(string categoria);
 }
     

@@ -8,4 +8,5 @@ public interface ICategoryRepository : IBaseRepository<Categoria,int>
 {
     Task<OperationResult> GetByServiciosAsync(string nombre);
     Task<OperationResult> GetServiciosByDescripcionAsync(string nombre);
+    Task<OperationResult> GetHabitacionByCapacidad(int capacidad);
 }

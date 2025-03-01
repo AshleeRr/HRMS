@@ -65,4 +65,9 @@ public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepo
             return result;
         }
     }
+
+    public Task<OperationResult> GetHabitacionByCapacidad(int capacidad)
+    {
+        throw new NotImplementedException();
+    }
 }

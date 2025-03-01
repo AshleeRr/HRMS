@@ -52,7 +52,6 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
                     h.Numero,
                     h.Detalle,
                     h.Estado,
-                    h.FechaCreacion,
                     t.PrecioPorNoche,
                     DescripcionPiso = p.Descripcion,
                     DescripcionCategoria = c.Descripcion,
@@ -71,25 +70,28 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
             return result;
         }
     }
-    
 
-    public async Task<OperationResult> GetByCategoriaAsync(int idCategoria)
+    public async Task<OperationResult> GetByCategoriaAsync(string categoria)
     {
-        var result = new OperationResult();
+        OperationResult result = new OperationResult();
         try
         {
-            var datos = await _context.Set<Habitacion>()
-                .Where(h => h.IdCategoria == idCategoria)
-                .ToListAsync();
-            result.Data = datos;
-        }
-        catch (Exception)
+           var query = from h in _context.Habitaciones
+               join c in _context.Categorias on h.IdCategoria equals c.IdCategoria
+               where c.Descripcion.Contains(categoria)
+               select h; 
+           var habitaciones = query.ToListAsync();
+            result.Data = habitaciones; 
+            result.IsSuccess = true;
+            return result;
+        }catch (Exception)
         {
             result.IsSuccess = false;
             result.Message = "Ocurrió un error obteniendo las habitaciones por categoría.";
+            return result;
         }
-        return result;
     }
+
 
     public async Task<OperationResult> GetByNumeroAsync(string numero)
     {
