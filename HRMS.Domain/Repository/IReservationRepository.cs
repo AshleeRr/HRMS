@@ -9,5 +9,7 @@ namespace HRMS.Domain.Repository
 
         Task<OperationResult> GetDisponibleRoomsOfCategoryInTimeLapse(DateTime start, DateTime end, int categoriaId);
 
+        Task<OperationResult> GetPricesForServicesinRoomCategory(int categoryId, IEnumerable<int> servicesIds);
+
     }
 }

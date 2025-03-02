@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using System.Linq.Expressions;
 using MyValidator.Validator;
-
+using HRMS.Domain.Entities.Servicio;
 
 namespace HRMS.Persistence.Repositories.Reserv
 {
@@ -242,6 +242,55 @@ namespace HRMS.Persistence.Repositories.Reserv
 
             return !existeReserva;
         }
+
+        public async Task<OperationResult> GetPricesForServicesinRoomCategory(int categoryId, IEnumerable<int> servicesIds) 
+        {
+            OperationResult result = new OperationResult();
+            if (categoryId == 0)
+            {
+                result.IsSuccess = false;
+                result.Message = "No se ha especificado una categoría.";
+            }
+            else if (servicesIds == null || servicesIds.Count() == 0)
+            {
+                result.IsSuccess = false;
+                result.Message = "No se han especificado servicios.";
+            }
+            else
+            {
+                try
+                {
+                    ServicioPorCategoria[] prices = await _context.ServicioPorCategorias
+                                        .Where(sc => sc.CategoriaID == categoryId && servicesIds.Contains(sc.CategoriaID))
+                                        //.Select(sc => sc.Precio)
+                                        .ToArrayAsync();
+
+                    if (prices.Length == servicesIds.Count())
+                    {
+                        result.Data = prices;
+                    }
+                    else
+                    {
+                        result.IsSuccess = false;
+                        result.Message = "No todos los servicios se encuentran disponibles para esta categoria de habitación";
+                    }
+                }
+                catch(Exception ex)
+                {
+                    result.IsSuccess = false;
+                    result.Message = _getErrorMessage();
+                    _logger.LogError(result.Message, ex.ToString());
+                }
+            }
+            return result;
+        }
+
+        public Task<bool> CanRoomCategoryTakePeople(int categoryId, int people)
+        {
+           // _context.Habitaciones.AnyAsync(h => h.IdCategoria == categoryId && h.Capa >= people);
+            throw new NotImplementedException();
+        }
+
         private string? _getErrorMessage([CallerMemberName]string source ="")
             => _configuration["ErrorReservationRepository:" + source]; 
     }

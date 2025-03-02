@@ -22,7 +22,8 @@ namespace HRMS.Persistence.Context
         public DbSet<Piso> Pisos { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Tarifas> Tarifas { get; set; }
-
+        public DbSet<ServicioPorCategoria> ServicioPorCategorias { get; set; }
+        public DbSet<ServicioPorReservacion> ServicioPorReservacions { get; set; }
 
     }
 }
