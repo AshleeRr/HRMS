@@ -1,37 +1,54 @@
-using HRMS.APIs.Configuration;
+using HRMS.Persistence.Context;
+using HRMS.Persistence.Interfaces.IRoomRepository;
+using HRMS.Persistence.Repositories.RoomRepository;
+using Microsoft.EntityFrameworkCore;
+using HRMS.IOC.ReservationDepedencies;
+using HRMS.IOC.ClientDependencies;
+using HRMS.IOC.AuditDependencies;
+using HRMS.IOC.UserRoleDependencies;
+using HRMS.IOC.UserDependencies;
+using HRMS.IOC.RoomDependency;
 
-namespace HRMS.APIs;
-
-public class Program
+namespace HRMS.APIs
 {
-    public static void Main(string[] args)
+    public class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-        // Configuración de servicios
-        ConfigureServices(builder.Services, builder.Configuration);
-        var app = builder.Build();
+            // Add services to the container.
+            //builder.Services.AddTransient<IHabitacionRepository, HabitacionRepository>();
+            builder.Services.AddControllers();
+            builder.Services.AddDbContext<HRMSContext>(options => {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DBHotel"));
+            });
+            builder.Services.AddReceptionDependencies()
+                .AddUserDependencies()
+                .AddUserRoleDependencies()
+                .AddClientDependencies()
+                .AddAuditDependencies();
 
 
-        // Configuración del middleware
-        ConfigureMiddleware(app, app.Environment);
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
-        app.Run();
-    }
+            var app = builder.Build();
 
-    private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-    {
-        services
-            .AddPersistenceServices(configuration)
-            .AddApplicationServices()
-            .AddApiServices()
-            .AddSwaggerConfiguration()
-            .AddCorsConfiguration();
-    }
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
-    private static void ConfigureMiddleware(WebApplication app, IWebHostEnvironment env)
-    {
-        app.UseCustomMiddleware(env);
-        app.MapControllers();
+            app.UseAuthorization();
+
+
+            app.MapControllers();
+
+            app.Run();
+        }
     }
 }
