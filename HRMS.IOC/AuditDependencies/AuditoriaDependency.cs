@@ -1,8 +1,9 @@
-﻿using HRMS.Domain.Entities.Audit;
+﻿using HRMS.Domain.Base.Validator;
+using HRMS.Domain.Base.Validator.AuditValidations;
+using HRMS.Domain.Entities.Audit;
 using HRMS.Persistence.Interfaces.IAuditRepository;
 using HRMS.Persistence.Repositories.AuditRepository;
 using Microsoft.Extensions.DependencyInjection;
-using MyValidator.Validator;
 
 namespace HRMS.IOC.AuditDependencies
 {

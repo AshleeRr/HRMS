@@ -88,7 +88,7 @@ namespace HRMS.APIs.Controllers.AuditController
                 return NotFound("No hay auditorias hechas en esta fecha");
             }
             return Ok(audit);
-        }
+        }/*
         [HttpGet("RealizarAccion")]
         public async Task<IActionResult> RealizarAccion()
         {
@@ -103,7 +103,7 @@ namespace HRMS.APIs.Controllers.AuditController
                 return NotFound("No hay auditorias hechas en esta fecha");
             }
             return Ok("Auditoría registrada correctamente.");
-        }
+        }*/
 
 
         // DELETE api/<AuditoriaController>/5
