@@ -44,7 +44,7 @@ public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacion
             var query = from h in _context.Habitaciones
                 join p in _context.Pisos on h.IdPiso equals p.IdPiso
                 join c in _context.Categorias on h.IdCategoria equals c.IdCategoria
-                join t in _context.Tarifas on h.IdHabitacion equals t.IdHabitacion
+                join t in _context.Tarifas on h.IdCategoria equals t.IdCategoria
                 where h.Estado == true && (t.FechaInicio <= DateTime.Now && t.FechaFin >= DateTime.Now)
                 select new
                 {

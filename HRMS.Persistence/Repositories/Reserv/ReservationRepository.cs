@@ -1,5 +1,5 @@
 ﻿using HRMS.Domain.Base;
-using HRMS.Domain.Entities.Reservation;
+using HRMS.Domain.Entities.Reservations;
 using HRMS.Models.Models.ReservationModels;
 using HRMS.Domain.Repository;
 using HRMS.Persistence.Base;
@@ -212,14 +212,23 @@ namespace HRMS.Persistence.Repositories.Reserv
             {
                 try
                 {
-                    var query = _context.Habitaciones
+                    var query = await _context.Habitaciones
                                     .Where(h => h.IdCategoria == categoriaId &&
                                         !_context.Reservations.Any(r =>
                                             r.IdHabitacion == h.IdHabitacion &&
                                             !(r.FechaSalida < start || r.FechaEntrada > end)   
                                         ))
-                                    .Select(h => h.IdHabitacion);
-                    result.Data = await query.ToListAsync();
+                                    .Select(h => h.IdHabitacion)
+                                    .FirstOrDefaultAsync();
+                    if(query == 0)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = "No hay habitaciones disponibles en la categoría especificada.";
+                    }
+                    else
+                    {
+                        result.Data = query;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -286,11 +295,77 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-        public Task<bool> CanRoomCategoryTakePeople(int categoryId, int people)
+        public async Task<bool> HasRoomCapacity(int categoryId, int people)
         {
-           // _context.Habitaciones.AnyAsync(h => h.IdCategoria == categoryId && h.Capa >= people);
+            try
+            {
+                if (categoryId == 0 || people == 0)
+                {
+                    return false;
+                }
+                return await _context.Categorias.AnyAsync(c => c.IdCategoria == categoryId && c.Capacidad >= people);
+            }
+            catch (Exception ex)
+            {
+
+                var message = _getErrorMessage();
+                _logger.LogError(message, ex.ToString());
+            }
+            
             throw new NotImplementedException();
         }
+
+
+        public async Task<OperationResult> GetCategoryForReserv(int categoryId, int people, DateTime start, DateTime end)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (categoryId == 0 || people == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Categoria o numero de personas no especificado";
+                }
+                else
+                {
+                    var query = from c in _context.Categorias
+                                join t in _context.Tarifas on c.IdCategoria equals t.IdCategoria
+                                where c.IdCategoria == categoryId
+                                //  &&t.FechaInicio >= start && t.FechaInicio < end &&
+                                //t.FechaFin > start && t.FechaFin <= end
+                                select new CategoryRoomForReserv
+                                {
+                                    Id = c.IdCategoria,
+                                    Capacity = c.Capacidad,
+                                    PricePerNight = t.PrecioPorNoche,
+                                    Descuento = t.Descuento
+                                };
+                    var res = await query.FirstOrDefaultAsync();
+                    if(res == null)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = "No se ha encontrado la categoria especificada";
+                    }
+                    else
+                    {
+                        result.Data = res;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                var message = _getErrorMessage();
+                result.IsSuccess = false;
+                result.Message = message;
+                _logger.LogError(message, ex.ToString());
+            }
+
+            return result;
+        }
+
+
+
 
         private string? _getErrorMessage([CallerMemberName]string source ="")
             => _configuration["ErrorReservationRepository:" + source]; 

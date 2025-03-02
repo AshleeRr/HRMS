@@ -12,8 +12,9 @@ namespace HRMS.Domain.Entities.RoomManagement
         [Key] 
         public int IdTarifa { get; set; }
 
-        [ForeignKey("IdHabitacion")] 
-        public int IdHabitacion { get; set; }
+        /*[ForeignKey("IdHabitacion")] 
+        public int IdHabitacion { get; set; }*/
+        public int IdCategoria { get; set; }
 
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }

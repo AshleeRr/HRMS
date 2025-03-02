@@ -9,5 +9,7 @@ namespace HRMS.Application.Interfaces.Reservation_2023_0731
         Task<OperationResult> ConfirmReservation(int id);
         Task<OperationResult> CancelReservation(int id);
         Task<OperationResult> GetReservationByClientID(int id);
+
+
     }
 }

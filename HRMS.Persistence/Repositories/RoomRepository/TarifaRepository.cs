@@ -15,10 +15,13 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
     
     public async Task<OperationResult> GetHabitacionByPrecioAsync(decimal precio)
     {
+        throw new NotImplementedException();
+        /*
         var result = new OperationResult();
 
         try
         {
+            
             var query = from h in _context.Habitaciones
                 join t in _context.Tarifas on h.IdHabitacion equals t.IdHabitacion
                 where t.PrecioPorNoche == precio
@@ -35,6 +38,7 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
             result.Message = "Ocurrió un error obteniendo la habitación por precio.";
             return result;
         }
+            */
     }
     public async Task<OperationResult> GetTarifasVigentesAsync(DateTime fecha)
     {
@@ -55,6 +59,8 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
     }
     public async Task<OperationResult> GetTarifasPorHabitacionAsync(int idHabitacion)
     {
+        throw new NotImplementedException();
+        /*
         var result = new OperationResult();
         try
         {
@@ -69,5 +75,6 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
             result.Message = "Ocurrió un error obteniendo las tarifas por habitación.";
         }   
         return result;
+        */
     }
 }

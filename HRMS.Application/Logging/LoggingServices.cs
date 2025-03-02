@@ -8,10 +8,10 @@ namespace HRMS.Infraestructure.Logging
 {
     public class LoggingServices : ILoggingServices
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<LoggingServices> _logger;
         private readonly IConfiguration _configuration;
 
-        public LoggingServices(ILogger logger, IConfiguration configuration)
+        public LoggingServices(ILogger<LoggingServices> logger, IConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
