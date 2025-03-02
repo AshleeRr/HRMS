@@ -1,36 +1,40 @@
-namespace HRMS.APIs;
+using HRMS.Persistence.Context;
+using HRMS.Persistence.Interfaces.IRoomRepository;
+using HRMS.Persistence.Repositories.RoomRepository;
+using Microsoft.EntityFrameworkCore;
 
-public class Program
+namespace HRMS.APIs
 {
-    public static void Main(string[] args)
+    public class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
+        
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-        // Configuración de servicios
-        ConfigureServices(builder.Services, builder.Configuration);
-        var app = builder.Build();
+            // Add services to the container.
+            //builder.Services.AddTransient<IHabitacionRepository, HabitacionRepository>();
+            builder.Services.AddControllers();
+
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseAuthorization();
 
 
-        // Configuración del middleware
-        ConfigureMiddleware(app, app.Environment);
+            app.MapControllers();
 
-        app.Run();
-    }
-    
-    private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-    {
-        //services
-            /*
-            .AddPersistenceServices(configuration)
-            .AddApplicationServices()
-            .AddApiServices()
-            .AddSwaggerConfiguration()
-            .AddCorsConfiguration();*/
-    }
-
-    private static void ConfigureMiddleware(WebApplication app, IWebHostEnvironment env)
-    {
-     //   app.UseCustomMiddleware(env);
-        app.MapControllers();
+            app.Run();
+        }
     }
 }
