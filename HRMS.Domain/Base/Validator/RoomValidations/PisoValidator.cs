@@ -2,9 +2,9 @@
 
 namespace HRMS.Domain.Base.Validator.RoomValidations;
 
-public class PisoValidation : Validator<Entities.RoomManagement.Piso>
+public class PisoValidator : Validator<Entities.RoomManagement.Piso>
 {
-    public PisoValidation()
+    public PisoValidator()
     {
         AddRule(p => p != null).WithErrorMessage("El piso no puede ser nulo");
         AddRule(p=> p.Descripcion.Length <=100).WithErrorMessage( 
