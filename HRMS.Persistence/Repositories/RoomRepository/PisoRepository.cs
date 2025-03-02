@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRMS.Persistence.Repositories.RoomRepository;
 
-public class PisoRepository : BaseRepository<Piso , int> , IPisoRepository
+public class PisoRepository : BaseRepository<Piso, int>, IPisoRepository
 {
     public PisoRepository(HRMSContext context) : base(context)
     {
@@ -16,46 +16,12 @@ public class PisoRepository : BaseRepository<Piso , int> , IPisoRepository
 
     public override async Task<List<Piso>> GetAllAsync()
     {
-        return  _context.Pisos.Where(p =>
+        return _context.Pisos.Where(p =>
                 p.Estado == true)
             .ToList();
     }
 
-    public override  async Task<OperationResult> SaveEntityAsync(Piso piso)
-    {
-        OperationResult result = new OperationResult();
-        try
-        {
-            var validator = new PisoValidator();
-            var validation = validator.Validate(piso);
-            if (!validation.IsSuccess)
-            {
-                result.IsSuccess = false;
-                result.Message = "Datos incorrectos.";
-                return result;
-            }
 
-            var exists = ExistsAsync(p => p.Descripcion == piso.Descripcion);
-            if (exists.Result)
-            {
-                result.IsSuccess = false;
-                result.Message = "El piso ya existe.";
-                return result;
-            }
-
-            _context.Pisos.Add(piso);
-            _context.SaveChanges();
-            result.IsSuccess = true;
-            result.Message = "Piso guardado correctamente.";
-        }
-        catch (Exception)
-        {
-            result.IsSuccess = false;
-            result.Message = "Ocurrió un error guardando el piso.";
-        }
-        return result;
-    }
-    
     public override async Task<Piso> GetEntityByIdAsync(int id)
     {
         if (id != 0)
@@ -68,7 +34,7 @@ public class PisoRepository : BaseRepository<Piso , int> , IPisoRepository
 
     public override async Task<OperationResult> UpdateEntityAsync(Piso piso)
     {
-        OperationResult result = new OperationResult();
+        var result = new OperationResult();
         try
         {
             var validator = new PisoValidator();
@@ -78,23 +44,41 @@ public class PisoRepository : BaseRepository<Piso , int> , IPisoRepository
                 return validation;
             }
 
-            var exists = ExistsAsync(p => p.Descripcion == piso.Descripcion);
-            if (exists.Result)
+            var existingPiso = await _context.Pisos.FindAsync(piso.IdPiso);
+            if (existingPiso == null)
             {
                 result.IsSuccess = false;
-                result.Message = "El piso ya existe.";
+                result.Message = "El piso no existe.";
                 return result;
             }
 
-            _context.Pisos.Update(piso);
-            _context.SaveChanges();
+            bool exists = await _context.Pisos
+                .AnyAsync(p => p.Descripcion == piso.Descripcion && p.IdPiso != piso.IdPiso);
+            if (exists)
+            {
+                result.IsSuccess = false;
+                result.Message = $"Ya existe otro piso con la descripción '{piso.Descripcion}'.";
+                return result;
+            }
+
+            existingPiso.Descripcion = piso.Descripcion;
+            existingPiso.Estado = piso.Estado;
+
+            await _context.SaveChangesAsync();
+
             result.IsSuccess = true;
             result.Message = "Piso actualizado correctamente.";
+            result.Data = existingPiso;
         }
-        catch (Exception)
+        catch (DbUpdateConcurrencyException)
         {
             result.IsSuccess = false;
-            result.Message = "Ocurrió un error actualizando el piso.";
+            result.Message = "El piso fue modificado por otro usuario. Intente nuevamente.";
+        }
+        catch (Exception ex)
+        {
+            result.IsSuccess = false;
+            result.Message = $"Ocurrió un error actualizando el piso: {ex.Message}";
         }
 
         return result;
@@ -105,20 +89,31 @@ public class PisoRepository : BaseRepository<Piso , int> , IPisoRepository
         var result = new OperationResult();
         try
         {
-            var query = from p in _context.Pisos
-                where p.Descripcion.Contains(descripcion)
-                select p;
-                   
-            var pisos = await query.ToListAsync();
-        
+            if (string.IsNullOrWhiteSpace(descripcion))
+            {
+                result.IsSuccess = false;
+                result.Message = "La descripción del piso no puede estar vacía.";
+                return result;
+            }
+
+            var pisos = await _context.Pisos
+                .Where(p => p.Descripcion.Contains(descripcion) && p.Estado == true)
+                .ToListAsync();
+
             result.Data = pisos;
             result.IsSuccess = true;
+
+            if (!pisos.Any())
+            {
+                result.Message = $"No se encontraron pisos con la descripción '{descripcion}'.";
+            }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             result.IsSuccess = false;
-            result.Message = "Ocurrió un error obteniendo el piso por descripción.";
+            result.Message = $"Ocurrió un error obteniendo el piso por descripción: {ex.Message}";
         }
+
         return result;
     }
 }
