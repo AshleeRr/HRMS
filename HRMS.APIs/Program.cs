@@ -1,5 +1,3 @@
-using HRMS.APIs.Configuration;
-
 namespace HRMS.APIs;
 
 public class Program
@@ -18,20 +16,21 @@ public class Program
 
         app.Run();
     }
-
+    
     private static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        services
+        //services
+            /*
             .AddPersistenceServices(configuration)
             .AddApplicationServices()
             .AddApiServices()
             .AddSwaggerConfiguration()
-            .AddCorsConfiguration();
+            .AddCorsConfiguration();*/
     }
 
     private static void ConfigureMiddleware(WebApplication app, IWebHostEnvironment env)
     {
-        app.UseCustomMiddleware(env);
+     //   app.UseCustomMiddleware(env);
         app.MapControllers();
     }
 }

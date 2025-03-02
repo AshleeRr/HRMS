@@ -1,6 +1,11 @@
-﻿namespace HRMS.Application.Interfaces.IUsersServices
+﻿using HRMS.Application.Base;
+using HRMS.Application.DTOs.ClientDTOs;
+using HRMS.Domain.Base;
+
+namespace HRMS.Application.Interfaces.IUsersServices
 {
-    public class IClientService 
+    public interface IClientService : IBaseServices<SaveClientDTO, UpdateClientDTO, RemoveClientDTO>
     {
+        Task<OperationResult> UpdataTipoDocumentoAndDocumentoAsync(int idCliente, int idTipoDocumento, string documento);
     }
 }
