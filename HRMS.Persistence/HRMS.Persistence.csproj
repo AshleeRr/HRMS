@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Repositories\Users\**" />
+    <EmbeddedResource Remove="Repositories\Users\**" />
+    <None Remove="Repositories\Users\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.12" />
   </ItemGroup>
@@ -14,10 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\HRMS.Domain\HRMS.Domain.csproj" />
     <ProjectReference Include="..\HRMS.Models\HRMS.Models.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Repositories\Users\" />
   </ItemGroup>
 
 </Project>
