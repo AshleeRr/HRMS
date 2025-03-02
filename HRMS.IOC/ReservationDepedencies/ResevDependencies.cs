@@ -4,7 +4,6 @@ using HRMS.Domain.Entities.Reservation;
 using HRMS.Domain.Repository;
 using HRMS.Persistence.Repositories.Reserv;
 using Microsoft.Extensions.DependencyInjection;
-using MyValidator.Validator;
 
 namespace HRMS.IOC.ReservationDepedencies
 {
