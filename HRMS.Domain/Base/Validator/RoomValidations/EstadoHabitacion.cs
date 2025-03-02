@@ -1,5 +1,6 @@
-﻿namespace HRMS.Domain.Base.Validator.RoomValidations;
+﻿using MyValidator.Validator;
 
+namespace HRMS.Domain.Base.Validator.RoomValidations;
 public class EstadoHabitacion : Validator<Entities.RoomManagement.EstadoHabitacion>
 {
     public EstadoHabitacion()

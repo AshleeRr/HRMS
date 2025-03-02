@@ -1,4 +1,5 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 
 
 namespace MyValidator.Validator

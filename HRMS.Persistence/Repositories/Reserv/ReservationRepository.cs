@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using System.Linq.Expressions;
+using HRMS.Domain.Base.Validator;
 using MyValidator.Validator;
 using HRMS.Domain.Entities.Servicio;
 

@@ -6,5 +6,5 @@ namespace HRMS.Persistence.Interfaces.IRoomRepository;
 
 public interface IPisoRepository : IBaseRepository<Piso, int>
 {
-    Task<OperationResult> GetByActivoAsync();
+    Task <OperationResult> GetPisoByDescripcion(string descripcion);
 }

@@ -12,6 +12,30 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
     public TarifaRepository(HRMSContext context) : base(context)
     {
     }
+    
+    public async Task<OperationResult> GetHabitacionByPrecioAsync(decimal precio)
+    {
+        var result = new OperationResult();
+
+        try
+        {
+            var query = from h in _context.Habitaciones
+                join t in _context.Tarifas on h.IdHabitacion equals t.IdHabitacion
+                where t.PrecioPorNoche == precio
+                select h;
+            var habitacion = await query.ToListAsync();
+            result.Data = habitacion;
+            result.IsSuccess = true;
+            return result;
+        }
+        
+        catch (Exception)
+        {
+            result.IsSuccess = false;
+            result.Message = "Ocurrió un error obteniendo la habitación por precio.";
+            return result;
+        }
+    }
     public async Task<OperationResult> GetTarifasVigentesAsync(DateTime fecha)
     {
         var result = new OperationResult();
@@ -44,23 +68,6 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
             result.IsSuccess = false;
             result.Message = "Ocurrió un error obteniendo las tarifas por habitación.";
         }   
-        return result;
-    }
-    public async Task<OperationResult> GetTarifaActivaByHabitacionAsync(int idHabitacion)
-    {
-        var result = new OperationResult();
-        try
-        {
-            var datos = await _context.Set<Tarifas>()
-                .Where(t => t.IdHabitacion == idHabitacion && t.FechaInicio <= DateTime.Now && t.FechaFin >= DateTime.Now)
-                .FirstOrDefaultAsync();
-            result.Data = datos;
-        }
-        catch (Exception)
-        {
-            result.IsSuccess = false;
-            result.Message = "Ocurrió un error obteniendo la tarifa activa.";
-        }
         return result;
     }
 }

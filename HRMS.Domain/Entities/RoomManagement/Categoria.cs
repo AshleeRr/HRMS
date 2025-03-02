@@ -13,4 +13,6 @@ public  sealed class Categoria : AuditEntity
     
     [ForeignKey("Servicio")]
     public short IdServicio { get; set; }
+    
+    public int Capacidad { get; set; }  
 }
