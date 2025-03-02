@@ -1,9 +1,9 @@
 ﻿using MyValidator.Validator;
 
 namespace HRMS.Domain.Base.Validator.RoomValidations;
-public class EstadoHabitacion : Validator<Entities.RoomManagement.EstadoHabitacion>
+public class EstadoHabitacionValidator : Validator<Entities.RoomManagement.EstadoHabitacion>
 {
-    public EstadoHabitacion()
+    public EstadoHabitacionValidator()
     {
         AddRule(e=> e != null).WithErrorMessage("El estado de la habitación no puede ser nulo");
         AddRule(e => e.Descripcion != null && e.Descripcion.Length<= 50 ).WithErrorMessage(

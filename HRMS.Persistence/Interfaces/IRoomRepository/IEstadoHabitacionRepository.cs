@@ -6,5 +6,5 @@ namespace HRMS.Persistence.Interfaces.IRoomRepository;
 
 public interface IEstadoHabitacionRepository : IBaseRepository<EstadoHabitacion, int>
 {
-    Task<OperationResult> GetByEstadoDescripcionAsync(string descripcion);
+    Task<OperationResult> GetEstadoByDescripcionAsync(string descripcion);
 }
