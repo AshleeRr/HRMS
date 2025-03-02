@@ -4,8 +4,8 @@ using HRMS.Persistence.Interfaces.IAuditRepository;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using HRMS.Persistence.Repositories.AuditRepository;
-using HRMS.Persistence.Repositories.ClientRepository;
 using HRMS.Persistence.Repositories.RoomRepository;
+using HRMS.Persistence.Repositories.UsersRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRMS.APIs.Configuration;
