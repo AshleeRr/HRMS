@@ -1,9 +1,9 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Audit;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IAuditRepository;
-using HRMS.Persistence.Repositories.ValidationsRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -15,12 +15,14 @@ namespace HRMS.Persistence.Repositories.AuditRepository
     {
         private readonly ILogger<AuditoriaRepository> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IValidator<Auditoria> _validator;
 
         public AuditoriaRepository(HRMSContext context, ILogger<AuditoriaRepository> logger,
-                                                     IConfiguration configuration) : base(context)
+                                                     IConfiguration configuration, IValidator<Auditoria> validator) : base(context)
         {
             _logger = logger;
             _configuration = configuration;
+            _validator = validator;
         }
         public override async Task<bool> ExistsAsync(Expression<Func<Auditoria, bool>> filter)
         {
@@ -53,7 +55,7 @@ namespace HRMS.Persistence.Repositories.AuditRepository
 
             return result;
         }
-        public override async Task<Auditoria> GetEntityByIdAsync(int id) // registro por id
+        public override async Task<Auditoria> GetEntityByIdAsync(int id)
         {
             var entity = await _context.Auditorias.FindAsync(id);
             if (entity == null)
@@ -62,9 +64,11 @@ namespace HRMS.Persistence.Repositories.AuditRepository
             }
             return entity;
         }
-        public async Task<OperationResult> LogAuditAsync(string accion, int idUsuario)
+        
+        public async Task<OperationResult> LogAuditAsync(string accion)
         {
             OperationResult result = new OperationResult();
+            /*
             try
             {
                 if (!Validation.ValidateAction(accion, result))
@@ -85,7 +89,7 @@ namespace HRMS.Persistence.Repositories.AuditRepository
                 result.IsSuccess = false;
                 _logger.LogError(result.Message, e.ToString());
 
-            }
+            }*/ // termianr este metood de auditoria para aplicar a los demas
             return result;
         }
         public async Task<List<Auditoria>> GetAuditByUserIdAsync(int idUsuario)

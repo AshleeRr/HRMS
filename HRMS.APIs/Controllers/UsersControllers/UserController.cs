@@ -95,20 +95,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 return StatusCode(500, "Error interno del servidor");
             }
         }
-        [HttpPatch("UpdateEstado")]
-        public async Task<IActionResult> UpdateEstado([FromBody] User user, bool nuevoEstado)
-        {
-            try
-            {
-                var usuario = await _userRepository.UpdateEstadoAsync(user, nuevoEstado);
-                return Ok(usuario);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error actualizando el estado del usuario");
-                return StatusCode(500, "Error interno del servidor");
-            }
-        }
+
         [HttpGet("completeName")]
         public async Task<IActionResult> GetUserByName(string nombreCompleto)
         {
@@ -128,25 +115,6 @@ namespace HRMS.APIs.Controllers.UsersControllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"Error obteniendo usuarios con el nombre: {nombreCompleto}");
-                return StatusCode(500, "Error interno del servidor");
-            }
-        }
-
-        [HttpPatch("UdateUserPassword")]
-        public async Task<IActionResult> UpdateUserPassword (int idUsuario, string clave)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(clave))
-                {
-                    return BadRequest("La clave no puede estar vacia. Asegurese de escribirla correctamente ");
-                }
-                var updatedPassword = await _userRepository.UpdatePasswordAsync(idUsuario, clave);
-                return Ok(updatedPassword);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Error actualizando la clave del usuario con el id: {idUsuario}");
                 return StatusCode(500, "Error interno del servidor");
             }
         }

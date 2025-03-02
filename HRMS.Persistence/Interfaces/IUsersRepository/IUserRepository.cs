@@ -8,8 +8,9 @@ namespace HRMS.Persistence.Interfaces.IUsersRepository
     {
         Task<OperationResult> GetUsersByUserRoleIdAsync(int id);
         Task<List<User>> GetUsersByNameAsync(string nombreCompleto);
-        Task<OperationResult> UpdatePasswordAsync(int idUsuario, string nuevaClave);
-        Task<User> AuthenticateUserAsync(string correo, string clave);
-        Task<OperationResult> UpdateEstadoAsync(User usuario, bool nuevoEstado); 
+       // Task<OperationResult> UpdatePasswordAsync(int idUsuario, string nuevaClave);
+      //  Task<User> AuthenticateUserAsync(string correo, string clave);
+       // Task<OperationResult> UpdateEstadoAsync(User usuario, bool nuevoEstado);
+        Task<User> GetUserByEmailAsync(string correo);
     }
 }
