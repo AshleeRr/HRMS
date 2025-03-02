@@ -108,7 +108,7 @@ namespace HRMS.Persistence.Repositories.ClientRepository
             }
             return entity;
         }
-
+        
         public override async Task<OperationResult> SaveEntityAsync(Client entity)
         {
             OperationResult resultSave = new OperationResult();

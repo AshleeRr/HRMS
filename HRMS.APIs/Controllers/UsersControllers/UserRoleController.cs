@@ -56,7 +56,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 return StatusCode(500, "Error interno del servidor");
             }
         }
-
+        /*
         [HttpPost("SaveUserRole")]
         public async Task<IActionResult> SaveUserRole([FromBody] UserRole userRole)
         {
@@ -69,7 +69,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 _logger.LogError(e, "Error creando rol de usuario");
                 return StatusCode(500, "Error interno del servidor");
             }
-        }
+        }*/
 
         [HttpPut("{id}")] // actualiza un rol usando su id
         public async Task<IActionResult> UpdateUserRole(int id, [FromBody] UserRole userRole)
