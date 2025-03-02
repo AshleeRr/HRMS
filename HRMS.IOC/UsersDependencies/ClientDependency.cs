@@ -5,7 +5,7 @@ using HRMS.Persistence.Interfaces.IUsersRepository;
 using HRMS.Persistence.Repositories.UsersRepository;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace HRMS.IOC.ClientDependencies
+namespace HRMS.IOC.UsersDependencies
 {
     public static class ClientDependency
     {

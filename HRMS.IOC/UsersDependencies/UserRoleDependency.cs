@@ -4,7 +4,7 @@ using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using HRMS.Persistence.Repositories.UsersRepository;
 using Microsoft.Extensions.DependencyInjection;
-namespace HRMS.IOC.UserRoleDependencies
+namespace HRMS.IOC.UsersDependencies
 {
     public static class UserRoleDependency
     {
