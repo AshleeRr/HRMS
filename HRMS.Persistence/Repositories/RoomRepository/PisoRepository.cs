@@ -1,18 +1,31 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.RoomValidations;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HRMS.Persistence.Repositories.RoomRepository;
 
 public class PisoRepository : BaseRepository<Piso, int>, IPisoRepository
 {
-    public PisoRepository(HRMSContext context) : base(context)
+    private readonly ILogger<PisoRepository> _logger;
+    private readonly IConfiguration _configuration;
+    private  IValidator<Piso> _validator;
+
+
+    public PisoRepository(HRMSContext context ,  ILogger<PisoRepository> logger,
+        IConfiguration configuration ,  IValidator<Piso> validator) : base(context)
     {
+        _logger = logger;
+        _configuration = configuration;
+        _validator = validator;
     }
+
 
     public override async Task<List<Piso>> GetAllAsync()
     {

@@ -1,17 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.RoomValidations;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using HRMS.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HRMS.Persistence.Repositories.RoomRepository;
 
 public class HabitacionRepository : BaseRepository<Habitacion, int>, IHabitacionRepository
 {
-    public HabitacionRepository(HRMSContext context) : base(context) {}
+    private readonly ILogger<HabitacionRepository> _logger;
+    private readonly IConfiguration _configuration;
+    private  IValidator<Habitacion> _validator;
+
+
+    public HabitacionRepository(HRMSContext context ,  ILogger<HabitacionRepository> logger,
+        IConfiguration configuration ,  IValidator<Habitacion> validator) : base(context)
+    {
+        _logger = logger;
+        _configuration = configuration;
+        _validator = validator;
+    }
 
     public override Task<List<Habitacion>> GetAllAsync()
     {

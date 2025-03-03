@@ -1,10 +1,12 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.ServiceValidations;
 using HRMS.Domain.Entities.Servicio;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IServicioRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace HRMS.Persistence.Repositories.ServiciosRepository;
@@ -12,10 +14,14 @@ namespace HRMS.Persistence.Repositories.ServiciosRepository;
 public class ServicioRepository : BaseRepository<Servicios, int>, IServicioRepository
 {
     private readonly ILogger<ServicioRepository> _logger;
-
-    public ServicioRepository(HRMSContext context, ILogger<ServicioRepository> logger = null) : base(context) 
+    private readonly IConfiguration _configuration;
+    private readonly IValidator<Servicios> _validator;
+    public ServicioRepository(HRMSContext context, ILogger<ServicioRepository> logger , 
+        IConfiguration configuration , IValidator<Servicios> validator) : base(context) 
     {
         _logger = logger;
+        _configuration = configuration;
+        _validator = validator;
     }
     
     public override async Task<List<Servicios>> GetAllAsync()

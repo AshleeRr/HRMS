@@ -1,17 +1,30 @@
-﻿using HRMS.Domain.Base;
+﻿using System.ComponentModel.DataAnnotations;
+using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.RoomValidations;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HRMS.Persistence.Repositories.RoomRepository;
 
 public class EstadoHabitacionRepository : BaseRepository<EstadoHabitacion, int>, IEstadoHabitacionRepository
 {
-    public EstadoHabitacionRepository(HRMSContext context) : base(context)
+    private readonly ILogger<EstadoHabitacionRepository> _logger;
+    private readonly IConfiguration _configuration;
+    private  IValidator<EstadoHabitacion> _validator;
+
+
+    public EstadoHabitacionRepository(HRMSContext context ,  ILogger<EstadoHabitacionRepository> logger,
+        IConfiguration configuration ,  IValidator<EstadoHabitacion> validator) : base(context)
     {
+        _logger = logger;
+        _configuration = configuration;
+        _validator = validator;
     }
 
     public override async Task<EstadoHabitacion> GetEntityByIdAsync(int id)

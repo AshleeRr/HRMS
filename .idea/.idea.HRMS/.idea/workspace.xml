@@ -10,21 +10,38 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="Todos los metodos de &quot;RoomManagement&quot; agregados">
-      <change afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/CategoriaDependency.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/HabitacionDependency.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/TarifasDependency.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.IOC/ServicesDependency/ServicioDependency.cs" afterDir="false" />
+    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="Algunos metodos de RoomManagementService añadidos">
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTO/CreateCategoriaDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTO/DeleteCategoriaDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTO/UpdateCategoriaDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDto/CreateEstadoHabitacionDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDto/DeleteEstadoHabitacionDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDto/UpdateEstadoHabitacionDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDto/CreateHabitacionDTO.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDto/DeleteHabitacionDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDto/UpdateHabitacionDTO.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDto/CreatePisoDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDto/DeletePisoDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDto/UpdatePisoDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDto/CreateTarifaDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDto/DeleteTarifaDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDto/UpdateTarifaDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/Interfaces/RoomManagementService/ICategoryService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/Interfaces/RoomManagementService/IEstadoHabitacionService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/Interfaces/RoomManagementService/IHabitacionService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/Interfaces/RoomManagementService/IPisoService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/Interfaces/RoomManagementService/ITarifaService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Interfaces/Reservation_2023-0731/IReservationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Interfaces/Reservation_2023-0731/IReservationService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagement/Habitacion/CreateHabitacionDTO.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagement/Habitacion/UpdateHabitacionDTO.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.IOC/ReservationDepedencies/ResevDependencies.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/ReservationDepedencies/ResevDependencies.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependency/HabitacionDependency.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/PisoRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/PisoRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/ServiciosRepository/ServicioRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/ServiciosRepository/ServicioRepository.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,11 +72,9 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock://C:/HRMS/Application/DTOs/RoomManagementDto/CategoriaDTO/DeleteCategoriaDto.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.IOC/AuditDependencies/AuditoriaDependency.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRMS.IOC/ClientDependencies/ClientDependency.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRMS.IOC/UserDependencies/UserDependency.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRMS.IOC/UserRoleDependencies/UserRoleDependency.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b741f17422844062bda644589ab84b32337fefcb677bc51957a62c3df8ad4d/AuthorizationAppBuilderExtensions.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -72,21 +87,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.HRMS.APIs: http.executor": "Debug",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "#51 on HabitFloors-20240045",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.HRMS.APIs: http.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#51 on HabitFloors-20240045&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.Web: http">
     <configuration name="HRMS.APIs: IIS Express" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" />
@@ -212,6 +227,7 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Todos los metodos de &quot;RoomManagement&quot; agregados" />
-    <option name="LAST_COMMIT_MESSAGE" value="Todos los metodos de &quot;RoomManagement&quot; agregados" />
+    <MESSAGE value="Algunos metodos de RoomManagementService añadidos" />
+    <option name="LAST_COMMIT_MESSAGE" value="Algunos metodos de RoomManagementService añadidos" />
   </component>
 </project>

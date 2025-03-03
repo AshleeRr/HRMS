@@ -1,17 +1,31 @@
-﻿using HRMS.Domain.Base;
+﻿using System.ComponentModel.DataAnnotations;
+using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.RoomValidations;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HRMS.Persistence.Repositories.RoomRepository;
 
 public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepository
 {
-    
-    public CategoriaRepository(HRMSContext context) : base(context) { }
+
+    private readonly ILogger<CategoriaRepository> _logger;
+    private  readonly IConfiguration _configuration;
+    private  IValidator<Categoria> _validator;
+
+    public CategoriaRepository(HRMSContext context, ILogger<CategoriaRepository> logger,
+        IConfiguration configuration,  IValidator<Categoria> validator) : base(context)
+    {
+        _logger = logger;
+        _configuration = configuration;
+        _validator = validator;
+    }
     
     public override async Task<List<Categoria>> GetAllAsync()
     {
