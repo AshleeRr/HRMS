@@ -53,26 +53,36 @@ namespace HRMS.Application.Services.Reservation_2023_0731
             return result;
         }
 
-        public async Task<OperationResult> ConfirmReservation(int id)
+        public async Task<OperationResult> ConfirmReservation(ReservationConfirmDTO dto)
         {
             var result = new OperationResult();
             try
             {
-                Reservation resv = await _reservationRepository.GetEntityByIdAsync(id);
+                Reservation resv = await _reservationRepository.GetEntityByIdAsync(dto.ReservationId);
                 if(resv == null)
                 {
                     result.IsSuccess = false;
                     result.Message = "No se ha encontrado la reserva";
-                    return result;
+                     
                 }
                 else if (resv.EstadoReserva == EstadoReserva.Cancelada)
                 {
                     result.IsSuccess = false;
                     result.Message = "No se puede confirmar una reserva cancelada";
-                    return result;
+                }
+                else if(resv.EstadoReserva == EstadoReserva.Confirmada)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "La reserva ya ha sido confirmada";
+                }
+                else if(!(resv.PrecioRestante == dto.Abono))
+                {
+                    result.IsSuccess = false;
+                    result.Message = "El abono no coincide con el precio restante";
                 }
                 else
                 {
+                    resv.TotalPagado += dto.Abono;
                     resv.EstadoReserva = EstadoReserva.Confirmada;
                     result = await _reservationRepository.UpdateEntityAsync(resv);
                     result.Data = resv;
@@ -210,6 +220,11 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                             result.IsSuccess = false;
                             result.Message = "El adelanto no puede ser mayor al total de la reserva";
                         }
+                        else if(dto.Adelanto < (total * 0.3m))
+                        {
+                            result.IsSuccess = false;
+                            result.Message = "El adelanto debe ser al menos el 30% del total de la reserva";
+                        }
                         else
                         {
                             Reservation reservation = new Reservation()
@@ -263,9 +278,78 @@ namespace HRMS.Application.Services.Reservation_2023_0731
             return result;
         }
 
-        public Task<OperationResult> Update(ReservationUpdateDTO dto)
+        public async Task<OperationResult> Update(ReservationUpdateDTO dto)
         {
-            throw new NotImplementedException();
+            OperationResult result = new OperationResult();
+            try
+            {
+                var reservation = await _reservationRepository.GetEntityByIdAsync(dto.ID);
+                if (reservation == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se ha encontrado la reserva";
+                    return result;
+                }
+                else if (reservation.EstadoReserva == EstadoReserva.Cancelada)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se puede modificar una reserva cancelada";
+                    return result;
+                }
+                else if(reservation.EstadoReserva == EstadoReserva.Confirmada)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se puede modificar una reserva confirmada";
+                    return result;
+                }
+                else
+                {
+                    var tarifInfo = await _reservationRepository.GetCategoryForReservByRoom(reservation.IdHabitacion.Value, 1, dto.In, dto.Out);
+                    if (reservation.FechaEntrada != dto.In || reservation.FechaSalida != dto.Out)
+                    {
+                        OperationResult newRoom = await _reservationRepository.GetDisponibleRoomsOfCategoryInTimeLapse(dto.In, dto.Out, tarifInfo.Data.Id);
+                        if (!newRoom.IsSuccess)
+                        {
+                            result = newRoom;
+                        }
+                        else
+                        {
+                            var servicesTotal = await _reservationRepository.GetTotalForServices(reservation.IdRecepcion);
+                            if(!servicesTotal.IsSuccess)
+                            {
+                                result = servicesTotal;
+                            }
+                            else
+                            {
+                                int days = (dto.Out - dto.In).Days;
+                                decimal totalForRoom = tarifInfo.Data.PricePerNight * days;
+                                reservation.IdHabitacion = (int)newRoom.Data;
+                                reservation.FechaEntrada = dto.In;
+                                reservation.FechaSalida = dto.Out;
+                                reservation.CostoPenalidad += (reservation.TotalPagado + reservation.PrecioRestante) * 0.1m;
+                                reservation.PrecioRestante =  (totalForRoom + reservation.CostoPenalidad + (decimal) servicesTotal.Data) - reservation.Adelanto;
+                                var op = await _reservationRepository.UpdateEntityAsync(reservation);
+                                if (op.IsSuccess)
+                                {
+                                    result.Data = reservation;
+                                }
+                                else
+                                {
+                                    result.IsSuccess = false;
+                                    result.Message = "No se ha podido actualizar la reserva";
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result = await _loggingServices.LogError(ex.Message, this);
+            }
+
+            return result;
         }
 
         public ReservationDTO MapToDto(Reservation reservation)

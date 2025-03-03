@@ -240,6 +240,52 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
+        public async Task<OperationResult> GetDisponibleRoomsOfCategoryInTimeLapse(DateTime start, DateTime end, int categoriaId, int ignoringResev)
+        {
+            OperationResult result = new OperationResult();
+            if (start > end)
+            {
+                result.IsSuccess = false;
+                result.Message = "La fecha de inicio no puede ser mayor a la fecha de fin.";
+            }
+            else if (categoriaId == 0)
+            {
+                result.IsSuccess = false;
+                result.Message = "No se ha especificado una categoría.";
+            }
+            else
+            {
+                try
+                {
+                    var query = await _context.Habitaciones
+                                    .Where(h => h.IdCategoria == categoriaId &&
+                                        !_context.Reservations.Any(r =>
+                                            r.IdHabitacion == h.IdHabitacion &&
+                                            !(r.FechaSalida < start || r.FechaEntrada > end || r.IdRecepcion == ignoringResev)
+                                        ))
+                                    .Select(h => h.IdHabitacion)
+                                    .FirstOrDefaultAsync();
+                    if (query == 0)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = "No hay habitaciones disponibles en la categoría especificada.";
+                    }
+                    else
+                    {
+                        result.Data = query;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result.IsSuccess = false;
+                    result.Message = _getErrorMessage();
+                    _logger.LogError(result.Message, ex.ToString());
+                }
+            }
+            return result;
+        }
+
+
         private async Task<bool> _isRoomDisponible(int? roomId, DateTime start, DateTime end)
         {
             if (roomId == null) return false;
@@ -364,6 +410,85 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
+        public async Task<OperationResult> GetCategoryForReservByRoom(int rommId, int people, DateTime start, DateTime end)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (rommId == 0 || people == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Categoria o numero de personas no especificado";
+                }
+                else
+                {
+                    var query = from c in _context.Categorias
+                                join h in _context.Habitaciones on c.IdCategoria equals h.IdCategoria
+                                join t in _context.Tarifas on c.IdCategoria equals t.IdCategoria
+                                where h.IdHabitacion == rommId
+                                //  &&t.FechaInicio >= start && t.FechaInicio < end &&
+                                //t.FechaFin > start && t.FechaFin <= end
+                                select new CategoryRoomForReserv
+                                {
+                                    Id = c.IdCategoria,
+                                    Capacity = c.Capacidad,
+                                    PricePerNight = t.PrecioPorNoche,
+                                    Descuento = t.Descuento
+                                };
+                    var res = await query.FirstOrDefaultAsync();
+                    if (res == null)
+                    {
+                        result.IsSuccess = false;
+                        result.Message = "No se ha encontrado la categoria especificada";
+                    }
+                    else
+                    {
+                        result.Data = res;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                var message = _getErrorMessage();
+                result.IsSuccess = false;
+                result.Message = message;
+                _logger.LogError(message, ex.ToString());
+            }
+
+            return result;
+        }
+
+        public async Task<OperationResult> GetTotalForServices(int reservationId)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (reservationId == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Reservacion no especificada";
+                }
+                else
+                {
+                    var total = (from r in _context.Reservations
+                                join sr in _context.ServicioPorReservacions on r.IdRecepcion equals sr.ReservacionID
+                                select sr.Precio).Sum();
+                    result.Data = total;
+                                
+                }
+            }
+            catch (Exception ex)
+            {
+
+                var message = _getErrorMessage();
+                result.IsSuccess = false;
+                result.Message = message;
+                _logger.LogError(message, ex.ToString());
+            }
+
+            return result;
+        }
 
 
 

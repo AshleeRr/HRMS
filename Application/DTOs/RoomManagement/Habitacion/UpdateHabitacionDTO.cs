@@ -1,5 +1,4 @@
-﻿using HRMS.Application.DTOs.BaseDTO;
-
+﻿
 namespace HRMS.Application.DTOs.RoomManagement.Habitacion;
 
 public class UpdateHabitacionDto : DTOBase

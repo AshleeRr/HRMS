@@ -6,7 +6,7 @@ namespace HRMS.Application.Interfaces.Reservation_2023_0731
 {
     public interface IReservationService : IBaseServices<ReservationAddDTO, ReservationUpdateDTO, ReservationRemoveDTO>
     {
-        Task<OperationResult> ConfirmReservation(int id);
+        Task<OperationResult> ConfirmReservation(ReservationConfirmDTO dto);
         Task<OperationResult> CancelReservation(int id);
         Task<OperationResult> GetReservationByClientID(int id);
 

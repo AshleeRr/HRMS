@@ -13,5 +13,10 @@ namespace HRMS.Domain.Repository
         Task<bool> HasRoomCapacity(int categoryId, int people);
         Task<OperationResult> GetCategoryForReserv(int categoryId, int people, DateTime start, DateTime end);
 
+        Task<OperationResult> GetDisponibleRoomsOfCategoryInTimeLapse(DateTime start, DateTime end, int categoriaId, int ignoringResev);
+        Task<OperationResult> GetCategoryForReservByRoom(int rommId, int people, DateTime start, DateTime end);
+
+        Task<OperationResult> GetTotalForServices(int reservationId);
+
     }
 }

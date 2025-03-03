@@ -68,33 +68,13 @@ namespace HRMS.APIs.Controllers
             return BadRequest(res.Message);
         }
 
-        [HttpPut("UpdateReservation/{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Reservation reser)
+        [HttpPut("UpdateReservation")]
+        public async Task<IActionResult> Put(ReservationUpdateDTO dto)
         {
-            var validRes = _validSave(reser);
-            if (!validRes.IsSuccess)
-            {
-                return BadRequest("Errores: " + validRes.Message);
-            }
-            var reservOrigin = await _reservationRepository.GetEntityByIdAsync(id);
-            if (reservOrigin == null)
-                return BadRequest("La reservación a Actualizar es Inexistente");
-
-            reservOrigin.IdCliente = reser.IdCliente;
-            reservOrigin.IdHabitacion = reser.IdHabitacion;
-            reservOrigin.Adelanto = reser.Adelanto;
-            reservOrigin.CostoPenalidad = reser.CostoPenalidad;
-            reservOrigin.TotalPagado = reser.TotalPagado;
-            reservOrigin.FechaEntrada = reser.FechaEntrada;
-            reservOrigin.FechaSalida = reser.FechaSalida;
-            reservOrigin.FechaSalidaConfirmacion = reser.FechaSalidaConfirmacion;
-            reservOrigin.PrecioInicial = reser.PrecioInicial;
-            reservOrigin.PrecioRestante = reser.PrecioRestante;
-
-            var res = await _reservationRepository.UpdateEntityAsync(reser);
+            var res = await _reservationServices.Update(dto);
             if (res.IsSuccess)
             {
-               return NoContent();
+                return Ok(res.Data);
             }
             return BadRequest(res.Message);
         }
@@ -111,9 +91,9 @@ namespace HRMS.APIs.Controllers
         }
 
         [HttpPatch("ConfirmReservation/{reservationId}")]
-        public async Task<IActionResult> ConfirmReservation(int reservationId)
+        public async Task<IActionResult> ConfirmReservation(ReservationConfirmDTO dto)
         {
-            var res = await _reservationServices.ConfirmReservation(reservationId);
+            var res = await _reservationServices.ConfirmReservation(dto);
             if (res.IsSuccess)
             {
                 return Ok(res.Message);
