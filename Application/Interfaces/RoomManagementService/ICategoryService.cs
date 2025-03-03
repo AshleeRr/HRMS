@@ -1,5 +1,5 @@
 ﻿using HRMS.Application.Base;
-using HRMS.Application.DTOs.RoomManagementDto.CategoriaDTO;
+using HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
 using HRMS.Domain.Base;
 
 namespace HRMS.Application.Interfaces.RoomManagementService;

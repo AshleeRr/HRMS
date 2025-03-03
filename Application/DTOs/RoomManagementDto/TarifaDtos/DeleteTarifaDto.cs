@@ -1,4 +1,4 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.TarifaDto;
+﻿namespace HRMS.Application.DTOs.RoomManagementDto.TarifaDtos;
 
 public class DeleteTarifaDto : DTOBase
 {

@@ -1,4 +1,4 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.CategoriaDTO;
+﻿namespace HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
 
 public class DeleteCategoriaDto : DTOBase
 {

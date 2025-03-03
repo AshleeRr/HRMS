@@ -1,11 +1,9 @@
 ﻿using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
-using HRMS.Domain.Base.Validator.ServiceValidations;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IRoomRepository;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -26,9 +24,7 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
         _configuration = configuration;
         _validator = validator;
     }
-
-
-
+    
     public Task<OperationResult> GetTarifasVigentesAsync(DateTime fecha)
     {
         throw new NotImplementedException();

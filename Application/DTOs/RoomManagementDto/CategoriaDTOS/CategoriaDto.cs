@@ -1,6 +1,6 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.CategoriaDTO;
+﻿namespace HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
 
-public class CreateCategoriaDto : DTOBase
+public class CategoriaDto : DTOBase
 {
     public string Descripcion { get; set; }
     public short IdServicio { get; set; }

@@ -1,6 +1,6 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.TarifaDto;
+﻿namespace HRMS.Application.DTOs.RoomManagementDto.TarifaDtos;
 
-public class CreateTarifaDto : DTOBase
+public class TarifaDto : DTOBase
 {
     public int IdCategoria { get; set; }
     public DateTime FechaInicio { get; set; }

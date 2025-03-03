@@ -1,4 +1,4 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.PisoDto;
+﻿namespace HRMS.Application.DTOs.RoomManagementDto.PisoDtos;
 
 public class UpdatePisoDto : CreatePisoDto
 {

@@ -1,5 +1,5 @@
 ﻿using HRMS.Application.Base;
-using HRMS.Application.DTOs.RoomManagementDto.TarifaDto;
+using HRMS.Application.DTOs.RoomManagementDto.TarifaDtos;
 using HRMS.Domain.Base;
 
 namespace HRMS.Application.Interfaces.RoomManagementService;
