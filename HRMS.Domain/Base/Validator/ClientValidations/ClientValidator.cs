@@ -15,6 +15,8 @@ namespace HRMS.Domain.Base.Validator.ClientValidations
                 .WithErrorMessage("El número de documento debe de tener ENTRE 6 y 15 caracteres");
             AddRule(c => c.Correo != null && c.Correo.Length <= 50)
                 .WithErrorMessage("El correo debe de tener menos de 50 caracteres");
+            AddRule(c => c.IdUsuario != null && c.IdUsuario != 1)
+                .WithErrorMessage("El id de usuario no puede ser nulo y debe ser 1");
         }
     }
 }
