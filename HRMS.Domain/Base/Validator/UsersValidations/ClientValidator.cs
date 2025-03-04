@@ -1,7 +1,7 @@
 ﻿using HRMS.Domain.Entities.Users;
 using MyValidator.Validator;
 
-namespace HRMS.Domain.Base.Validator.ClientValidations
+namespace HRMS.Domain.Base.Validator.UsersValidations
 {
     public class ClientValidator : Validator<Client>
     {
