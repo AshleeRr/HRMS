@@ -45,7 +45,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var roles = await _context.UserRoles.Where(ur => ur.Estado == true).ToListAsync();
                 if (!roles.Any())
                 {
-                    _logger.LogWarning("No se encontraron usuarios activos");
+                    _logger.LogWarning("No se encontraron roles activos");
                 }
                 result.Data = roles;
                 result.IsSuccess = true;
@@ -117,6 +117,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 }
 
                 rolUsuario.Descripcion = entity.Descripcion;
+                rolUsuario.RolNombre = entity.RolNombre;
 
                 _context.UserRoles.Update(rolUsuario);
                 await _context.SaveChangesAsync();
@@ -130,6 +131,11 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 _logger.LogError(result.Message, ex.ToString());
             }
             return result;
+        }
+
+        public async Task<UserRole> GetRoleByNameAsync(string rolNombre)
+        {
+            return await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.RolNombre == rolNombre);
         }
     }
 }
