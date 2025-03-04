@@ -131,5 +131,10 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             return result;
         }
+
+        public async Task<UserRole> GetRoleByNameAsync(string rolNombre)
+        {
+            return await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.RolNombre == rolNombre);
+        }
     }
 }
