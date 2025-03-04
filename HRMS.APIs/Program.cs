@@ -1,6 +1,6 @@
+using HRMS.IOC.AuditDependencies;
+using HRMS.IOC.UsersDependencies;
 using HRMS.Persistence.Context;
-using HRMS.Persistence.Interfaces.IRoomRepository;
-using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRMS.APIs
@@ -12,8 +12,23 @@ namespace HRMS.APIs
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            //builder.Services.AddTransient<IHabitacionRepository, HabitacionRepository>();
+            builder.Services.AddDbContext<HRMSContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DBHotel"));
+            });
+            
             builder.Services.AddControllers();
+
+            // añadir las dependencias
+            builder.Services.AddClientDependencies();
+            builder.Services.AddUserDependencies();
+            builder.Services.AddUserRoleDependencies();
+            builder.Services.AddAuditDependencies();
+
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
             
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -29,8 +44,6 @@ namespace HRMS.APIs
             }
 
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();
