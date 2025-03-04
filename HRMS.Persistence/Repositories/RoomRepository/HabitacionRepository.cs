@@ -36,27 +36,68 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
         public async Task<OperationResult> GetByPisoAsync(int idPiso)
         {
+            var habitaciones = await _context.Habitaciones
+                .Where(h => h.IdPiso == idPiso)
+                .ToListAsync(); 
             return await GetByFilterAsync(
                 null,
                 null,
-                _context.Habitaciones.Where(h => h.IdPiso == idPiso),
+                habitaciones.AsQueryable(), 
                 $"No se encontraron habitaciones en el piso {idPiso}."
             );
         }
 
+
         public async Task<OperationResult> GetByCategoriaAsync(string categoria)
         {
+            var habitaciones = await _context.Habitaciones
+                .Join(_context.Categorias, h => h.IdCategoria, c => c.IdCategoria, (h, c) => new { h, c })
+                .Where(hc => hc.c.Descripcion.Contains(categoria))
+                .Select(hc => hc.h)
+                .ToListAsync();
             return await GetByFilterAsync(
-                "La descripción de la categoría no puede estar vacía.",
-                categoria,
-                from h in _context.Habitaciones
-                join c in _context.Categorias on h.IdCategoria equals c.IdCategoria
-                where c.Descripcion.Contains(categoria)
-                select h,
-                $"No se encontraron habitaciones en la categoría '{categoria}'."
-            );
+                null, null, habitaciones.AsQueryable(),
+                " No se encontraron habitaciones con la categoría especificada.");
         }
 
+        public async Task<OperationResult> GetInfoHabitacionesAsync()
+        {
+            var result = new OperationResult();
+            try
+            {
+                var query = from h in _context.Habitaciones
+                    join p in _context.Pisos on h.IdPiso equals p.IdPiso
+                    join c in _context.Categorias on h.IdCategoria equals c.IdCategoria
+                    join t in _context.Tarifas on h.IdCategoria equals t.IdCategoria
+                    join s in _context.Servicios on c.IdServicio equals s.IdSercicio 
+                    where h.Estado == true && (t.FechaInicio <= DateTime.Now && t.FechaFin >= DateTime.Now)
+                    select new 
+                    {
+                        h.IdHabitacion,
+                        h.Numero, 
+                        h.Detalle, 
+                        h.Estado,
+                        t.PrecioPorNoche,
+                        DescripcionPiso = p.Descripcion,
+                        DescripcionCategoria = c.Descripcion,
+                        NombreServicio = s.Nombre,
+                        DescripcionServicio = s.Descripcion
+                    };
+
+
+                var habitaciones = await query.ToListAsync();
+                result.Data = habitaciones;
+                result.IsSuccess = true;
+                return result;
+            }
+            catch (Exception e)
+            {
+                result.IsSuccess = false;
+                result.Message = "Ocurrió un error obteniendo la información de las habitaciones.";
+                return result;
+            }
+        }
+        
         public async Task<OperationResult> GetByNumeroAsync(string numero)
         {
             if (string.IsNullOrWhiteSpace(numero))
@@ -183,6 +224,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 };
             }
         }
+        
         
         private OperationResult ValidateHabitacion(Habitacion habitacion)
         {

@@ -12,13 +12,11 @@ namespace HRMS.Application.Services.RoomServices
     {
         private readonly ILogger<HabitacionServices> _logger;
         private readonly IHabitacionRepository _habitacionRepository;
-        private readonly IConfiguration _configuration;
 
-        public HabitacionServices(IHabitacionRepository habitacionRepository, ILogger<HabitacionServices> logger, IConfiguration configuration)
+        public HabitacionServices(IHabitacionRepository habitacionRepository, ILogger<HabitacionServices> logger)
         {
             _habitacionRepository = habitacionRepository;
             _logger = logger;
-            _configuration = configuration;
         }
         
 
@@ -42,7 +40,6 @@ namespace HRMS.Application.Services.RoomServices
         public async Task<OperationResult> GetById(int id)
         {
             if (id <= 0) return ValidationResult("El id de la habitación no puede ser menor o igual a 0");
-
             try
             {
                 _logger.LogInformation($"Obteniendo habitación por id: {id}");
@@ -123,6 +120,7 @@ namespace HRMS.Application.Services.RoomServices
                 if (habitacion == null) return ValidationResult("La habitación no existe");
 
                 habitacion.Estado = false;
+                _logger.LogInformation($"Habitación eliminada correctamente");
                 return await SaveUpdatedHabitacion(habitacion);
             }
             catch (Exception ex)
@@ -132,19 +130,83 @@ namespace HRMS.Application.Services.RoomServices
         }
         
         
-        public Task<OperationResult> GetByPiso(int idPiso)
+        public async Task<OperationResult> GetByPiso(int idPiso)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _logger.LogInformation("Obteniendo habitaciones por piso");
+        
+                if (idPiso <= 0) 
+                    return ValidationResult("El id del piso no puede ser menor o igual a 0");
+        
+                var operationResult = await _habitacionRepository.GetByPisoAsync(idPiso);
+
+                var habitaciones = operationResult?.Data as List<Habitacion>; 
+                
+                return habitaciones?.Any() == true
+                    ? SuccessResult("Habitaciones obtenidas correctamente", habitaciones)
+                    : SuccessResult("No se encontraron habitaciones registradas", new List<Habitacion>());
+            }
+            catch (Exception ex)
+            {
+                return ErrorResult($"Error al obtener las habitaciones del piso {idPiso}", ex);
+            }
+        }
+        public async Task<OperationResult> GetByCategoria(string categoria)
+        {
+            try
+            {
+                _logger.LogInformation($"Obteniendo habitaciones por categoría: {categoria}");
+                if (string.IsNullOrEmpty(categoria)) return ValidationResult
+                    ("La descripción de la categoría no puede estar vacía");
+                
+                var operationResult = await _habitacionRepository.GetByCategoriaAsync(categoria);
+                
+                var habitaciones = operationResult?.Data as List<Habitacion>;
+                return habitaciones?.Any() == true
+                    ? SuccessResult("Habitaciones obtenidas correctamente", habitaciones)
+                    : SuccessResult($"No se encontraron habitaciones en la categoría '{categoria}'", new List<Habitacion>());
+            }
+            catch (Exception ex)
+            {
+                return ErrorResult($"Error al obtener las habitaciones de la categoría {categoria}", ex);
+            }
         }
 
-        public Task<OperationResult> GetByNumero(string numero)
+
+        public async Task<OperationResult> GetByNumero(string numero)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _logger.LogInformation($"Obteniendo habitación por número: {numero}");
+                if(string.IsNullOrEmpty(numero)) return 
+                    ValidationResult("El número de habitación no puede estar vacío");
+
+                var habitacion = await _habitacionRepository.GetByNumeroAsync(numero);
+                return habitacion.Data == null
+                    ? SuccessResult("No se encontró la habitación", null)
+                    : SuccessResult("Habitación obtenida correctamente", habitacion.Data);
+            }
+            catch (Exception ex)
+            {
+                return ErrorResult($"Error al obtener la habitación con número {numero}", ex);
+            }
         }
 
-        public Task<OperationResult> GetByCategoria(string categoria)
+
+        public async Task<OperationResult> GetInfoHabitacionesAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                _logger.LogInformation("Obteniedo información de las habitaciones");
+                var habitacion = await _habitacionRepository.GetInfoHabitacionesAsync();
+                return habitacion.Data == null
+                    ? SuccessResult("No se encontró la información de las habitaciones", null)
+                    : SuccessResult("Información de las habitaciones obtenida correctamente", habitacion.Data);
+            }catch (Exception ex)
+            {
+                return ErrorResult("Error al obtener la información de las habitaciones", ex);
+            }
         }
 
         private static OperationResult SuccessResult(string message, object? data) => new() { IsSuccess = true, Message = message, Data = data };

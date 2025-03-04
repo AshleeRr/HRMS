@@ -11,5 +11,7 @@ public interface IHabitacionRepository : IBaseRepository<Habitacion, int>
     Task<OperationResult> GetByNumeroAsync(string numero);
     
     Task<OperationResult> GetByCategoriaAsync(string categoria);
+    
+    Task<OperationResult> GetInfoHabitacionesAsync();
 }
     

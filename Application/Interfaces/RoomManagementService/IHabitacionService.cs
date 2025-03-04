@@ -9,4 +9,5 @@ public interface IHabitacionService : IBaseServices<CreateHabitacionDTo, UpdateH
     Task<OperationResult> GetByPiso(int idPiso);
     Task<OperationResult> GetByNumero(string numero);
     Task<OperationResult> GetByCategoria(string categoria);
+    Task<OperationResult> GetInfoHabitacionesAsync();
 }

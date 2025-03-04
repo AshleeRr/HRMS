@@ -9,5 +9,4 @@ public interface ICategoryService :  IBaseServices<CreateCategoriaDto, UpdateCat
     Task<OperationResult> GetCategoriaByServicio(string nombreServicio);
     Task<OperationResult> GetServiciosByDescripcion(string descripcion);
     Task<OperationResult> GetHabitacionesByCapacidad(int capacidad);
-    Task<OperationResult> GetAllWithHabitaciones();
 }
