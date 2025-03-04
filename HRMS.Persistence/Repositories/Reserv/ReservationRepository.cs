@@ -490,7 +490,34 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
+        public async Task<OperationResult> ExistUser(int userId)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (userId == 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se ha especificado el usuario";
+                }
+                else
+                {
+                    var query = await _context.Clients.AnyAsync(c => c.IdCliente == userId);
+                    result.Data = query;
 
+                }
+            }
+            catch (Exception ex)
+            {
+
+                var message = _getErrorMessage();
+                result.IsSuccess = false;
+                result.Message = message;
+                _logger.LogError(message, ex.ToString());
+            }
+
+            return result;
+        }
 
         private string? _getErrorMessage([CallerMemberName]string source ="")
             => _configuration["ErrorReservationRepository:" + source]; 

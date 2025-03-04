@@ -17,6 +17,7 @@ namespace HRMS.Domain.Repository
         Task<OperationResult> GetCategoryForReservByRoom(int rommId, int people, DateTime start, DateTime end);
 
         Task<OperationResult> GetTotalForServices(int reservationId);
+        Task<OperationResult> ExistUser(int userId);
 
     }
 }

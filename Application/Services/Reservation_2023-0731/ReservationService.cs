@@ -179,6 +179,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
             try
             {
                 var servicesSelected = await _reservationRepository.GetPricesForServicesinRoomCategory(dto.RoomCategoryID, dto.Services);
+                var userExists = await _reservationRepository.ExistUser(dto.UserID);
                 OperationResult CatAndTarif = await _reservationRepository.GetCategoryForReserv(dto.RoomCategoryID, dto.PeopleNumber,dto.In, dto.Out);
                 if (!servicesSelected.IsSuccess)
                 {
@@ -188,6 +189,11 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                 {
                     result.IsSuccess = false;
                     result.Message = "No se ha encontrado la categoria de habitación seleccionada";
+                }
+                else if(userExists.IsSuccess)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se ha encontrado el usuario";
                 }
                 else if (((CategoryRoomForReserv)CatAndTarif.Data).Capacity < dto.PeopleNumber)
                 {
@@ -220,7 +226,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                             result.IsSuccess = false;
                             result.Message = "El adelanto no puede ser mayor al total de la reserva";
                         }
-                        else if(dto.Adelanto < (total * 0.3m))
+                        else if (dto.Adelanto < (total * 0.3m))
                         {
                             result.IsSuccess = false;
                             result.Message = "El adelanto debe ser al menos el 30% del total de la reserva";
