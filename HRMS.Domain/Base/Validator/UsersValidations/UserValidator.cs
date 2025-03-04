@@ -1,11 +1,11 @@
 ﻿using HRMS.Domain.Entities.Users;
 using MyValidator.Validator;
 
-namespace HRMS.Domain.Base.Validator.UserValidations
+namespace HRMS.Domain.Base.Validator.UsersValidations
 {
     public class UserValidator : Validator<User>
     {
-        public UserValidator() 
+        public UserValidator()
         {
             AddRule(u => u != null)
                 .WithErrorMessage("El usuario no puede ser nulo");
@@ -21,12 +21,12 @@ namespace HRMS.Domain.Base.Validator.UserValidations
         private bool ValidateClave(string? clave)
         {
             if (string.IsNullOrEmpty(clave))
-                 return false;
-            
+                return false;
+
             if (clave.Length < 12 || clave.Length > 50)
                 return false;
 
-            if (!clave.Any(char.IsUpper) || !clave.Any(char.IsDigit) || !clave.Any(char.IsLower) )
+            if (!clave.Any(char.IsUpper) || !clave.Any(char.IsDigit) || !clave.Any(char.IsLower))
                 return false;
 
             string caracteresEspeciales = "@#!*?$/,{}=.;:";

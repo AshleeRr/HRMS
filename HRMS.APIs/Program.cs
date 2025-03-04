@@ -19,7 +19,7 @@ namespace HRMS.APIs
             
             builder.Services.AddControllers();
 
-            // aÃ±adir las dependencias
+            // añadir las dependencias
             builder.Services.AddClientDependencies();
             builder.Services.AddUserDependencies();
             builder.Services.AddUserRoleDependencies();

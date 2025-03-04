@@ -11,8 +11,8 @@ namespace HRMS.Domain.Entities.Users
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdUsuario { get; set; }
         public string? Clave { get; set; }
-        [ForeignKey("UserRole")]
-        public int IdRolUsuario { get; set; } // FK
+        [ForeignKey("IdRolUsuario")]
+        public int IdRolUsuario { get; set; }
     }
 }
 
