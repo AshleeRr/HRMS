@@ -110,7 +110,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             return entity;
         }
-        
+        /*
         public override async Task<OperationResult> SaveEntityAsync(Client entity)
         {
             OperationResult resultSave = new OperationResult();
@@ -137,7 +137,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 _logger.LogError(resultSave.Message, ex.ToString());
             }
             return resultSave;
-        }
+        }*/
         private OperationResult _validClientForUpdateMethod(Client client)
         {
             return _validator.Validate(client);

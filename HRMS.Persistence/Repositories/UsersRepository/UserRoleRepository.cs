@@ -117,6 +117,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 }
 
                 rolUsuario.Descripcion = entity.Descripcion;
+                rolUsuario.RolNombre = entity.RolNombre;
 
                 _context.UserRoles.Update(rolUsuario);
                 await _context.SaveChangesAsync();
