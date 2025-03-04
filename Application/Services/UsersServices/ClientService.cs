@@ -20,34 +20,82 @@ namespace HRMS.Application.Services.UsersServices
             _configuration = configuration;
         }
 
-        public Task<OperationResult> GetAll()
+        public async Task<OperationResult> GetAll()
         {
-            throw new NotImplementedException();
+            OperationResult result = new OperationResult();
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
-        public Task<OperationResult> GetById(int id)
+        public async Task<OperationResult> GetById(int id)
         {
-            throw new NotImplementedException();
+            OperationResult result = new OperationResult();
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
-        public Task<OperationResult> Remove(RemoveClientDTO dto)
+        public async Task<OperationResult> Remove(RemoveClientDTO dto)
         {
-            throw new NotImplementedException();
+            OperationResult result = new OperationResult();
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
-        public Task<OperationResult> Save(SaveClientDTO dto)
+        public async Task<OperationResult> Save(SaveClientDTO dto)
         {
-            throw new NotImplementedException();
+            OperationResult result = new OperationResult();
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
-        public Task<OperationResult> UpdataTipoDocumentoAndDocumentoAsync(int idCliente, int idTipoDocumento, string documento)
+        public async Task<OperationResult> UpdateTipoDocumentoAndDocumentoAsync(int idCliente, int idTipoDocumento, string documento)
         {
-            throw new NotImplementedException();
+            OperationResult result = new OperationResult();
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
-        public Task<OperationResult> Update(UpdateClientDTO dto)
+        public async Task<OperationResult> Update(UpdateClientDTO dto)
         {
-            throw new NotImplementedException();
+            OperationResult result = new OperationResult();
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 }
