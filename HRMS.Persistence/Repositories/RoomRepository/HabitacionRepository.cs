@@ -53,27 +53,30 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             await ExecuteOperationAsync(async () =>
             {
                 var habitaciones = await (from h in _context.Habitaciones
-                                          join p in _context.Pisos on h.IdPiso equals p.IdPiso
-                                          join c in _context.Categorias on h.IdCategoria equals c.IdCategoria
-                                          join t in _context.Tarifas on h.IdCategoria equals t.IdCategoria
-                                          join s in _context.Servicios on c.IdServicio equals s.IdServicio
-                                          where h.Estado == true&& t.FechaInicio <= DateTime.Now && t.FechaFin >= DateTime.Now
-                                          select new
-                                          {
-                                              h.IdHabitacion,
-                                              h.Numero,
-                                              h.Detalle,
-                                              h.Estado,
-                                              t.PrecioPorNoche,
-                                              DescripcionPiso = p.Descripcion,
-                                              DescripcionCategoria = c.Descripcion,
-                                              NombreServicio = s.Nombre,
-                                              DescripcionServicio = s.Descripcion
-                                          }).ToListAsync();
+                    join p in _context.Pisos on h.IdPiso equals p.IdPiso
+                    join c in _context.Categorias on h.IdCategoria equals c.IdCategoria
+                    join t in _context.Tarifas 
+                        on c.IdCategoria equals t.IdCategoria into tarifasGroup
+                    from t in tarifasGroup.DefaultIfEmpty()
+                    join s in _context.Servicios 
+                        on c.IdServicio equals s.IdServicio into serviciosGroup
+                    from s in serviciosGroup.DefaultIfEmpty()
+                    where h.Estado == true
+                    select new
+                    {
+                        h.IdHabitacion,
+                        h.Numero,
+                        h.Detalle,
+                        h.Estado,
+                        PrecioPorNoche = t != null ? t.PrecioPorNoche : h.Precio ?? 0,
+                        DescripcionPiso = p.Descripcion,
+                        DescripcionCategoria = c.Descripcion,
+                        NombreServicio = s != null ? s.Nombre : "Sin servicio",
+                        DescripcionServicio = s != null ? s.Descripcion : "Sin descripción de servicio"
+                    }).ToListAsync();
 
                 return Success(habitaciones);
             });
-
         public async Task<OperationResult> GetByNumeroAsync(string numero) =>
             await ExecuteOperationAsync(async () =>
             {
