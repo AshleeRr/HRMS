@@ -36,6 +36,14 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
         public async Task<OperationResult> GetByPisoAsync(int idPiso)
         {
+            if(idPiso <= 0)
+            {
+                return new OperationResult
+                {
+                    IsSuccess = false,
+                    Message = "El ID del piso debe ser mayor que cero."
+                };
+            }
             var habitaciones = await _context.Habitaciones
                 .Where(h => h.IdPiso == idPiso)
                 .ToListAsync(); 
@@ -51,14 +59,18 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         public async Task<OperationResult> GetByCategoriaAsync(string categoria)
         {
             var habitaciones = await _context.Habitaciones
-                .Join(_context.Categorias, h => h.IdCategoria, c => c.IdCategoria, (h, c) => new { h, c })
+                .Join(_context.Categorias, h => h.IdCategoria, c => c.IdCategoria, (h, c) => new
+                {
+                    h, c
+                })
                 .Where(hc => hc.c.Descripcion.Contains(categoria))
                 .Select(hc => hc.h)
                 .ToListAsync();
             return await GetByFilterAsync(
-                null, null, habitaciones.AsQueryable(),
+                "Tiene que introducir una categoria", categoria, habitaciones.AsQueryable(),
                 " No se encontraron habitaciones con la categoría especificada.");
         }
+
 
         public async Task<OperationResult> GetInfoHabitacionesAsync()
         {
@@ -97,7 +109,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 return result;
             }
         }
-        
+
         public async Task<OperationResult> GetByNumeroAsync(string numero)
         {
             if (string.IsNullOrWhiteSpace(numero))

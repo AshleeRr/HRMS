@@ -1,7 +1,7 @@
 ﻿using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Application.Services.RoomServices;
 using HRMS.Domain.Base.Validator;
-using HRMS.Domain.Base.Validator.RoomValidations;
+using HRMS.Domain.Base.Validator.ServiceValidations;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Infraestructure.Logging;
@@ -11,15 +11,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HRMS.IOC.RoomDependencies;
 
-public static class RoomDependency
+public static class TarifaDependency
 {
-    public static IServiceCollection AddRoomCollection(this IServiceCollection services)
+    public static IServiceCollection AddTarifaDependecy(this IServiceCollection services)
     {
-        services.AddScoped<IHabitacionRepository, HabitacionRepository>();
-        services.AddScoped<IValidator<Habitacion>, HabitacionValidator>();
-        services.AddScoped<IHabitacionService, HabitacionServices>();
+        services.AddScoped<ITarifaRepository, TarifaRepository>();
+        services.AddScoped<IValidator<Tarifas>, TarifasValidator>();
+        services.AddScoped<ITarifaService, TarifaServices>();
         services.AddScoped<ILoggingServices, LoggingServices>();
-
         return services;
     }
+    
 }

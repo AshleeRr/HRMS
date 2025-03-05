@@ -7,6 +7,4 @@ namespace HRMS.Application.Interfaces.RoomManagementService;
 public interface IPisoService : IBaseServices<CreatePisoDto, UpdatePisoDto, DeletePisoDto>
 {
     Task<OperationResult> GetPisoByDescripcion(string descripcion);
-    Task<OperationResult> GetPisosWithHabitaciones();
-    Task<OperationResult> GetPisoOcupacion();
 }

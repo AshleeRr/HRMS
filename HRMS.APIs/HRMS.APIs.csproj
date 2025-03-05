@@ -12,7 +12,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application\HRMS.Application.csproj" />
     <ProjectReference Include="..\HRMS.IOC\HRMS.IOC.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="RoomManagementControllers\" />
   </ItemGroup>
 
 </Project>

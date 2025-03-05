@@ -8,6 +8,4 @@ public interface IEstadoHabitacionService : IBaseServices<CreateEstadoHabitacion
     UpdateEstadoHabitacionDto, DeleteEstadoHabitacionDto>
 {
     Task<OperationResult> GetEstadoByDescripcion(string descripcion);
-    Task<OperationResult> GetEstadosConHabitaciones();
-    Task<OperationResult> GetEstadisticasPorEstado();
 }

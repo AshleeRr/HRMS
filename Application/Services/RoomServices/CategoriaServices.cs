@@ -20,224 +20,144 @@ namespace HRMS.Application.Services.RoomServices
 
         public async Task<OperationResult> GetAll()
         {
-            var result = new OperationResult();
-            try
+            _logger.LogInformation("Buscando todas las categorías.");
+            return await ExecuteOperationAsync(async () =>
             {
-                _logger.LogInformation("Buscando todas las categorias");
-
-                var categorias = await _categoryRepository.GetAllAsync();
-                if (categorias.Count == 0)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "Ninguna categoría encontrada";
-                    return result;
-                }
-
-                result.Data = categorias;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error al buscar todas las categorias");
-                result.IsSuccess = false;
-                result.Message = "Ocurrió un error al buscar las categorias";
-            }
-            return result;
+                var categories = await _categoryRepository.GetAllAsync();
+                return categories.Any()
+                    ? new OperationResult { Data = categories }
+                    : new OperationResult { IsSuccess = false, Message = "No se encontraron categorías." };
+            }, "Error al buscar todas las categorías.");
         }
 
         public async Task<OperationResult> GetById(int id)
         {
-            var result = new OperationResult();
-            
-            try
+            _logger.LogInformation("Buscando categoría por ID: {Id}", id);
+            ValidateId(id, "El ID de la categoría debe ser mayor que 0.");
+            return await ExecuteOperationAsync(async () =>
             {
-                _logger.LogInformation("Buscando categoria por ID: {Id}", id);
-                if (id <= 0)
-                {
-                    _logger.LogWarning("ID de categoria tiene que ser mayor a 0");
-                    result.IsSuccess = false;
-                    result.Message = "ID de categoria inválido";
-                }
-                
-                var categoria = await _categoryRepository.GetEntityByIdAsync(id);
-                
-                if (categoria == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "Ninguna categoría encontrada";
-                    return result;
-                }
-
-                result.Data = categoria;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error al buscar categoria por ID");
-                result.IsSuccess = false;
-                result.Message = "Ocurrió un error al buscar la categoria";
-            }
-            return result;
-        }
-
-        public async Task<OperationResult> Update(UpdateCategoriaDto dto)
-        {
-            var result = new OperationResult();
-            try
-            {
-                _logger.LogInformation("Updating category with ID: {Id}", dto.IdCategoria);
-
-                var categoria = await _categoryRepository.GetEntityByIdAsync(dto.IdCategoria);
-                if (categoria == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "Category not found";
-                    return result;
-                }
-
-                categoria.Descripcion = dto.Descripcion;
-                await _categoryRepository.UpdateEntityAsync(categoria);
-
-                result.Message = "La categoría se actualizó correctamente";
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error al actualizar la categoria");
-                result.IsSuccess = false;
-                result.Message = "Ocurrió un error al actualizar la categoria";
-            }
-            return result;
+                var category = await _categoryRepository.GetEntityByIdAsync(id);
+                return category != null
+                    ? new OperationResult { Data = category }
+                    : new OperationResult { IsSuccess = false, Message = "Categoría no encontrada." };
+            }, "Error al buscar la categoría por ID.");
         }
 
         public async Task<OperationResult> Save(CreateCategoriaDto dto)
         {
-            var result = new OperationResult();
-            try
+            _logger.LogInformation("Creando una nueva categoría.");
+            ValidateId(dto.IdServicio, "El ID del servicio debe ser mayor que 0.");
+
+            var category = new Categoria 
+            { 
+                Descripcion = dto.Descripcion, 
+                Capacidad = dto.Capacidad, 
+                IdServicio = dto.IdServicio 
+            };
+
+            return await ExecuteOperationAsync(async () =>
             {
-                _logger.LogInformation("Creando una nueva categoria");
+                await _categoryRepository.SaveEntityAsync(category);
+                return new OperationResult { Data = category, Message = "Categoría creada exitosamente." };
+            }, "Error al crear la categoría.");
+        }
 
-                var categoria = new Categoria
-                {
-                    Descripcion = dto.Descripcion
-                };
-
-                await _categoryRepository.SaveEntityAsync(categoria);
-
-                result.Message = "Category created successfully";
-                result.Data = categoria;
-            }
-            catch (Exception e)
+        public async Task<OperationResult> Update(UpdateCategoriaDto dto)
+        {
+            _logger.LogInformation("Actualizando la categoría con ID: {Id}", dto.IdCategoria);
+            return await ExecuteOperationAsync(async () =>
             {
-                _logger.LogError(e, "Error creating category");
-                result.IsSuccess = false;
-                result.Message = "An error occurred while creating the category";
-            }
-            return result;
+                var category = await FindCategoryByIdAsync(dto.IdCategoria);
+                category.Descripcion = dto.Descripcion;
+
+                await _categoryRepository.UpdateEntityAsync(category);
+                return new OperationResult { Message = "Categoría actualizada correctamente." };
+            }, "Error al actualizar la categoría.");
         }
 
         public async Task<OperationResult> Remove(DeleteCategoriaDto dto)
         {
-            var result = new OperationResult();
-            try
+            _logger.LogInformation("Eliminando la categoría con ID: {Id}", dto.IdCategoria);
+            return await ExecuteOperationAsync(async () =>
             {
-                _logger.LogInformation("Deleting category with ID: {Id}", dto.IdCategoria);
+                var category = await FindCategoryByIdAsync(dto.IdCategoria);
+                category.Estado = false;
 
-                var categoria = await _categoryRepository.GetEntityByIdAsync(dto.IdCategoria);
-                if (categoria == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "Category not found";
-                    return result;
-                }
-
-                categoria.Estado = false;
-                await _categoryRepository.UpdateEntityAsync(categoria);
-
-                result.Message = "Category deleted successfully";
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error deleting category");
-                result.IsSuccess = false;
-                result.Message = "An error occurred while deleting the category";
-            }
-            return result;
+                await _categoryRepository.UpdateEntityAsync(category);
+                return new OperationResult { Message = "Categoría eliminada correctamente." };
+            }, "Error al eliminar la categoría.");
         }
 
         public async Task<OperationResult> GetCategoriaByServicio(string nombreServicio)
         {
-            var result = new OperationResult();
-            try
+            _logger.LogInformation("Buscando categoría para el servicio: {ServiceName}", nombreServicio);
+            return await ExecuteOperationAsync(async () =>
             {
-                _logger.LogInformation("Fetching category for service: {ServiceName}", nombreServicio);
-
-                var categoria = await _categoryRepository.GetCategoriaByServiciosAsync(nombreServicio);
-                if (categoria == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "Category not found for the given service";
-                    return result;
-                }
-
-                result.Data = categoria;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error fetching category by service");
-                result.IsSuccess = false;
-                result.Message = "An error occurred while retrieving the category";
-            }
-            return result;
+                var category = await _categoryRepository.GetCategoriaByServiciosAsync(nombreServicio);
+                return category != null
+                    ? new OperationResult { Data = category }
+                    : new OperationResult { IsSuccess = false, Message = "No se encontró una categoría para el servicio indicado." };
+            }, "Error al buscar la categoría por servicio.");
         }
 
         public async Task<OperationResult> GetServiciosByDescripcion(string descripcion)
         {
-            var result = new OperationResult();
             try
             {
-                _logger.LogInformation("Fetching services for description: {Description}", descripcion);
-
-                var servicios = await _categoryRepository.GetServiciosByDescripcionAsync(descripcion);
-                if (servicios == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No services found for the given description";
-                    return result;
-                }
-
-                result.Data = servicios;
+                _logger.LogInformation("Buscando servicios con la descripción: {Description}", descripcion);
+                var operationResult = await _categoryRepository.GetServiciosByDescripcionAsync(descripcion);
+                return operationResult.IsSuccess
+                    ? new OperationResult { Data = operationResult.Data }
+                    : new OperationResult
+                        { IsSuccess = false, Message = "No se encontraron servicios con esa descripción." };
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.LogError(e, "Error fetching services by description");
-                result.IsSuccess = false;
-                result.Message = "An error occurred while retrieving services";
+                _logger.LogError(ex, "Error al buscar servicios por descripción.");
+                return new OperationResult { IsSuccess = false, Message = "Error al buscar servicios por descripción." };
             }
-            return result;
         }
+        
 
         public async Task<OperationResult> GetHabitacionesByCapacidad(int capacidad)
         {
-            var result = new OperationResult();
+            _logger.LogInformation("Buscando habitaciones con capacidad: {Capacity}", capacidad);
+            return await ExecuteOperationAsync(async () =>
+            {
+                ValidateId(capacidad, "La capacidad de la habitación debe ser mayor que 0.");
+                var categories = await _categoryRepository.GetHabitacionByCapacidad(capacidad);
+                return categories != null
+                    ? new OperationResult { Data = categories }
+                    : new OperationResult { IsSuccess = false, Message = "No se encontraron habitaciones con la capacidad indicada." };
+            }, "Error al buscar habitaciones por capacidad.");
+        }
+
+
+        private async Task<OperationResult> ExecuteOperationAsync(Func<Task<OperationResult>> operation, string errorMessage)
+        {
             try
             {
-                _logger.LogInformation("Fetching rooms with capacity: {Capacity}", capacidad);
-
-                var habitaciones = await _categoryRepository.GetHabitacionByCapacidad(capacidad);
-                if (habitaciones == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No rooms found for the given capacity";
-                    return result;
-                }
-
-                result.Data = habitaciones;
+                return await operation();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.LogError(e, "Error fetching rooms by capacity");
-                result.IsSuccess = false;
-                result.Message = "An error occurred while retrieving rooms";
+                _logger.LogError(ex, errorMessage);
+                return new OperationResult { IsSuccess = false, Message = errorMessage };
             }
-            return result;
+        }
+
+
+        private void ValidateId(int value, string message)
+        {
+            if (value <= 0) throw new ArgumentException(message);
+        }
+
+
+        private async Task<Categoria> FindCategoryByIdAsync(int id)
+        {
+            var category = await _categoryRepository.GetEntityByIdAsync(id);
+            if (category == null) throw new KeyNotFoundException("Categoría no encontrada.");
+            return category;
         }
     }
 }

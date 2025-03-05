@@ -2,5 +2,5 @@
 
 public class PisoDto : DTOBase
 {
-    public string Descripion { get; set; }
+    public string Descripcion { get; set; }
 }

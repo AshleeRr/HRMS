@@ -6,7 +6,6 @@ namespace HRMS.Application.Interfaces.RoomManagementService;
 
 public interface ITarifaService : IBaseServices<CreateTarifaDto, UpdateTarifaDto, DeleteTarifaDto>
 {
-    Task<OperationResult> GetTarifasVigentes(DateTime fecha);
+    Task<OperationResult> GetTarifasVigentes(String fechaInput);
     Task<OperationResult> GetHabitacionesByPrecio(decimal precio);
-    Task<OperationResult> GetTarifasByCategoria(int idCategoria);
 }

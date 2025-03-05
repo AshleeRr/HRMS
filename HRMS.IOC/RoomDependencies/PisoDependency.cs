@@ -11,13 +11,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HRMS.IOC.RoomDependencies;
 
-public static class RoomDependency
+public static class PisoDependency
 {
-    public static IServiceCollection AddRoomCollection(this IServiceCollection services)
+    public static IServiceCollection AddPisoDependency(this IServiceCollection services)
     {
-        services.AddScoped<IHabitacionRepository, HabitacionRepository>();
-        services.AddScoped<IValidator<Habitacion>, HabitacionValidator>();
-        services.AddScoped<IHabitacionService, HabitacionServices>();
+        services.AddScoped<IPisoRepository, PisoRepository>();
+        services.AddScoped<IValidator<Piso>, PisoValidator>();
+        services.AddScoped<IPisoService, PisoServices>();
         services.AddScoped<ILoggingServices, LoggingServices>();
 
         return services;
