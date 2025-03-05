@@ -2,6 +2,7 @@
 using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
 using HRMS.Domain.Entities.RoomManagement;
+using HRMS.Persistence.Interfaces.IRoomRepository;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.Extensions.Logging;
 
@@ -9,10 +10,10 @@ namespace HRMS.Application.Services.RoomServices;
 
 public class TarifaServices : ITarifaService
 {
-    private readonly TarifaRepository _tarifaRepository;
+    private readonly ITarifaRepository _tarifaRepository;
     private readonly ILogger<TarifaServices> _logger;
 
-    public TarifaServices(TarifaRepository tarifaRepository, ILogger<TarifaServices> logger)
+    public TarifaServices(ITarifaRepository tarifaRepository, ILogger<TarifaServices> logger)
     {
         _tarifaRepository = tarifaRepository;
         _logger = logger;

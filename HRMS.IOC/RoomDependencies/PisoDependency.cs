@@ -4,8 +4,10 @@ using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.RoomValidations;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
+using HRMS.Domain.Repository;
 using HRMS.Infraestructure.Logging;
 using HRMS.Persistence.Interfaces.IRoomRepository;
+using HRMS.Persistence.Repositories.Reserv;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,7 +19,8 @@ public static class PisoDependency
     {
         services.AddScoped<IPisoRepository, PisoRepository>();
         services.AddScoped<IValidator<Piso>, PisoValidator>();
-        services.AddScoped<IPisoService, PisoServices>();
+        services.AddScoped<IHabitacionRepository, HabitacionRepository>();  
+        services.AddScoped<IReservationRepository, ReservationRepository>(); 
         services.AddScoped<ILoggingServices, LoggingServices>();
 
         return services;

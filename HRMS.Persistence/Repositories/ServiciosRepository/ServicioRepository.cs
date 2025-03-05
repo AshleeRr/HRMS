@@ -83,7 +83,7 @@ public class ServicioRepository : BaseRepository<Servicios, int>, IServicioRepos
     {
         var result = new OperationResult();
         
-        if (servicios.IdSercicio <= 0)
+        if (servicios.IdServicio <= 0)
         {
             result.IsSuccess = false;
             result.Message = "El ID del servicio no es válido";
@@ -92,7 +92,7 @@ public class ServicioRepository : BaseRepository<Servicios, int>, IServicioRepos
         
         try
         {
-            var servicio = await _context.Set<Servicios>().FindAsync(servicios.IdSercicio);
+            var servicio = await _context.Set<Servicios>().FindAsync(servicios.IdServicio);
             if (servicio == null)
             {
                 result.IsSuccess = false;
@@ -109,7 +109,7 @@ public class ServicioRepository : BaseRepository<Servicios, int>, IServicioRepos
             
             var existingService = await _context.Set<Servicios>()
                 .FirstOrDefaultAsync(s => s.Nombre == servicios.Nombre && 
-                                          s.IdSercicio != servicios.IdSercicio &&
+                                          s.IdServicio != servicios.IdServicio &&
                                           s.Estado == true);
             
             if (existingService != null)
@@ -133,13 +133,13 @@ public class ServicioRepository : BaseRepository<Servicios, int>, IServicioRepos
         {
             result.IsSuccess = false;
             result.Message = "El servicio fue modificado por otro usuario. Intente nuevamente.";
-            _logger?.LogWarning("Conflicto de concurrencia actualizando servicio ID {Id}", servicios.IdSercicio);
+            _logger?.LogWarning("Conflicto de concurrencia actualizando servicio ID {Id}", servicios.IdServicio);
         }
         catch (Exception ex)
         {
             result.IsSuccess = false;
             result.Message = $"Error al actualizar el servicio: {ex.Message}";
-            _logger?.LogError(ex, "Error actualizando servicio ID {Id}", servicios.IdSercicio);
+            _logger?.LogError(ex, "Error actualizando servicio ID {Id}", servicios.IdServicio);
         }
         
         return result;

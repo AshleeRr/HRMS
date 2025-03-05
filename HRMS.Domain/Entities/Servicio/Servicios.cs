@@ -8,7 +8,7 @@ namespace HRMS.Domain.Entities.Servicio;
 public sealed class Servicios : AuditEntity
 {
     [Key]
-    public short IdSercicio { get; set; }
+    public short IdServicio { get; set; }
     public string Nombre { get; set; } = string.Empty;
     public string Descripcion { get; set; } = string.Empty;
 }

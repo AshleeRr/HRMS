@@ -128,7 +128,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 "El nombre del servicio no puede estar vacío.",
                 nombre,
                 from c in _context.Categorias
-                join s in _context.Servicios on c.IdServicio equals s.IdSercicio
+                join s in _context.Servicios on c.IdServicio equals s.IdServicio
                 where s.Descripcion.Contains(nombre)
                 select c,
                 $"No se encontraron categorías para el servicio '{nombre}'."
@@ -141,7 +141,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 "La descripción del servicio no puede estar vacía.",
                 descripcion,
                 from c in _context.Categorias
-                join s in _context.Servicios on c.IdServicio equals s.IdSercicio
+                join s in _context.Servicios on c.IdServicio equals s.IdServicio
                 where s.Descripcion.Contains(descripcion)
                 select s,
                 "No se encontraron servicios con esa descripción."

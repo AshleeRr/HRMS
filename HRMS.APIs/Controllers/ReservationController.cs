@@ -3,7 +3,7 @@ using HRMS.Domain.Entities.Reservation;
 using HRMS.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
 
-/*
+
 namespace HRMS.APIs.Controllers
 {
     [Route("api/[controller]")]
@@ -142,4 +142,3 @@ namespace HRMS.APIs.Controllers
 
     }
 }
-*/
