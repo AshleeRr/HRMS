@@ -10,12 +10,14 @@ namespace HRMS.Application.Services.RoomServices
     public class EstadoHabitacionService : IEstadoHabitacionService
     {
         private readonly IEstadoHabitacionRepository _estadoHabitacionRepository;
+        private readonly IHabitacionRepository _habitacionRepository;
         private readonly ILogger<EstadoHabitacionService> _logger;
 
-        public EstadoHabitacionService(IEstadoHabitacionRepository estadoHabitacionRepository, ILogger<EstadoHabitacionService> logger)
+        public EstadoHabitacionService(IEstadoHabitacionRepository estadoHabitacionRepository, ILogger<EstadoHabitacionService> logger, IHabitacionRepository habitacionRepository)
         {
             _estadoHabitacionRepository = estadoHabitacionRepository;
             _logger = logger;
+            _habitacionRepository = habitacionRepository;
         }
 
         public async Task<OperationResult> GetAll()
@@ -120,12 +122,19 @@ namespace HRMS.Application.Services.RoomServices
         {
             try
             {
-                return false;
+                var result = await _habitacionRepository.ExistenHabitacionesConEstadoAsync(idEstado);
+                
+                if (result)
+                {
+                    _logger.LogInformation("El estado de habitación {IdEstado} está siendo usado por habitaciones activas", idEstado);
+                }
+                
+                return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al verificar habitaciones con estado {IdEstado}", idEstado);
-                return false;
+                _logger.LogError(ex, "Error al verificar si hay habitaciones usando el estado {IdEstado}", idEstado);
+                return true;
             }
         }
 
@@ -142,6 +151,7 @@ namespace HRMS.Application.Services.RoomServices
         {
             Descripcion = estado.Descripcion,
         };
+        
 
         private static OperationResult Success(object data = null) =>
             new() { IsSuccess = true, Data = data };

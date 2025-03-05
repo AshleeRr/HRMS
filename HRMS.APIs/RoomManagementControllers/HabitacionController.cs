@@ -21,10 +21,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// Obtiene todas las habitaciones
         /// </summary>
         /// <returns>Lista de habitaciones</returns>
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet("GetAllHabitaciones")] 
         public async Task<IActionResult> GetAll()
         {
             _logger.LogInformation("Obteniendo todas las habitaciones");
@@ -37,11 +34,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// </summary>
         /// <param name="id">ID de la habitación</param>
         /// <returns>Datos de la habitación</returns>
-        [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpGet("GetBy{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             _logger.LogInformation($"Obteniendo habitación con ID: {id}");
@@ -56,7 +49,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// </summary>
         /// <param name="dto">Datos de la habitación a crear</param>
         /// <returns>Resultado de la operación</returns>
-        [HttpPost]
+        [HttpPost("CreateHabitacion")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -76,7 +69,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// <param name="id">ID de la habitación</param>
         /// <param name="dto">Datos actualizados de la habitación</param>
         /// <returns>Resultado de la operación</returns>
-        [HttpPut("{id}")]
+        [HttpPut("(UpdateHabitacionBy){id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -98,7 +91,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// </summary>
         /// <param name="id">ID de la habitación a eliminar</param>
         /// <returns>Resultado de la operación</returns>
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteHabitacionBy{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -118,7 +111,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// </summary>
         /// <param name="idPiso">ID del piso</param>
         /// <returns>Lista de habitaciones del piso</returns>
-        [HttpGet("piso/{idPiso}")]
+        [HttpGet("GetHabitacionBy{idPiso}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -134,7 +127,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// </summary>
         /// <param name="categoria">Descripción de la categoría</param>
         /// <returns>Lista de habitaciones de la categoría</returns>
-        [HttpGet("categoria/{categoria}")]
+        [HttpGet("GetHabitacionBy{categoria}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -150,7 +143,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// </summary>
         /// <param name="numero">Número de la habitación</param>
         /// <returns>Datos de la habitación</returns>
-        [HttpGet("numero/{numero}")]
+        [HttpGet("GetHabitacionBy/{numero}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -168,7 +161,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// Obtiene información detallada de todas las habitaciones
         /// </summary>
         /// <returns>Información detallada de habitaciones</returns>
-        [HttpGet("info")]
+        [HttpGet("GetInfoHabitaciones")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

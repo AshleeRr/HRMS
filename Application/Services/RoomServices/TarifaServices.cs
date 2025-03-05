@@ -68,6 +68,8 @@ public class TarifaServices : ITarifaService
         return await ExecuteOperationAsync(async () =>
         {
             var validacion = ValidarDescripcion(dto.Descripcion);
+            if(dto.IdCategoria <= 0)
+                return Failure("El ID de la categoría debe ser mayor que 0.");
             if (!validacion.IsSuccess) return validacion;
 
             ValidarFechas(dto.FechaInicio, dto.FechaFin);
@@ -77,6 +79,7 @@ public class TarifaServices : ITarifaService
 
             var tarifa = new Tarifas
             {
+                IdCategoria = dto.IdCategoria,
                 Descripcion = dto.Descripcion,
                 Estado = true,
                 FechaInicio = dto.FechaInicio,
@@ -132,13 +135,31 @@ public class TarifaServices : ITarifaService
         try
         {
             _logger.LogInformation("Buscando habitaciones con precio de tarifa: {Precio}", precio);
+        
             if (precio <= 0)
                 return Failure("El precio de la tarifa debe ser mayor a 0.");
+            
             var operationResult = await _tarifaRepository.GetHabitacionByPrecioAsync(precio);
-            var habitaciones = operationResult.Data as List<Habitacion>;
-            return habitaciones != null
-                ? Success(habitaciones)
-                : Failure(" No se encontraron habitaciones con el precio de tarifa indicado.");
+        
+            if (!operationResult.IsSuccess)
+            {
+                return Failure(operationResult.Message);
+            }
+        
+            if (operationResult.Data == null)
+            {
+                return Failure("No se encontraron habitaciones con el precio de tarifa indicado.");
+            }
+            if (operationResult.Data is IEnumerable<Habitacion> habitacionesEnum)
+            {
+                var habitaciones = habitacionesEnum.ToList();
+                if (habitaciones.Any())
+                {
+                    return Success(habitaciones);
+                }
+            }
+        
+            return Failure("No se encontraron habitaciones con el precio de tarifa indicado.");
         }
         catch (Exception ex)
         {

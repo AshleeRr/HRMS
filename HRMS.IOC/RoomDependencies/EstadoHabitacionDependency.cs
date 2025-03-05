@@ -18,6 +18,8 @@ public static class EstadoHabitacionDependency
         services.AddScoped<IEstadoHabitacionRepository, EstadoHabitacionRepository>();
         services.AddScoped<IValidator<EstadoHabitacion>, EstadoHabitacionValidator>();
         services.AddScoped<IEstadoHabitacionService, EstadoHabitacionService>();
+        services.AddScoped<ILoggingServices, LoggingServices>();
+
         return services;
     }
 }

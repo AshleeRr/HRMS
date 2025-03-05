@@ -16,8 +16,4 @@
     <ProjectReference Include="..\HRMS.IOC\HRMS.IOC.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="RoomManagementControllers\" />
-  </ItemGroup>
-
 </Project>

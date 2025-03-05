@@ -17,7 +17,6 @@ public static class CategoriaDependency
     {
         services.AddScoped<ICategoryRepository, CategoriaRepository>();
         services.AddScoped<IValidator<Categoria>, CategoriaValidator>();
-        services.AddScoped<IHabitacionRepository, HabitacionRepository>(); 
         services.AddScoped<ILoggingServices, LoggingServices>();
         services.AddScoped<ICategoryService, CategoriaServices>();
     

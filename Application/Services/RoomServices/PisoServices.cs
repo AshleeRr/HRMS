@@ -63,6 +63,7 @@ namespace HRMS.Application.Services.RoomServices
                 var piso = new Piso { Descripcion = dto.Descripcion, Estado = true };
 
                 var result = await _pisoRepository.SaveEntityAsync(piso);
+                Success(null, "Piso creado correctamente.");
                 return result.IsSuccess && result.Data != null
                     ? Success(MapToDto((Piso)result.Data), "Piso creado correctamente.")
                     : result;
@@ -92,40 +93,61 @@ namespace HRMS.Application.Services.RoomServices
         public async Task<OperationResult> Remove(DeletePisoDto dto)
         {
             return await ExecuteOperationAsync(async () =>
-            {
-                if (dto.IdPiso <= 0) return Failure("El ID del piso debe ser mayor que 0.");
-
-                _logger.LogInformation("Eliminando piso con ID: {Id}", dto.IdPiso);
-                var piso = await _pisoRepository.GetEntityByIdAsync(dto.IdPiso);
-                if (piso == null) return Failure($"No se encontró el piso con ID {dto.IdPiso}.");
-
-                if (await TieneReservasActivas(dto.IdPiso))
                 {
-                    return Failure("No se puede eliminar el piso porque tiene reservas activas asociadas.");
-                }
+                    if (dto.IdPiso <= 0) return Failure("El ID del piso debe ser mayor que 0.");
+                    _logger.LogInformation("Eliminando piso con ID: {Id}", dto.IdPiso);
+                    var piso = await _pisoRepository.GetEntityByIdAsync(dto.IdPiso);
+                    if (piso == null) return Failure($"No se encontró el piso con ID {dto.IdPiso}.");
 
-                piso.Estado = false;
-                var result = await _pisoRepository.UpdateEntityAsync(piso);
+                    if (await TieneReservasActivas(dto.IdPiso))
+                    {
+                        return Failure("No se puede eliminar el piso porque tiene reservas activas asociadas.");
+                    }
 
-                return result.IsSuccess && result.Data != null
-                    ? Success(MapToDto((Piso)result.Data), "Piso eliminado correctamente.")
-                    : result;
-            }, $"Error al eliminar el piso con ID {dto.IdPiso}.");
+                    if (await TieneHabitacionesAsociadas(dto.IdPiso))
+                    {
+                        return Failure("No se puede eliminar el piso porque tiene habitaciones asociadas. Debe eliminar o reubicar las habitaciones primero.");
+                    }
+
+                    piso.Estado = false;
+                    var result = await _pisoRepository.UpdateEntityAsync(piso);
+
+                    return result.IsSuccess && result.Data != null
+                        ? Success(MapToDto((Piso)result.Data), "Piso eliminado correctamente.")
+                        : result;
+                }, $"Error al eliminar el piso con ID {dto.IdPiso}.");
         }
+
 
         public async Task<OperationResult> GetPisoByDescripcion(string descripcion)
         {
             return await ExecuteOperationAsync(async () =>
-            {
-                if (string.IsNullOrWhiteSpace(descripcion)) return Failure("La descripción no puede estar vacía.");
+                {
+                    if (string.IsNullOrWhiteSpace(descripcion)) return Failure("La descripción no puede estar vacía.");
 
-                _logger.LogInformation("Buscando piso por descripción: {Descripcion}", descripcion);
-                var result = await _pisoRepository.GetPisoByDescripcion(descripcion);
+                    _logger.LogInformation("Buscando piso por descripción: {Descripcion}", descripcion);
+                    var result = await _pisoRepository.GetPisoByDescripcion(descripcion);
 
-                return result.IsSuccess && result.Data != null
-                    ? Success(MapToDto((Piso)result.Data))
-                    : Failure($"No se encontraron pisos con la descripción '{descripcion}'.");
-            }, $"Error al buscar el piso con descripción '{descripcion}'.");
+                 
+        
+                    if (result.IsSuccess && result.Data != null)
+                    {
+                        if (result.Data is IEnumerable<Piso> pisos)
+                        {
+                            var pisosList = pisos.ToList();
+                            if (pisosList.Any())
+                            {
+                                return Success(pisosList.Select(MapToDto));
+                            }
+                        }
+                        else if (result.Data is Piso piso)
+                        {
+                            return Success(MapToDto(piso));
+                        }
+                    }
+        
+                    return Failure($"No se encontraron pisos con la descripción '{descripcion}'.");
+                }, $"Error al buscar el piso con descripción '{descripcion}'.");
         }
 
         private async Task<bool> TieneReservasActivas(int idPiso)
@@ -149,6 +171,17 @@ namespace HRMS.Application.Services.RoomServices
                 }
             }
             return false;
+        }
+
+        private async Task<bool> TieneHabitacionesAsociadas(int idPiso)
+        {
+            var habitacionesResult = await _habitacionRepository.GetByPisoAsync(idPiso);
+
+            if (!habitacionesResult.IsSuccess || habitacionesResult.Data == null) return false;
+
+            var habitaciones = habitacionesResult.Data as IEnumerable<Habitacion>;
+    
+            return habitaciones != null && habitaciones.Any(h => h.Estado == true);
         }
 
         private static OperationResult ValidarDescripcion(string descripcion)

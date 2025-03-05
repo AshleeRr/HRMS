@@ -10,9 +10,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="Validaciones a los Repositorios, y Api de habitacion agregado">
+    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/HRMS.APIs/RoomManagementControllers/EstadoHabitacionController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/TarifaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/TarifaDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/EstadoHabitacionServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/EstadoHabitacionServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/PisoServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/PisoServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/TarifaServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/TarifaServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/RoomManagementControllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/RoomManagementControllers/HabitacionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Categoria.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Categoria.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/Servicio/Servicios.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/Servicio/Servicios.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/CategoriaDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/CategoriaDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/EstadoHabitacionDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/EstadoHabitacionDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +71,7 @@
     <setting file="mock://C:/HRMS/HRMS.APIs/appsettings.Development.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.IOC/AuditDependencies/AuditoriaDependency.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b741f17422844062bda644589ab84b32337fefcb677bc51957a62c3df8ad4d/AuthorizationAppBuilderExtensions.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -67,23 +84,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.HRMS.APIs: http.executor": "Run",
-    ".NET Launch Settings Profile.HRMS.Web: http.executor": "Debug",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "HTTP Request.HRMS.APIs | #1.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "HabitFloors-20240045",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.HRMS.APIs: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.HRMS.Web: http.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;HTTP Request.HRMS.APIs | #1.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;HabitFloors-20240045&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.APIs: http">
     <configuration name="HRMS.APIs | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.http" executionIdentifier="#1" runType="Run single request">
       <method v="2" />
@@ -190,6 +207,7 @@
       <workItem from="1741040930967" duration="691000" />
       <workItem from="1741117566861" duration="1895000" />
       <workItem from="1741119498672" duration="3200000" />
+      <workItem from="1741195978501" duration="13247000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
@@ -231,7 +249,39 @@
       <option name="project" value="LOCAL" />
       <updated>1741164245413</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="EndPoints de habitaciones completa">
+      <option name="closed" value="true" />
+      <created>1741167497789</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1741167497789</updated>
+    </task>
+    <task id="LOCAL-00007" summary="EndPoint de habitaciones Hecha">
+      <option name="closed" value="true" />
+      <created>1741167512528</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1741167512528</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Api HabitacionController.cs file addded">
+      <option name="closed" value="true" />
+      <created>1741167572642</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1741167572642</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Eliminacion de referencias innecesarias">
+      <option name="closed" value="true" />
+      <created>1741167767110</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1741167767110</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -268,6 +318,10 @@
     <MESSAGE value="Servicios de Habitaciones y CategoriaServices.cs agregados" />
     <MESSAGE value="Capa de servicios completada" />
     <MESSAGE value="Validaciones a los Repositorios, y Api de habitacion agregado" />
-    <option name="LAST_COMMIT_MESSAGE" value="Validaciones a los Repositorios, y Api de habitacion agregado" />
+    <MESSAGE value="EndPoints de habitaciones completa" />
+    <MESSAGE value="EndPoint de habitaciones Hecha" />
+    <MESSAGE value="Api HabitacionController.cs file addded" />
+    <MESSAGE value="Eliminacion de referencias innecesarias" />
+    <option name="LAST_COMMIT_MESSAGE" value="Eliminacion de referencias innecesarias" />
   </component>
 </project>

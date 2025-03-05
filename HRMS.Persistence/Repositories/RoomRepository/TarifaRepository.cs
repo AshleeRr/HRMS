@@ -147,19 +147,83 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
         }
     }
 
-
-
-    public Task<OperationResult> GetHabitacionByPrecioAsync(decimal precio)
+    public async Task<OperationResult> GetHabitacionByPrecioAsync(decimal precio)
     {
-        if(precio <= 0)
-            return Task.FromResult(new OperationResult { IsSuccess = false, Message = "El precio de la tarifa debe ser mayor a 0." });
-        var tarifa = _context.Tarifas.FirstOrDefault(t => t.PrecioPorNoche == precio && t.Estado == true 
-            && t.FechaInicio <= DateTime.Now && t.FechaFin >= DateTime.Now); 
-        return Task.FromResult(tarifa != null
-            ? new OperationResult { Data = tarifa }
-            : new OperationResult { IsSuccess = false, Message = "No se encontró una tarifa con el precio indicado." });
+        try
+        {
+            if (precio <= 0)
+                return new OperationResult
+                    { IsSuccess = false, Message = "El precio de la tarifa debe ser mayor a 0." };
+
+            _logger.LogInformation($"Buscando tarifas con precio: {precio}, fecha actual: {DateTime.Now}");
+
+            var fechaActual = DateTime.Now;
+            var tarifas = await _context.Tarifas
+                .Where(t => t.PrecioPorNoche == precio && t.Estado == true
+                                                       && t.FechaInicio <= fechaActual && t.FechaFin >= fechaActual)
+                .ToListAsync();
+
+            _logger.LogInformation($"Tarifas encontradas: {tarifas.Count}");
+
+            if (!tarifas.Any())
+            {
+                var todasTarifas = await _context.Tarifas
+                    .Where(t => t.PrecioPorNoche == precio && t.Estado == true)
+                    .ToListAsync();
+
+                _logger.LogInformation($"Tarifas con precio {precio} sin filtro de fecha: {todasTarifas.Count}");
+
+                if (todasTarifas.Any())
+                {
+                    foreach (var t in todasTarifas)
+                    {
+                        _logger.LogInformation(
+                            $"Tarifa ID: {t.IdTarifa}, FechaInicio: {t.FechaInicio}, FechaFin: {t.FechaFin}, Vigente: {t.FechaInicio <= fechaActual && t.FechaFin >= fechaActual}");
+                    }
+                }
+
+                return new OperationResult
+                    { IsSuccess = false, Message = "No se encontraron tarifas vigentes con el precio indicado." };
+            }
+
+            var categoriaIds = tarifas.Select(t => t.IdCategoria).ToList();
+            _logger.LogInformation($"Categorías encontradas para las tarifas: {string.Join(", ", categoriaIds)}");
+
+            var habitaciones = await _context.Habitaciones
+                .Where(h => h.Estado == true && h.IdCategoria.HasValue && categoriaIds.Contains(h.IdCategoria.Value))
+                .ToListAsync();
+
+            _logger.LogInformation($"Habitaciones encontradas: {habitaciones.Count}");
+
+            if (!habitaciones.Any())
+            {
+                var todasHabitacionesEnCategorias = await _context.Habitaciones
+                    .Where(h => h.IdCategoria.HasValue && categoriaIds.Contains(h.IdCategoria.Value))
+                    .ToListAsync();
+
+                _logger.LogInformation(
+                    $"Total de habitaciones en esas categorías (incluso inactivas): {todasHabitacionesEnCategorias.Count}");
+
+                foreach (var h in todasHabitacionesEnCategorias)
+                {
+                    _logger.LogInformation(
+                        $"Habitación ID: {h.IdHabitacion}, Categoría: {h.IdCategoria}, Estado: {h.Estado}");
+                }
+            }
+
+            return habitaciones.Any()
+                ? new OperationResult { IsSuccess = true, Data = habitaciones }
+                : new OperationResult
+                    { IsSuccess = false, Message = "No se encontraron habitaciones con el precio de tarifa indicado." };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al buscar habitaciones por precio de tarifa.");
+            return new OperationResult
+                { IsSuccess = false, Message = $"Error al buscar habitaciones por precio de tarifa: {ex.Message}" };
+        }
     }
-    
+
     private OperationResult ValidarTarifa(Tarifas tarifa)
     {
         var validation =  _validator.Validate(tarifa);

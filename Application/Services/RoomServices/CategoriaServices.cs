@@ -50,6 +50,7 @@ namespace HRMS.Application.Services.RoomServices
             return await ExecuteOperationAsync(async () =>
             {
                 ValidateId(dto.IdServicio, "El ID del servicio debe ser mayor que 0.");
+                ValidateId(dto.Capacidad , "La capacidad de la categoría debe ser mayor que 0.");
                 _logger.LogInformation("Creando una nueva categoría.");
 
                 var category = new Categoria
@@ -151,7 +152,7 @@ namespace HRMS.Application.Services.RoomServices
         private async Task<Categoria> FindCategoryByIdAsync(int id)
         {
             var category = await _categoryRepository.GetEntityByIdAsync(id);
-            if (category == null) throw new KeyNotFoundException($"No se encontró la categoría con ID {id}.");
+            if (category == null) Failure($"No se encontró la categoría por el Id {id}.");
             return category;
         }
 
@@ -170,7 +171,7 @@ namespace HRMS.Application.Services.RoomServices
 
         private void ValidateId(int value, string message)
         {
-            if (value <= 0) throw new ArgumentException(message);
+            if (value <= 0) Failure(message);
         }
 
         private static OperationResult Success(object data = null, string message = null) =>
