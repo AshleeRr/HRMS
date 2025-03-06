@@ -10,20 +10,22 @@ using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using System.Linq.Expressions;
 using HRMS.Domain.Base.Validator;
-using MyValidator.Validator;
 using HRMS.Domain.Entities.Servicio;
+using HRMS.Domain.InfraestructureInterfaces.Logging;
 
 namespace HRMS.Persistence.Repositories.Reserv
 {
     public class ReservationRepository : BaseRepository<Reservation, int>, IReservationRepository
     {
         private ILogger<ReservationRepository> _logger;
+        private ILoggingServices _loggingServices;
         private IValidator<Reservation> _validator;
         private IConfiguration _configuration;
          
-        public ReservationRepository(HRMSContext context, ILogger<ReservationRepository> logger, IConfiguration configuration, IValidator<Reservation> validator) : base(context)
+        public ReservationRepository(HRMSContext context, ILogger<ReservationRepository> logger, ILoggingServices loggingServices IConfiguration configuration, IValidator<Reservation> validator) : base(context)
         {
             _logger = logger;
+            _loggingServices = loggingServices;
             _validator = validator;
             _configuration = configuration;
         }
@@ -72,9 +74,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                 result = await base.SaveEntityAsync(entity);
                 if (!result.IsSuccess)
                 {
-                    string? message = _getErrorMessage();
-                    _logger.LogError(message);
-                    result.Message = message;
+                    result = await _loggingServices.LogError(ex.Message, this);
                 }
 
             }
@@ -137,9 +137,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                 result = await base.UpdateEntityAsync(entity);
                 if (!result.IsSuccess)
                 {
-                    string? message = _getErrorMessage();
-                    _logger.LogError(message);
-                    result.Message = message;
+                    result = await _loggingServices.LogError(ex.Message, this);
                 }
             
             }
@@ -187,9 +185,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                 }
                 catch (Exception ex)
                 {
-                    result.IsSuccess = false;
-                    result.Message = _getErrorMessage();
-                    _logger.LogError(result.Message, ex.ToString());
+                    result = await _loggingServices.LogError(ex.Message, this);
                 }
             }
             return result;
@@ -232,9 +228,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                 }
                 catch (Exception ex)
                 {
-                    result.IsSuccess = false;
-                    result.Message = _getErrorMessage();
-                    _logger.LogError(result.Message, ex.ToString());
+                    result = await _loggingServices.LogError(ex.Message, this);
                 }
             }
             return result;
@@ -277,9 +271,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                 }
                 catch (Exception ex)
                 {
-                    result.IsSuccess = false;
-                    result.Message = _getErrorMessage();
-                    _logger.LogError(result.Message, ex.ToString());
+                    result = await _loggingServices.LogError(ex.Message, this);
                 }
             }
             return result;
@@ -333,9 +325,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                 }
                 catch(Exception ex)
                 {
-                    result.IsSuccess = false;
-                    result.Message = _getErrorMessage();
-                    _logger.LogError(result.Message, ex.ToString());
+                    result = await _loggingServices.LogError(ex.Message, this);
                 }
             }
             return result;
@@ -354,8 +344,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             catch (Exception ex)
             {
 
-                var message = _getErrorMessage();
-                _logger.LogError(message, ex.ToString());
+                await _loggingServices.LogError(ex.Message, this);
             }
             
             throw new NotImplementedException();
@@ -401,10 +390,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             catch (Exception ex)
             {
 
-                var message = _getErrorMessage();
-                result.IsSuccess = false;
-                result.Message = message;
-                _logger.LogError(message, ex.ToString());
+                result = await _loggingServices.LogError(ex.Message, this);
             }
 
             return result;
@@ -450,10 +436,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             catch (Exception ex)
             {
 
-                var message = _getErrorMessage();
-                result.IsSuccess = false;
-                result.Message = message;
-                _logger.LogError(message, ex.ToString());
+                result = await _loggingServices.LogError(ex.Message, this);
             }
 
             return result;
@@ -481,10 +464,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             catch (Exception ex)
             {
 
-                var message = _getErrorMessage();
-                result.IsSuccess = false;
-                result.Message = message;
-                _logger.LogError(message, ex.ToString());
+                result = await _loggingServices.LogError(ex.Message, this);
             }
 
             return result;
@@ -509,11 +489,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             }
             catch (Exception ex)
             {
-
-                var message = _getErrorMessage();
-                result.IsSuccess = false;
-                result.Message = message;
-                _logger.LogError(message, ex.ToString());
+                result = await _loggingServices.LogError(ex.Message, this);
             }
 
             return result;
