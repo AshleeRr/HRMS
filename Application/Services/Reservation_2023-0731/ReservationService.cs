@@ -7,7 +7,6 @@ using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Domain.Repository;
 using HRMS.Models.Models.ReservationModels;
 
-
 namespace HRMS.Application.Services.Reservation_2023_0731
 {
     public class ReservationService : IReservationService
@@ -131,7 +130,8 @@ namespace HRMS.Application.Services.Reservation_2023_0731
             try
             {
                 var resv = await _reservationRepository.GetReservationsByClientId(id);
-                result.Data = resv;
+                var dto = MapToDTOClientInfo(resv.Data);
+                result.Data = dto;
             }
             catch (Exception ex)
             {
@@ -374,5 +374,19 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                 PenaltyCost = reservation.CostoPenalidad,
                 TotalPaid = reservation.TotalPagado
             };
+
+        public ReservClientInfoDTO MapToDTOClientInfo(ReservHabitClientModel model)
+        {
+            return new ReservClientInfoDTO
+            {
+                ClientID = model.ClientID,
+                ClientName = model.ClientName,
+                In = model.In,
+                Out = model.Out,
+                ReservationID = model.ReservationID,
+                RoomNumber = model.RoomNumber,
+                Total = model.Total
+            };
+        }
     }
 }

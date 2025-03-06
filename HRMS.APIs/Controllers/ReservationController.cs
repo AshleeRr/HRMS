@@ -5,7 +5,6 @@ using HRMS.Domain.Entities.Reservations;
 using HRMS.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
 
-
 namespace HRMS.APIs.Controllers
 {
     [Route("api/[controller]")]
