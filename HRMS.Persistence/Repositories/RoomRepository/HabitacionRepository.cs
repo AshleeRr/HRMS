@@ -17,7 +17,8 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         private readonly IValidator<Habitacion> _validator;
         private readonly ILogger<HabitacionRepository> _logger;
 
-        public HabitacionRepository(HRMSContext context, IConfiguration configuration, IValidator<Habitacion> validator, ILogger<HabitacionRepository> logger) : base(context)
+        public HabitacionRepository(HRMSContext context, IConfiguration 
+            configuration, IValidator<Habitacion> validator, ILogger<HabitacionRepository> logger) : base(context)
         {
             _configuration = configuration;
             _validator = validator;
@@ -35,7 +36,8 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             {
                 ValidateId(idPiso, "El ID del piso debe ser mayor que cero.");
                 var habitaciones = await _context.Habitaciones.Where(h => h.IdPiso == idPiso).ToListAsync();
-                return habitaciones.Any() ? Success(habitaciones) : Failure($"No se encontraron habitaciones en el piso {idPiso}.");
+                return habitaciones.Any() ? Success(habitaciones)
+                    : Failure($"No se encontraron habitaciones en el piso {idPiso}.");
             });
 
         public async Task<OperationResult> GetByCategoriaAsync(string categoria) =>
@@ -45,11 +47,13 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
                 var habitaciones = await _context.Habitaciones
                     .Join(_context.Categorias, h => h.IdCategoria, c => c.IdCategoria, (h, c) => new { h, c })
-                    .Where(hc => hc.c.Descripcion.Contains(categoria))
+                    .Where(hc => hc.c.Descripcion != null && hc.c.Descripcion.Contains
+                        (categoria, StringComparison.OrdinalIgnoreCase) && hc.c.Estado == true)
                     .Select(hc => hc.h)
                     .ToListAsync();
 
-                return habitaciones.Any() ? Success(habitaciones) : Failure("No se encontraron habitaciones con la categoría especificada.");
+                return habitaciones.Any() ? Success(habitaciones) 
+                    : Failure("No se encontraron habitaciones con la categoría especificada.");
             });
 
         public async Task<OperationResult> GetInfoHabitacionesAsync() =>
@@ -60,13 +64,12 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                     var habitaciones = await (from h in _context.Habitaciones
                         join p in _context.Pisos on h.IdPiso equals p.IdPiso
                         join c in _context.Categorias on h.IdCategoria equals c.IdCategoria
-                        join t in _context.Tarifas
-                            on c.IdCategoria equals t.IdCategoria
-                        join s in _context.Set<Servicios>()
-                            on c.IdServicio equals s.IdServicio into serviciosGroup
+                        join t in _context.Tarifas on c.IdCategoria equals t.IdCategoria
+                        join s in _context.Set<Servicios>() on c.IdServicio equals s.IdServicio into serviciosGroup
                         from s in serviciosGroup.DefaultIfEmpty()
                         where h.Estado == true
-                              && t.FechaInicio <= DateTime.Now && t.FechaFin >= DateTime.Now
+                              && t.FechaInicio <= DateTime.Now 
+                              && t.FechaFin >= DateTime.Now
                         select new
                         {
                             h.IdHabitacion,
@@ -79,42 +82,11 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                             NombreServicio = s != null ? s.Nombre : "Sin servicio",
                             DescripcionServicio = s != null ? s.Descripcion : "Sin descripción"
                         }).ToListAsync();
-                    if (!habitaciones.Any())
-                    {
-                        var hasHabitaciones = await _context.Habitaciones.AnyAsync(h => h.Estado == true);
-                        if (!hasHabitaciones)
-                            return Success(new { mensaje = "No hay habitaciones activas en la base de datos" });
 
-                        var hasTarifasVigentes = await _context.Tarifas.AnyAsync(
-                            t => t.FechaInicio <= DateTime.Now && t.FechaFin >= DateTime.Now);
-                        if (!hasTarifasVigentes)
-                            return Success(new { mensaje = "No hay tarifas vigentes para la fecha actual" });
+                    if (habitaciones.Any())
+                        return Success(habitaciones);
 
-                        var categoriasConServicio = await _context.Categorias
-                            .Join(_context.Set<Servicios>(),
-                                c => c.IdServicio,
-                                s => s.IdServicio,
-                                (c, s) => new { c.IdCategoria, c.Descripcion, s.Nombre })
-                            .ToListAsync();
-
-                        if (!categoriasConServicio.Any())
-                            return Success(new { mensaje = "No hay categorías con servicios asociados" });
-
-                        var habitacionesSinFiltroFechas = await _context.Habitaciones
-                            .Where(h => h.Estado == true)
-                            .Take(5)
-                            .Select(h => new { h.IdHabitacion, h.Numero })
-                            .ToListAsync();
-
-                        return Success(new
-                        {
-                            mensaje = "No se encontraron habitaciones que cumplan con todos los criterios",
-                            categoriasConServicio,
-                            habitacionesSinFiltroFechas
-                        });
-                    }
-
-                    return Success(habitaciones);
+                    return await HandleNoHabitacionesFound();
                 }
                 catch (Exception ex)
                 {
@@ -127,7 +99,8 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 if (string.IsNullOrWhiteSpace(numero)) return Failure("El número de habitación no puede estar vacío.");
 
                 var habitacion = await _context.Habitaciones.FirstOrDefaultAsync(h => h.Numero == numero);
-                return habitacion != null ? Success(habitacion) : Failure($"No se encontró la habitación con número '{numero}'.");
+                return habitacion != null ? Success(habitacion) : 
+                    Failure($"No se encontró la habitación con número '{numero}'.");
             });
 
         public override async Task<OperationResult> SaveEntityAsync(Habitacion habitacion) =>
@@ -136,10 +109,11 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 var validation = ValidateHabitacion(habitacion);
                 if (!validation.IsSuccess) return validation;
 
-                await ValidateForeignKeys(habitacion);
+                var foreignKeyValidation = await ValidateForeignKeys(habitacion);
+                if (!foreignKeyValidation.IsSuccess) return foreignKeyValidation;
 
-                if (await ExistsAsync(h => h.Numero == habitacion.Numero))
-                    return Failure($"Ya existe una habitación con el número '{habitacion.Numero}'.");
+                var uniqueNumberValidation = await ValidateUniqueRoomNumber(habitacion);
+                if (!uniqueNumberValidation.IsSuccess) return uniqueNumberValidation;
 
                 await _context.Habitaciones.AddAsync(habitacion);
                 await _context.SaveChangesAsync();
@@ -156,11 +130,11 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 var existingRoom = await _context.Habitaciones.FindAsync(habitacion.IdHabitacion);
                 if (existingRoom == null) return Failure("La habitación no existe.");
 
-                await ValidateForeignKeys(habitacion);
+                var foreignKeyValidation = await ValidateForeignKeys(habitacion);
+                if (!foreignKeyValidation.IsSuccess) return foreignKeyValidation;
 
-                if (habitacion.Numero != existingRoom.Numero &&
-                    await ExistsAsync(h => h.Numero == habitacion.Numero && h.IdHabitacion != habitacion.IdHabitacion))
-                    return Failure($"Ya existe otra habitación con el número '{habitacion.Numero}'.");
+                var uniqueNumberValidation = await ValidateUniqueRoomNumber(habitacion, true);
+                if (!uniqueNumberValidation.IsSuccess) return uniqueNumberValidation;
 
                 UpdateHabitacion(existingRoom, habitacion);
                 await _context.SaveChangesAsync();
@@ -178,22 +152,47 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al verificar si existen habitaciones con el estado {IdEstado}", idEstado);
-                return true;
+                return false;
             }
         }
 
-        private async Task ValidateForeignKeys(Habitacion habitacion)
+        private async Task<OperationResult> ValidateUniqueRoomNumber(Habitacion habitacion, bool isUpdate = false)
         {
-            if (!await _context.Pisos.AnyAsync(p => p.IdPiso == habitacion.IdPiso && p.Estado == true))
-                throw new ArgumentException($"El piso con ID {habitacion.IdPiso} no existe o está inactivo.");
-
-            if (!await _context.Categorias.AnyAsync(c => c.IdCategoria == habitacion.IdCategoria && c.Estado == true))
-                throw new ArgumentException($"La categoría con ID {habitacion.IdCategoria} no existe o está inactiva.");
-
-            if (!await _context.EstadoHabitaciones.AnyAsync(e => e.IdEstadoHabitacion == habitacion.IdEstadoHabitacion && e.Estado == true))
-                throw new ArgumentException($"El estado de habitación con ID {habitacion.IdEstadoHabitacion} no existe o está inactivo.");
+            if (isUpdate)
+            {
+                var existingRoom = await _context.Habitaciones.FindAsync(habitacion.IdHabitacion);
+                if (existingRoom != null && habitacion.Numero != existingRoom.Numero)
+                {
+                    if (await ExistsAsync(h => h.Numero == habitacion.Numero && h.IdHabitacion != habitacion.IdHabitacion))
+                        return Failure($"Ya existe otra habitación con el número '{habitacion.Numero}'. El número debe ser único en todos los pisos.");
+                }
+            }
+            else
+            {
+                if (await ExistsAsync(h => h.Numero == habitacion.Numero))
+                    return Failure($"Ya existe una habitación con el número '{habitacion.Numero}'. El número debe ser único en todos los pisos.");
+            }
+    
+            return Success();
         }
 
+        private async Task<OperationResult> ValidateForeignKeys(Habitacion habitacion)
+        {
+            if (!await _context.Pisos.AnyAsync(p => p.IdPiso == habitacion.IdPiso))
+                return Failure($"El piso con ID {habitacion.IdPiso} no existe.");
+        
+            if (!await _context.Pisos.AnyAsync(p => p.IdPiso == habitacion.IdPiso && p.Estado == true))
+                return Failure($"El piso con ID {habitacion.IdPiso} está inactivo.");
+
+            if (!await _context.Categorias.AnyAsync(c => c.IdCategoria == habitacion.IdCategoria && c.Estado == true))
+                return Failure($"La categoría con ID {habitacion.IdCategoria} no existe o está inactiva.");
+
+            if (!await _context.EstadoHabitaciones.AnyAsync(e => e.IdEstadoHabitacion == habitacion.IdEstadoHabitacion && e.Estado == true))
+                return Failure($"El estado de habitación con ID {habitacion.IdEstadoHabitacion} no existe o está inactivo.");
+
+            return Success();
+        }
+        
         private static void UpdateHabitacion(Habitacion existing, Habitacion updated)
         {
             existing.Numero = updated.Numero;
@@ -228,5 +227,39 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
         private static OperationResult Failure(string message) =>
             new() { IsSuccess = false, Message = message };
+        
+        private async Task<OperationResult> HandleNoHabitacionesFound()
+        {
+            var hasHabitaciones = await _context.Habitaciones.AnyAsync(h => h.Estado == true);
+            if (!hasHabitaciones)
+                return Success(new { mensaje = "No hay habitaciones activas en la base de datos" });
+
+            var hasTarifasVigentes = await _context.Tarifas.AnyAsync(t 
+                => t.FechaInicio <= DateTime.Now && t.FechaFin >= DateTime.Now);
+            if (!hasTarifasVigentes)
+                return Success(new { mensaje = "No hay tarifas vigentes para la fecha actual" });
+
+            var categoriasConServicio = await _context.Categorias
+                .Join(_context.Set<Servicios>(), c 
+                    => c.IdServicio, s => s.IdServicio, (c, s) =>
+                    new { c.IdCategoria, c.Descripcion, s.Nombre })
+                .ToListAsync();
+
+            if (!categoriasConServicio.Any())
+                return Success(new { mensaje = "No hay categorías con servicios asociados" });
+
+            var habitacionesSinFiltroFechas = await _context.Habitaciones
+                .Where(h => h.Estado == true)
+                .Take(5)
+                .Select(h => new { h.IdHabitacion, h.Numero })
+                .ToListAsync();
+
+            return Success(new
+            {
+                mensaje = "No se encontraron habitaciones que cumplan con todos los criterios",
+                categoriasConServicio,
+                habitacionesSinFiltroFechas
+            });
+        }
     }
 }

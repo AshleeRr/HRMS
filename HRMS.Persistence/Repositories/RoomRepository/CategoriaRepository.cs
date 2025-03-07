@@ -1,13 +1,11 @@
 ﻿using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
-using HRMS.Domain.Entities.Servicio;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace HRMS.Persistence.Repositories.RoomRepository
 {
@@ -70,7 +68,8 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                         c => c.IdServicio,
                         s => s.IdServicio,
                         (c, s) => new { Categoria = c, Servicio = s })
-                    .Where(cs => cs.Servicio.Nombre.Contains(nombre) && cs.Categoria.Estado == true)
+                    .Where(cs => cs.Servicio.Nombre.Contains(nombre , 
+                        StringComparison.OrdinalIgnoreCase) && cs.Categoria.Estado == true && cs.Servicio.Estado == true)
                     .Select(cs => cs.Categoria)
                     .ToListAsync();
 
@@ -85,7 +84,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                     return Failure("La descripción del servicio no puede estar vacía.");
 
                 var servicios = await _context.Servicios
-                    .Where(s => s.Descripcion.Contains(descripcion) && s.Estado == true)
+                    .Where(s => s.Descripcion.Contains(descripcion , StringComparison.OrdinalIgnoreCase) && s.Estado == true)
                     .ToListAsync();
 
                 return Success(servicios, servicios.Any() ? null : "No se encontraron servicios con esa descripción.");

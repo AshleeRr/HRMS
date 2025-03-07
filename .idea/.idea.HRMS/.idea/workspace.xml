@@ -11,24 +11,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/HRMS.APIs/RoomManagementControllers/EstadoHabitacionController.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/CategoriaRepositoryTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/HabitacionRepositoryTest.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/TarifaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/TarifaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/EstadoHabitacionServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/EstadoHabitacionServices.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/PisoServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/PisoServices.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/TarifaServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/TarifaServices.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/RoomManagementControllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/RoomManagementControllers/HabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Categoria.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Categoria.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/Servicio/Servicios.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/Servicio/Servicios.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/CategoriaDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/CategoriaDependency.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/EstadoHabitacionDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/EstadoHabitacionDependency.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/HRMS.Persistence.Test.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/HRMS.Persistence.Test.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/UnitTest1.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/UnitTest1.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,19 +51,12 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Controllers/AuditController/AuditoriaController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Controllers/ReservationController.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.APIs/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.APIs/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.APIs/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.APIs/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Program.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.APIs/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.APIs/Program.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.APIs/appsettings.Development.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.IOC/AuditDependencies/AuditoriaDependency.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b741f17422844062bda644589ab84b32337fefcb677bc51957a62c3df8ad4d/AuthorizationAppBuilderExtensions.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c3ec25c53b94f51fa21da479c513e551efee2b5ae49a79934686d2bb714d46/TestInvoker.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -207,7 +190,10 @@
       <workItem from="1741040930967" duration="691000" />
       <workItem from="1741117566861" duration="1895000" />
       <workItem from="1741119498672" duration="3200000" />
-      <workItem from="1741195978501" duration="13247000" />
+      <workItem from="1741195978501" duration="15340000" />
+      <workItem from="1741217542658" duration="9477000" />
+      <workItem from="1741277093134" duration="9021000" />
+      <workItem from="1741304358191" duration="4386000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
@@ -281,7 +267,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741167767110</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Apis integradas">
+      <option name="closed" value="true" />
+      <created>1741213639388</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1741213639388</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -322,6 +316,7 @@
     <MESSAGE value="EndPoint de habitaciones Hecha" />
     <MESSAGE value="Api HabitacionController.cs file addded" />
     <MESSAGE value="Eliminacion de referencias innecesarias" />
-    <option name="LAST_COMMIT_MESSAGE" value="Eliminacion de referencias innecesarias" />
+    <MESSAGE value="Apis integradas" />
+    <option name="LAST_COMMIT_MESSAGE" value="Apis integradas" />
   </component>
 </project>
