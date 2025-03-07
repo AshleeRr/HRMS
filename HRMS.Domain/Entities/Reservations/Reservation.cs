@@ -1,9 +1,10 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Entities.Servicio;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace HRMS.Domain.Entities.Reservation
+namespace HRMS.Domain.Entities.Reservations
 {
 
     [Table("Recepcion")]
@@ -12,7 +13,7 @@ namespace HRMS.Domain.Entities.Reservation
         [Key]
         [Column("IdRecepcion")]
         public int IdRecepcion { get; set; }
-
+        public EstadoReserva EstadoReserva { get; set; }
         public DateTime? FechaEntrada { get; set; }
         public DateTime? FechaSalida { get; set; }
         public DateTime? FechaSalidaConfirmacion { get; set; }
@@ -35,5 +36,7 @@ namespace HRMS.Domain.Entities.Reservation
 
         [ForeignKey("idHabitacion")]
         public int? IdHabitacion { get; set; }
+
+        public ICollection<ServicioPorReservacion>? ReservaServicios { get; set; }
     }
 }
