@@ -39,7 +39,8 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             return await GetByFilterAsync(
                 "La descripción del piso no puede estar vacía.",
                 descripcion,
-                _context.Pisos.Where(p => p.Descripcion != null && p.Descripcion.Contains(descripcion) && p.Estado == true),
+                _context.Pisos.Where(p => p.Descripcion != null && p.Descripcion.Contains(descripcion , 
+                    StringComparison.OrdinalIgnoreCase) && p.Estado == true),
                 $"No se encontraron pisos con la descripción '{descripcion}'."
             );
         }
@@ -99,9 +100,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             }
         }
 
-        // -----------------------
-        // Métodos Privados
-        // -----------------------
 
         private OperationResult ValidatePiso(Piso piso)
         {

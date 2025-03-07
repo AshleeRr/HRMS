@@ -45,20 +45,20 @@ namespace HRMS.Persistence.Test.RoomManagementTest
             _context.Pisos.AddRange(new[]
             {
                 new Piso { IdPiso = 1, Estado = true },
-                new Piso { IdPiso = 2, Estado = false },  // Inactive floor
-                new Piso { IdPiso = 3, Estado = true }    // Agregar piso 3 activo
+                new Piso { IdPiso = 2, Estado = false }, 
+                new Piso { IdPiso = 3, Estado = true }    
             });
 
             _context.Categorias.AddRange(new[]
             {
                 new Categoria { IdCategoria = 1, Descripcion = "Standard", Estado = true },
-                new Categoria { IdCategoria = 2, Descripcion = "Deluxe", Estado = false }  // Inactive category
+                new Categoria { IdCategoria = 2, Descripcion = "Deluxe", Estado = false }  
             });
 
             _context.EstadoHabitaciones.AddRange(new[]
             {
                 new EstadoHabitacion { IdEstadoHabitacion = 1, Estado = true },
-                new EstadoHabitacion { IdEstadoHabitacion = 2, Estado = false }  // Inactive state
+                new EstadoHabitacion { IdEstadoHabitacion = 2, Estado = false } 
             });
 
             _context.SaveChanges();
@@ -146,9 +146,9 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         }
 
         [Theory]
-        [InlineData("standard", 1)]  // Lowercase
-        [InlineData("STANDARD", 1)]  // Uppercase
-        [InlineData("StAnDaRd", 1)]  // Mixed case
+        [InlineData("standard", 1)]  
+        [InlineData("STANDARD", 1)]  
+        [InlineData("StAnDaRd", 1)]  
         public async Task GetByCategoriaAsync_WithCaseVariations_ReturnsMatches(string searchTerm, int expectedCount)
         {
             // Arrange
@@ -174,7 +174,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
             // Arrange
             _context.Habitaciones.Add(new Habitacion 
             { 
-                IdCategoria = 2,  // Inactive category
+                IdCategoria = 2,  
                 Estado = true,
                 IdPiso = 1,
                 IdEstadoHabitacion = 1
@@ -235,7 +235,6 @@ namespace HRMS.Persistence.Test.RoomManagementTest
             Assert.False(result.IsSuccess);
             _testOutputHelper.WriteLine($"Mensaje de error: {result.Message}");
     
-            // Usar una aseveración más flexible
             Assert.Contains("inactivo", result.Message.ToLower());
         }
         
@@ -259,7 +258,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         public async Task GetInfoHabitacionesAsync_WhenNoServicesAssociated_ReturnsFallbackServiceInfo()
         {
             // Arrange
-            var categoria = _context.Categorias.First(c => c.Estado == true); // Usar una categoría activa
+            var categoria = _context.Categorias.First(c => c.Estado == true); 
     
             _context.Habitaciones.Add(new Habitacion { 
                 Estado = true,

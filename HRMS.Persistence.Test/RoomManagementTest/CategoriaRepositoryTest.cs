@@ -70,7 +70,7 @@
 
                 // Assert
                 Assert.False(result.IsSuccess);
-                Assert.Contains("Failed", result.Message); // Cambiado para que coincida con el mensaje que configuramos
+                Assert.Contains("Failed", result.Message); 
             }
 
             [Fact]
@@ -123,7 +123,6 @@
                 var repo = CreateRepository(context);
                 var categoria = new Categoria { IdCategoria = 999 };
     
-                // Configurar el mock para que pase la validación
                 _mockValidator.Setup(v => v.Validate(It.IsAny<Categoria>()))
                     .Returns(new OperationResult { IsSuccess = true });
 

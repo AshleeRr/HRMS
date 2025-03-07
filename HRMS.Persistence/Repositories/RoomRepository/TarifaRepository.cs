@@ -8,42 +8,45 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace HRMS.Persistence.Repositories.RoomRepository;
-
-public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepository
+namespace HRMS.Persistence.Repositories.RoomRepository
 {
-    
-    private readonly ILogger<TarifaRepository> _logger;
-    private readonly IConfiguration _configuration;
-    private  IValidator<Tarifas> _validator;
-
-
-    public TarifaRepository(HRMSContext context ,  ILogger<TarifaRepository> logger,
-        IConfiguration configuration ,  IValidator<Tarifas> validator) : base(context)
+    public class TarifaRepository : BaseRepository<Tarifas, int>, ITarifaRepository
     {
-        _logger = logger;
-        _configuration = configuration;
-        _validator = validator;
-    }
-    
-    public override async Task<List<Tarifas>> GetAllAsync()
-    {
-        return await _context.Tarifas.Where(t=> t.Estado == true).ToListAsync();
-    }
-    
-    public override async Task<Tarifas> GetEntityByIdAsync(int id)
-    {
-        return (id != 0 ? await _context.Set<Tarifas>().FindAsync(id) : null) ?? throw new InvalidOperationException();    
-    }
+        private readonly ILogger<TarifaRepository> _logger;
+        private readonly IConfiguration _configuration;
+        private readonly IValidator<Tarifas> _validator;
 
-    public override async Task<OperationResult> SaveEntityAsync(Tarifas tarifas)
-    {
-        var result = ValidarTarifa(tarifas);
-        if (!result.IsSuccess) return result;
-
-        try
+        public TarifaRepository(
+            HRMSContext context,
+            ILogger<TarifaRepository> logger,
+            IConfiguration configuration,
+            IValidator<Tarifas> validator
+        ) : base(context)
         {
-            if (await ExistsAsync(t => t.PrecioPorNoche == tarifas.PrecioPorNoche))
+            _logger = logger;
+            _configuration = configuration;
+            _validator = validator;
+        }
+
+        public override async Task<List<Tarifas>> GetAllAsync()
+        {
+            return await _context.Tarifas.Where(t => t.Estado == true).ToListAsync();
+        }
+
+        public override async Task<Tarifas> GetEntityByIdAsync(int id)
+        {
+            if (id <=0) throw new ArgumentException("ID no válido", nameof(id));
+
+            return await _context.Set<Tarifas>().FindAsync(id)
+                   ?? throw new InvalidOperationException($"No se encontró la tarifa con ID: {id}");
+        }
+
+        public override async Task<OperationResult> SaveEntityAsync(Tarifas tarifas)
+        {
+            var validation = ValidarTarifa(tarifas);
+            if (!validation.IsSuccess) return validation;
+    
+            if (await _context.Tarifas.AnyAsync(t => t.PrecioPorNoche == tarifas.PrecioPorNoche))
             {
                 return new OperationResult
                 {
@@ -51,35 +54,19 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
                     Message = $"Ya existe una tarifa con el precio '{tarifas.PrecioPorNoche}'."
                 };
             }
-
-            _context.Tarifas.Add(tarifas);
-            await _context.SaveChangesAsync();
-
-            return new OperationResult
+    
+            return await ExecuteDatabaseOperationAsync(async () =>
             {
-                IsSuccess = true,
-                Message = "Tarifa guardada exitosamente.",
-                Data = tarifas
-            };
+                _context.Tarifas.Add(tarifas);
+                await _context.SaveChangesAsync();
+            }, "Tarifa guardada exitosamente.", tarifas);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error al guardar la tarifa.");
-            return new OperationResult
-            {
-                IsSuccess = false,
-                Message = $"Error al guardar la tarifa: {ex.Message}"
-            };
-        }
-    }
 
-    public override async Task<OperationResult> UpdateEntityAsync(Tarifas tarifas)
-    {
-        var result = ValidarTarifa(tarifas);
-        if (!result.IsSuccess) return result;
-
-        try
+        public override async Task<OperationResult> UpdateEntityAsync(Tarifas tarifas)
         {
+            var validation = ValidarTarifa(tarifas);
+            if (!validation.IsSuccess) return validation;
+
             var existingTarifa = await _context.Tarifas.FindAsync(tarifas.IdTarifa);
             if (existingTarifa == null)
             {
@@ -91,173 +78,99 @@ public class TarifaRepository : BaseRepository<Tarifas, int> ,  ITarifaRepositor
             }
 
             UpdateTarifa(existingTarifa, tarifas);
-            await _context.SaveChangesAsync();
-
-            return new OperationResult
+            return await ExecuteDatabaseOperationAsync(async () =>
             {
-                IsSuccess = true,
-                Message = "Habitación actualizada correctamente.",
-                Data = existingTarifa
-            };
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            _logger.LogError("Error al actualizar la tarifa. La tarifa ya ha sido modificada por otro usuario.");
-            return new OperationResult
-            {
-                IsSuccess = false,
-                Message = "La tarifa ya ha sido modificada por otro usuario. Intente nuevamente."
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error al actualizar la tarifa.");
-            return new OperationResult
-            {
-                IsSuccess = false,
-                Message = $"Error al actualizar la tarifa: {ex.Message}"
-            };
+                await _context.SaveChangesAsync();
+            }, "Tarifa actualizada correctamente.", existingTarifa);
         }
 
-    }
-
-    public async Task<OperationResult> GetTarifasVigentesAsync(string fechaInput)
-    {
-        try
+        public async Task<OperationResult> GetTarifasVigentesAsync(string fechaInput)
         {
-            _logger.LogInformation("Validando el formato de la fecha ingresada: {FechaInput}", fechaInput);
+            var fechaValidation = ValidateFechaFormat(fechaInput);
+            if (!fechaValidation.IsSuccess) return fechaValidation;
 
-            var fechaValidacion = ValidateFechaFormat(fechaInput);
-            if (!fechaValidacion.IsSuccess) return fechaValidacion;
-
-            DateTime fecha = (DateTime)fechaValidacion.Data;
+            DateTime fecha = (DateTime)fechaValidation.Data;
 
             var tarifas = await _context.Tarifas
                 .Where(t => t.Estado == true && t.FechaInicio <= fecha && t.FechaFin >= fecha)
                 .ToListAsync();
-
+            
             return tarifas.Any()
                 ? new OperationResult { IsSuccess = true, Data = tarifas }
                 : new OperationResult { IsSuccess = false, Message = $"No se encontraron tarifas vigentes para la fecha {fecha:yyyy-MM-dd}." };
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error al obtener tarifas vigentes.");
-            return new OperationResult { IsSuccess = false, Message = "Error al obtener tarifas vigentes." };
-        }
-    }
 
-    public async Task<OperationResult> GetHabitacionByPrecioAsync(decimal precio)
-    {
-        try
+        public async Task<OperationResult> GetHabitacionByPrecioAsync(decimal precio)
         {
             if (precio <= 0)
-                return new OperationResult
-                    { IsSuccess = false, Message = "El precio de la tarifa debe ser mayor a 0." };
-
-            _logger.LogInformation($"Buscando tarifas con precio: {precio}, fecha actual: {DateTime.Now}");
+                return new OperationResult { IsSuccess = false, Message = "El precio de la tarifa debe ser mayor a 0." };
 
             var fechaActual = DateTime.Now;
             var tarifas = await _context.Tarifas
-                .Where(t => t.PrecioPorNoche == precio && t.Estado == true
-                                                       && t.FechaInicio <= fechaActual && t.FechaFin >= fechaActual)
-                .ToListAsync();
-
-            _logger.LogInformation($"Tarifas encontradas: {tarifas.Count}");
+                                        .Where(t => t.PrecioPorNoche == precio && t.Estado == true &&
+                                                    t.FechaInicio <= fechaActual && t.FechaFin >= fechaActual)
+                                        .ToListAsync();
 
             if (!tarifas.Any())
             {
-                var todasTarifas = await _context.Tarifas
-                    .Where(t => t.PrecioPorNoche == precio && t.Estado == true)
-                    .ToListAsync();
-
-                _logger.LogInformation($"Tarifas con precio {precio} sin filtro de fecha: {todasTarifas.Count}");
-
-                if (todasTarifas.Any())
-                {
-                    foreach (var t in todasTarifas)
-                    {
-                        _logger.LogInformation(
-                            $"Tarifa ID: {t.IdTarifa}, FechaInicio: {t.FechaInicio}, FechaFin: {t.FechaFin}, Vigente: {t.FechaInicio <= fechaActual && t.FechaFin >= fechaActual}");
-                    }
-                }
-
-                return new OperationResult
-                    { IsSuccess = false, Message = "No se encontraron tarifas vigentes con el precio indicado." };
+                return new OperationResult { IsSuccess = false, Message = "No se encontraron tarifas vigentes con el precio indicado." };
             }
 
             var categoriaIds = tarifas.Select(t => t.IdCategoria).ToList();
-            _logger.LogInformation($"Categorías encontradas para las tarifas: {string.Join(", ", categoriaIds)}");
-
             var habitaciones = await _context.Habitaciones
-                .Where(h => h.Estado == true && h.IdCategoria.HasValue && categoriaIds.Contains(h.IdCategoria.Value))
-                .ToListAsync();
-
-            _logger.LogInformation($"Habitaciones encontradas: {habitaciones.Count}");
-
-            if (!habitaciones.Any())
-            {
-                var todasHabitacionesEnCategorias = await _context.Habitaciones
-                    .Where(h => h.IdCategoria.HasValue && categoriaIds.Contains(h.IdCategoria.Value))
-                    .ToListAsync();
-
-                _logger.LogInformation(
-                    $"Total de habitaciones en esas categorías (incluso inactivas): {todasHabitacionesEnCategorias.Count}");
-
-                foreach (var h in todasHabitacionesEnCategorias)
-                {
-                    _logger.LogInformation(
-                        $"Habitación ID: {h.IdHabitacion}, Categoría: {h.IdCategoria}, Estado: {h.Estado}");
-                }
-            }
+                                             .Where(h => h.Estado == true && h.IdCategoria.HasValue && categoriaIds.Contains(h.IdCategoria.Value))
+                                             .ToListAsync();
 
             return habitaciones.Any()
                 ? new OperationResult { IsSuccess = true, Data = habitaciones }
-                : new OperationResult
-                    { IsSuccess = false, Message = "No se encontraron habitaciones con el precio de tarifa indicado." };
+                : new OperationResult { IsSuccess = false, Message = "No se encontraron habitaciones con el precio de tarifa indicado." };
         }
-        catch (Exception ex)
+
+        private OperationResult ValidarTarifa(Tarifas tarifa)
         {
-            _logger.LogError(ex, "Error al buscar habitaciones por precio de tarifa.");
-            return new OperationResult
-                { IsSuccess = false, Message = $"Error al buscar habitaciones por precio de tarifa: {ex.Message}" };
+            return _validator.Validate(tarifa);
         }
-    }
 
-    private OperationResult ValidarTarifa(Tarifas tarifa)
-    {
-        var validation =  _validator.Validate(tarifa);
-        return validation.IsSuccess ? new OperationResult() { IsSuccess = true } : validation;
-    }
-    
-    private void UpdateTarifa(Tarifas entity, Tarifas entityToUpdate)
-    {
-        entityToUpdate.PrecioPorNoche = entity.PrecioPorNoche;
-        entityToUpdate.FechaInicio = entity.FechaInicio;
-        entityToUpdate.FechaFin = entity.FechaFin;
-        entityToUpdate.Estado = entity.Estado;
-    }
-    
-    private static OperationResult ValidateFechaFormat(string fechaInput)
-    {
-        if (string.IsNullOrWhiteSpace(fechaInput))
-            return new OperationResult { IsSuccess = false, Message = "La fecha no puede estar vacía." };
-
-        DateTime fecha;
-        string[] formatosValidos = { "dd/MM/yyyy", "yyyy-MM-dd", "MM/dd/yyyy", "dd-MM-yyyy" };
-
-        if (!DateTime.TryParseExact(fechaInput, formatosValidos, 
-                System.Globalization.CultureInfo.InvariantCulture, 
-                System.Globalization.DateTimeStyles.None, out fecha))
+        private static void UpdateTarifa(Tarifas target, Tarifas source)
         {
-            return new OperationResult
+            target.PrecioPorNoche = source.PrecioPorNoche;
+            target.FechaInicio = source.FechaInicio;
+            target.FechaFin = source.FechaFin;
+            target.Estado = source.Estado;
+        }
+
+        private async Task<OperationResult> ExecuteDatabaseOperationAsync(Func<Task> operation, string successMessage, dynamic? data = null)
+        {
+            try
             {
-                IsSuccess = false,
-                Message = "El formato de la fecha es incorrecto. Usa formatos válidos: dd/MM/yyyy, yyyy-MM-dd, MM/dd/yyyy, dd-MM-yyyy."
-            };
+                await operation();
+                return new OperationResult { IsSuccess = true, Message = successMessage, Data = data };
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                _logger.LogError("Error de concurrencia al actualizar la tarifa.");
+                return new OperationResult { IsSuccess = false, Message = "La tarifa ya ha sido modificada por otro usuario. Intente nuevamente." };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en la operación.");
+                return new OperationResult { IsSuccess = false, Message = $"Error en la operación: {ex.Message}" };
+            }
         }
 
-        return new OperationResult { IsSuccess = true, Data = fecha };
-    }
+        private static OperationResult ValidateFechaFormat(string fechaInput)
+        {
+            if (string.IsNullOrWhiteSpace(fechaInput))
+                return new OperationResult { IsSuccess = false, Message = "La fecha no puede estar vacía." };
 
+            string[] formatosValidos = { "dd/MM/yyyy", "yyyy-MM-dd", "MM/dd/yyyy", "dd-MM-yyyy" };
+            if (DateTime.TryParseExact(fechaInput, formatosValidos, System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out var fecha))
+            {
+                return new OperationResult { IsSuccess = true, Data = fecha };
+            }
+
+            return new OperationResult { IsSuccess = false, Message = "El formato de la fecha es incorrecto. Usa formatos válidos: dd/MM/yyyy, yyyy-MM-dd, MM/dd/yyyy, dd-MM-yyyy." };
+        }
+    }
 }
