@@ -27,7 +27,8 @@ namespace HRMS.Application.Services.RoomServices
                 var habitaciones = await _habitacionRepository.GetAllAsync();
                 
                 return SuccessResult(
-                    habitaciones?.Any() == true ? "Habitaciones obtenidas correctamente" : "No se encontraron habitaciones registradas",
+                    habitaciones?.Any() == true ? "Habitaciones obtenidas correctamente" :
+                        "No se encontraron habitaciones registradas",
                     habitaciones ?? new List<Habitacion>());
             }
             catch (Exception ex)

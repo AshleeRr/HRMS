@@ -63,15 +63,20 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 if (string.IsNullOrWhiteSpace(nombre))
                     return Failure("El nombre del servicio no puede estar vacío.");
 
-                var categorias = await _context.Categorias
+               
+                var categoriasYServicios = await _context.Categorias
                     .Join(_context.Servicios,
                         c => c.IdServicio,
                         s => s.IdServicio,
                         (c, s) => new { Categoria = c, Servicio = s })
-                    .Where(cs => cs.Servicio.Nombre.Contains(nombre , 
-                        StringComparison.OrdinalIgnoreCase) && cs.Categoria.Estado == true && cs.Servicio.Estado == true)
-                    .Select(cs => cs.Categoria)
+                    .Where(cs => cs.Categoria.Estado == true && cs.Servicio.Estado == true)
                     .ToListAsync();
+
+                var categorias = categoriasYServicios
+                    .Where(cs => cs.Servicio.Nombre.Contains(nombre, StringComparison.OrdinalIgnoreCase))
+                    .Select(cs => cs.Categoria)
+                    .ToList();
+                
 
                 return Success(categorias,
                     categorias.Any() ? null : $"No se encontraron categorías para el servicio '{nombre}'.");

@@ -46,7 +46,8 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 if (string.IsNullOrWhiteSpace(categoria)) return Failure("Debe ingresar una categoría.");
 
                 var habitaciones = await _context.Habitaciones
-                    .Join(_context.Categorias, h => h.IdCategoria, c => c.IdCategoria, (h, c) => new { h, c })
+                    .Join(_context.Categorias, h => h.IdCategoria, c => c.IdCategoria, 
+                        (h, c) => new { h, c })
                     .Where(hc => hc.c.Descripcion != null && hc.c.Descripcion.Contains
                         (categoria, StringComparison.OrdinalIgnoreCase) && hc.c.Estado == true)
                     .Select(hc => hc.h)
@@ -155,7 +156,20 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 return false;
             }
         }
-
+        public async Task<OperationResult> GetByCategoriaIdAsync(int idCategoria) =>
+            await ExecuteOperationAsync(async () =>
+            {
+                ValidateId(idCategoria, "El ID de la categoría debe ser mayor que cero.");
+        
+                var habitaciones = await _context.Habitaciones
+                    .Where(h => h.IdCategoria == idCategoria && h.Estado == true)
+                    .ToListAsync();
+            
+                return habitaciones.Any() 
+                    ? Success(habitaciones, "Habitaciones encontradas para la categoría especificada.") 
+                    : Failure($"No se encontraron habitaciones activas para la categoría con ID {idCategoria}.");
+            });
+        
         private async Task<OperationResult> ValidateUniqueRoomNumber(Habitacion habitacion, bool isUpdate = false)
         {
             if (isUpdate)
@@ -192,7 +206,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
             return Success();
         }
-        
+
         private static void UpdateHabitacion(Habitacion existing, Habitacion updated)
         {
             existing.Numero = updated.Numero;

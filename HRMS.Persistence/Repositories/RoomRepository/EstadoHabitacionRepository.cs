@@ -82,7 +82,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             }
 
             var estados = await _context.EstadoHabitaciones
-                .Where(e => e.Descripcion.Contains(descripcionEstado, StringComparison.OrdinalIgnoreCase) && e.Estado == true)
+                .Where(e => e.Descripcion != null && e.Descripcion.Contains(descripcionEstado, StringComparison.OrdinalIgnoreCase) && e.Estado == true)
                 .ToListAsync();
 
             return new OperationResult

@@ -11,37 +11,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservClientInfoDTO.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservDtosValidator/ReservAddDtoValidator.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservDtosValidator/ReservUpdateDtoValidator.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationAddDTO.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationConfirmDTO.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationDTO.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationRemoveDTO.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationUpdateDTO.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Application/Services/Reservation_2023-0731/ReservationService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/Reservations/EstadoReserva.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/Servicio/ServicioPorCategoria.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/Servicio/ServicioPorReservacion.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Models/Models/ReservationModels/CategoryRoomForReserv.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/ReservationTests/ReservationRepositoryTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Persistence/Context/Configurations/ServicePerCategoryConfig.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Persistence/Context/Configurations/ServiciePerReservationConfig.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/HRMS.Application.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Application/HRMS.Application.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Interfaces/Reservation_2023-0731/IReservationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Interfaces/Reservation_2023-0731/IReservationService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/ReservationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/ReservationController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/PisoController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/PisoController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/HRMS.Application.Test.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/HRMS.Application.Test.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/Reservation/ReservationValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/Reservation/ReservationValidator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/Reservations/Reservation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/Reservations/Reservation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/HRMS.Domain.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/HRMS.Domain.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Repository/IReservationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Repository/IReservationRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.IOC/ReservationDepedencies/ResevDependencies.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/ReservationDepedencies/ResevDependencies.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/HRMS.Persistence.Test.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/HRMS.Persistence.Test.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/TarifaRepositoryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/TarifaRepositoryTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Context/HRMSContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Context/HRMSContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/Reserv/ReservationRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/Reserv/ReservationRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/RoomDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/RoomDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/ICategoryRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/ICategoryRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +82,7 @@
     "HTTP Request.HRMS.APIs | #1.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "Merging HabitFloors-20240045",
+    "git-widget-placeholder": "HabitFloors-20240045",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -218,7 +200,7 @@
       <workItem from="1741195978501" duration="15340000" />
       <workItem from="1741217542658" duration="9477000" />
       <workItem from="1741277093134" duration="9021000" />
-      <workItem from="1741304358191" duration="20681000" />
+      <workItem from="1741304358191" duration="26647000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />

@@ -58,7 +58,7 @@ namespace HRMS.APIs.RoomManagementControllers
             return HandleOperationResult(result);
         }
 
-        [HttpGet("GetCategoriaByDescripcionServicio/{nombreServicio}")]
+        [HttpGet("GetCategoriaByNombreServicio/{nombreServicio}")]
         public async Task<IActionResult> GetByServicio(string nombreServicio)
         {
             _logger.LogInformation("Buscando categorías para el servicio: {NombreServicio}", nombreServicio);

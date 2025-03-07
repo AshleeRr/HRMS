@@ -112,7 +112,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// </summary>
         /// <param name="idPiso">ID del piso</param>
         /// <returns>Lista de habitaciones del piso</returns>
-        [HttpGet("GetHabitacionBy{idPiso}")]
+        [HttpGet("GetHabitacionByPiso/{idPiso}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -128,7 +128,7 @@ namespace HRMS.APIs.RoomManagementControllers
         /// </summary>
         /// <param name="categoria">Descripción de la categoría</param>
         /// <returns>Lista de habitaciones de la categoría</returns>
-        [HttpGet("GetHabitacionBy{categoria}")]
+        [HttpGet("GetHabitacionByCategoria/{categoria}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

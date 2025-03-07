@@ -1,4 +1,4 @@
-﻿using HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
+﻿﻿using HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
 using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
 using HRMS.Domain.Entities.RoomManagement;
@@ -82,19 +82,21 @@ namespace HRMS.Application.Services.RoomServices
         public async Task<OperationResult> Remove(DeleteCategoriaDto dto)
         {
             return await ExecuteOperationAsync(async () =>
-            {
-                _logger.LogInformation("Eliminando categoría con ID: {Id}", dto.IdCategoria);
-                
-                var category = await FindCategoryByIdAsync(dto.IdCategoria);
-                if (await TieneHabitacionesAsociadas(category.Descripcion))
                 {
-                    return Failure("No se puede eliminar la categoría porque tiene habitaciones asociadas.");
-                }
+                    _logger.LogInformation("Eliminando categoría con ID: {Id}", dto.IdCategoria);
 
-                category.Estado = false;
-                await _categoryRepository.UpdateEntityAsync(category);
-                return Success(category, "Categoría eliminada correctamente.");
-            }, $"Error al eliminar la categoría con ID {dto.IdCategoria}.");
+                    var category = await FindCategoryByIdAsync(dto.IdCategoria);
+
+                    // Verifica habitaciones asociadas usando el ID de categoría
+                    if (await TieneHabitacionesAsociadas(dto.IdCategoria))
+                    {
+                        return Failure("No se puede eliminar la categoría porque tiene habitaciones asociadas.");
+                    }
+
+                    category.Estado = false;
+                    await _categoryRepository.UpdateEntityAsync(category);
+                    return Success(category, "Categoría eliminada correctamente.");
+                }, $"Error al eliminar la categoría con ID {dto.IdCategoria}.");
         }
 
         public async Task<OperationResult> GetCategoriaByServicio(string nombreServicio)
@@ -140,14 +142,15 @@ namespace HRMS.Application.Services.RoomServices
             }, $"Error al obtener habitaciones con capacidad {capacidad}.");
         }
         
-        private async Task<bool> TieneHabitacionesAsociadas(string descripcionCategoria)
+        private async Task<bool> TieneHabitacionesAsociadas(int idCategoria)
         {
-            var habitacionesResult = await _habitacionRepository.GetByCategoriaAsync(descripcionCategoria);
+            var habitacionesResult = await _habitacionRepository.GetByCategoriaIdAsync(idCategoria);
             if (!habitacionesResult.IsSuccess || habitacionesResult.Data == null) return false;
 
             var habitaciones = habitacionesResult.Data as IEnumerable<Habitacion>;
             return habitaciones != null && habitaciones.Any();
         }
+
 
         private async Task<Categoria> FindCategoryByIdAsync(int id)
         {
