@@ -1,4 +1,6 @@
-﻿using HRMS.Application.Interfaces.Reservation_2023_0731;
+﻿using HRMS.Application.DTOs.Reservation_2023_0731;
+using HRMS.Application.DTOs.Reservation_2023_0731.ReservDtosValidator;
+using HRMS.Application.Interfaces.Reservation_2023_0731;
 using HRMS.Application.Services.Reservation_2023_0731;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.ReservationValidator;
@@ -19,6 +21,7 @@ namespace HRMS.IOC.ReservationDepedencies
             services.AddScoped<IReservationRepository, ReservationRepository>();
             services.AddScoped<IValidator<Reservation>, ReservationValidator>();
             services.AddScoped<IReservationService, ReservationService>();
+            services.AddScoped<IValidator<ReservationAddDTO>, ReservAddDtoValidator>();
             services.AddScoped<ILoggingServices, LoggingServices>();
             return services;
         }

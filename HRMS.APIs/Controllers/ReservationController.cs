@@ -1,6 +1,7 @@
 ﻿using HRMS.Application.DTOs.Reservation_2023_0731;
 using HRMS.Application.Interfaces.Reservation_2023_0731;
 using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Reservations;
 using HRMS.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,14 @@ namespace HRMS.APIs.Controllers
     {
         private readonly IReservationRepository _reservationRepository;
         private readonly IReservationService _reservationServices;
+        private readonly IValidator<ReservationAddDTO> _validatorAdd;
         private readonly ILogger<ReservationsController> _logger;
 
-        public ReservationsController(IReservationRepository reservationRepository, ILogger<ReservationsController> logger, IReservationService reservationService)
+        public ReservationsController(IReservationRepository reservationRepository, ILogger<ReservationsController> logger
+            , IValidator<ReservationAddDTO> validatorAdd, IReservationService reservationService)
         {
             _reservationServices = reservationService;
+            _validatorAdd = validatorAdd;
             _reservationRepository = reservationRepository;
             _logger = logger;
         }
@@ -52,13 +56,13 @@ namespace HRMS.APIs.Controllers
         [HttpPost("CreateReservation")]
         public async Task<IActionResult> Post([FromBody] ReservationAddDTO reserv)
         {
-            /*
-            var validRes = _validSave(reserv);
+            
+            var validRes = _validatorAdd.Validate(reserv);
             if (!validRes.IsSuccess)
             {
                 return BadRequest("Errores: " + validRes.Message);
             }
-            */
+            
             var res = await _reservationServices.Save(reserv);
             if (res.IsSuccess)
             {
@@ -70,6 +74,10 @@ namespace HRMS.APIs.Controllers
         [HttpPut("UpdateReservation")]
         public async Task<IActionResult> Put(ReservationUpdateDTO dto)
         {
+            if(dto.ID == 0)
+            {
+                return BadRequest("El ID no puede ser cero");
+            }
             var res = await _reservationServices.Update(dto);
             if (res.IsSuccess)
             {
@@ -81,6 +89,10 @@ namespace HRMS.APIs.Controllers
         [HttpGet("GetReservationsByClientId/{clientID}")]
         public async Task<IActionResult> GetReservationsByClientId(int clientID)
         {
+            if(clientID == 0)
+            {
+                return BadRequest("El ID del cliente no puede ser cero");
+            }
             var res = await _reservationRepository.GetReservationsByClientId(clientID);
             if (res.IsSuccess)
             {
@@ -92,6 +104,14 @@ namespace HRMS.APIs.Controllers
         [HttpPatch("ConfirmReservation/{reservationId}")]
         public async Task<IActionResult> ConfirmReservation(ReservationConfirmDTO dto)
         {
+            if(dto.UserID == 0)
+            {
+                return BadRequest("El ID del usuario no puede ser cero");
+            }
+            if (dto.ReservationId == 0)
+            {
+                return BadRequest("El ID de la reservación no puede ser cero");
+            }
             var res = await _reservationServices.ConfirmReservation(dto);
             if (res.IsSuccess)
             {

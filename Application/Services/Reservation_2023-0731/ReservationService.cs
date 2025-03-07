@@ -372,6 +372,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                 RoomId = reservation.IdHabitacion,
                 RemainingPrice = reservation.PrecioRestante,
                 PenaltyCost = reservation.CostoPenalidad,
+                ReservationId = reservation.IdRecepcion,
                 TotalPaid = reservation.TotalPagado
             };
 

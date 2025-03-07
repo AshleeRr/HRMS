@@ -8,8 +8,6 @@ namespace HRMS.Application.DTOs.Reservation_2023_0731
         public DateTime In { get; set; }
         public DateTime Out { get; set; }
         public string Observations { get; set; }
-        public IEnumerable<int> AddServices { get; set; }
-        public IEnumerable<int> RemoveServices { get; set; }
         public decimal AbonoPenalidad { get; set; }
     }
 }

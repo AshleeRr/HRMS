@@ -22,7 +22,8 @@ namespace HRMS.Persistence.Repositories.Reserv
         private IValidator<Reservation> _validator;
         private IConfiguration _configuration;
          
-        public ReservationRepository(HRMSContext context, ILogger<ReservationRepository> logger, ILoggingServices loggingServices IConfiguration configuration, IValidator<Reservation> validator) : base(context)
+        public ReservationRepository(HRMSContext context, ILogger<ReservationRepository> logger, ILoggingServices loggingServices,
+            IConfiguration configuration, IValidator<Reservation> validator) : base(context)
         {
             _logger = logger;
             _loggingServices = loggingServices;
@@ -43,7 +44,7 @@ namespace HRMS.Persistence.Repositories.Reserv
         {
             if(filter != null)
             {
-                return await base.GetAllAsync(r => r.Estado.Value && filter.Compile()(r));
+                return await base.GetAllAsync(filter);
             }
             var res = new OperationResult();
             res.IsSuccess = false;
@@ -74,7 +75,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                 result = await base.SaveEntityAsync(entity);
                 if (!result.IsSuccess)
                 {
-                    result = await _loggingServices.LogError(ex.Message, this);
+                    result = await _loggingServices.LogError("", this);
                 }
 
             }
@@ -137,7 +138,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                 result = await base.UpdateEntityAsync(entity);
                 if (!result.IsSuccess)
                 {
-                    result = await _loggingServices.LogError(ex.Message, this);
+                    result = await _loggingServices.LogError("", this);
                 }
             
             }
@@ -495,7 +496,6 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-        private string? _getErrorMessage([CallerMemberName]string source ="")
-            => _configuration["ErrorReservationRepository:" + source]; 
+
     }
 }
