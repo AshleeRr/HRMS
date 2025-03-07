@@ -2,7 +2,7 @@
 
 namespace HRMS.Domain.Base.Validator.ReservationValidator
 {
-    public class ReservationValidator : Validator<Entities.Reservation.Reservation>
+    public class ReservationValidator : Validator<Entities.Reservations.Reservation>
     {
         public ReservationValidator()
         {

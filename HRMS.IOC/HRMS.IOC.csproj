@@ -12,6 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application\HRMS.Application.csproj" />
+    <ProjectReference Include="..\HRMS.Application\HRMS.Infraestructure.csproj" />
     <ProjectReference Include="..\HRMS.Persistence\HRMS.Persistence.csproj" />
   </ItemGroup>
 

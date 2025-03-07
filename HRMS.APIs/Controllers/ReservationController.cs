@@ -1,8 +1,10 @@
-﻿using HRMS.Domain.Base;
-using HRMS.Domain.Entities.Reservation;
+﻿using HRMS.Application.DTOs.Reservation_2023_0731;
+using HRMS.Application.Interfaces.Reservation_2023_0731;
+using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
+using HRMS.Domain.Entities.Reservations;
 using HRMS.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace HRMS.APIs.Controllers
 {
@@ -11,10 +13,15 @@ namespace HRMS.APIs.Controllers
     public class ReservationsController : ControllerBase
     {
         private readonly IReservationRepository _reservationRepository;
+        private readonly IReservationService _reservationServices;
+        private readonly IValidator<ReservationAddDTO> _validatorAdd;
         private readonly ILogger<ReservationsController> _logger;
 
-        public ReservationsController(IReservationRepository reservationRepository, ILogger<ReservationsController> logger)
+        public ReservationsController(IReservationRepository reservationRepository, ILogger<ReservationsController> logger
+            , IValidator<ReservationAddDTO> validatorAdd, IReservationService reservationService)
         {
+            _reservationServices = reservationService;
+            _validatorAdd = validatorAdd;
             _reservationRepository = reservationRepository;
             _logger = logger;
         }
@@ -22,8 +29,13 @@ namespace HRMS.APIs.Controllers
         [HttpGet("GetAll")]
         public async Task<IActionResult> Get()
         {
-            var res = await _reservationRepository.GetAllAsync();
-            return Ok(res);
+            var res = await _reservationServices.GetAll();
+            if(!res.IsSuccess)
+            {
+                return BadRequest(res.Message);
+            }
+            IEnumerable<ReservationDTO> dtos = res.Data as IEnumerable<ReservationDTO>;
+            return Ok(res.Data);
         }
 
         [HttpGet("GetByID/{id}")]
@@ -42,15 +54,16 @@ namespace HRMS.APIs.Controllers
         }
 
         [HttpPost("CreateReservation")]
-        public async Task<IActionResult> Post([FromBody] Reservation reserv)
+        public async Task<IActionResult> Post([FromBody] ReservationAddDTO reserv)
         {
-
-            var validRes = _validSave(reserv);
+            
+            var validRes = _validatorAdd.Validate(reserv);
             if (!validRes.IsSuccess)
             {
                 return BadRequest("Errores: " + validRes.Message);
             }
-            var res = await _reservationRepository.SaveEntityAsync(reserv);
+            
+            var res = await _reservationServices.Save(reserv);
             if (res.IsSuccess)
             {
                 return Created();
@@ -58,33 +71,17 @@ namespace HRMS.APIs.Controllers
             return BadRequest(res.Message);
         }
 
-        [HttpPut("UpdateReservation/{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Reservation reser)
+        [HttpPut("UpdateReservation")]
+        public async Task<IActionResult> Put(ReservationUpdateDTO dto)
         {
-            var validRes = _validSave(reser);
-            if (!validRes.IsSuccess)
+            if(dto.ID == 0)
             {
-                return BadRequest("Errores: " + validRes.Message);
+                return BadRequest("El ID no puede ser cero");
             }
-            var reservOrigin = await _reservationRepository.GetEntityByIdAsync(id);
-            if (reservOrigin == null)
-                return BadRequest("La reservación a Actualizar es Inexistente");
-
-            reservOrigin.IdCliente = reser.IdCliente;
-            reservOrigin.IdHabitacion = reser.IdHabitacion;
-            reservOrigin.Adelanto = reser.Adelanto;
-            reservOrigin.CostoPenalidad = reser.CostoPenalidad;
-            reservOrigin.TotalPagado = reser.TotalPagado;
-            reservOrigin.FechaEntrada = reser.FechaEntrada;
-            reservOrigin.FechaSalida = reser.FechaSalida;
-            reservOrigin.FechaSalidaConfirmacion = reser.FechaSalidaConfirmacion;
-            reservOrigin.PrecioInicial = reser.PrecioInicial;
-            reservOrigin.PrecioRestante = reser.PrecioRestante;
-
-            var res = await _reservationRepository.UpdateEntityAsync(reser);
+            var res = await _reservationServices.Update(dto);
             if (res.IsSuccess)
             {
-               return NoContent();
+                return Ok(res.Data);
             }
             return BadRequest(res.Message);
         }
@@ -92,6 +89,10 @@ namespace HRMS.APIs.Controllers
         [HttpGet("GetReservationsByClientId/{clientID}")]
         public async Task<IActionResult> GetReservationsByClientId(int clientID)
         {
+            if(clientID == 0)
+            {
+                return BadRequest("El ID del cliente no puede ser cero");
+            }
             var res = await _reservationRepository.GetReservationsByClientId(clientID);
             if (res.IsSuccess)
             {
@@ -100,7 +101,46 @@ namespace HRMS.APIs.Controllers
             return BadRequest(res.Message);
         }
 
+        [HttpPatch("ConfirmReservation/{reservationId}")]
+        public async Task<IActionResult> ConfirmReservation(ReservationConfirmDTO dto)
+        {
+            if(dto.UserID == 0)
+            {
+                return BadRequest("El ID del usuario no puede ser cero");
+            }
+            if (dto.ReservationId == 0)
+            {
+                return BadRequest("El ID de la reservación no puede ser cero");
+            }
+            var res = await _reservationServices.ConfirmReservation(dto);
+            if (res.IsSuccess)
+            {
+                return Ok(res.Message);
+            }
+            return BadRequest(res.Message);
+        }
 
+        [HttpPatch("CancelReservation/{reservationId}")]
+        public async Task<IActionResult> CancelReservation(int reservationId)
+        {
+            var res = await _reservationServices.CancelReservation(reservationId);
+            if (res.IsSuccess)
+            {
+                return Ok(res.Message);
+            }
+            return BadRequest(res.Message);
+        }
+
+        [HttpDelete("RemoveReservation")]
+        public async Task<IActionResult> Remove(ReservationRemoveDTO dTO)
+        {
+            var res = await _reservationServices.Remove(dTO);
+            if (res.IsSuccess)
+            {
+                return Ok(res.Message);
+            }
+            return BadRequest(res.Message);
+        }
 
         private OperationResult _validSave(Reservation r)
         {

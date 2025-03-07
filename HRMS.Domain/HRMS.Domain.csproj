@@ -12,8 +12,4 @@
     <None Remove="Entities\RoomManagment\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Entities\Servicio\" />
-  </ItemGroup>
-
 </Project>
