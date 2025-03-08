@@ -63,7 +63,7 @@ namespace HRMS.Application.Services.RoomServices
                 var piso = new Piso { Descripcion = dto.Descripcion, Estado = true };
 
                 var result = await _pisoRepository.SaveEntityAsync(piso);
-                Success(null, "Piso creado correctamente.");
+        
                 return result.IsSuccess && result.Data != null
                     ? Success(MapToDto((Piso)result.Data), "Piso creado correctamente.")
                     : result;
@@ -127,9 +127,7 @@ namespace HRMS.Application.Services.RoomServices
 
                     _logger.LogInformation("Buscando piso por descripción: {Descripcion}", descripcion);
                     var result = await _pisoRepository.GetPisoByDescripcion(descripcion);
-
-                 
-        
+            
                     if (result.IsSuccess && result.Data != null)
                     {
                         if (result.Data is IEnumerable<Piso> pisos)
@@ -145,7 +143,7 @@ namespace HRMS.Application.Services.RoomServices
                             return Success(MapToDto(piso));
                         }
                     }
-        
+
                     return Failure($"No se encontraron pisos con la descripción '{descripcion}'.");
                 }, $"Error al buscar el piso con descripción '{descripcion}'.");
         }

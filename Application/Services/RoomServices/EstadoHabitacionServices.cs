@@ -64,6 +64,7 @@ namespace HRMS.Application.Services.RoomServices
             {
                 var validacion = ValidarEstado(dto.Descripcion);
                 if (!validacion.IsSuccess) return validacion;
+                if(dto.IdEstadoHabitacion <= 0) return Failure("El ID del estado de habitación debe ser mayor que cero.");
 
                 var estadoHabitacion = await _estadoHabitacionRepository.GetEntityByIdAsync(dto.IdEstadoHabitacion);
                 if (estadoHabitacion == null) return Failure($"No se encontró el estado con ID {dto.IdEstadoHabitacion}.");

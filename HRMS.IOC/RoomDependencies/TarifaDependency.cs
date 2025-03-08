@@ -19,6 +19,7 @@ public static class TarifaDependency
         services.AddScoped<IValidator<Tarifas>, TarifasValidator>();
         services.AddScoped<ITarifaService, TarifaServices>();
         services.AddScoped<ILoggingServices, LoggingServices>();
+        services.AddScoped<ICategoryRepository, CategoriaRepository>();
         return services;
     }
     

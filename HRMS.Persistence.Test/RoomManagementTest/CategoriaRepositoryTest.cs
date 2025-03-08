@@ -211,7 +211,7 @@
                 var repo = CreateRepository(context);
 
                 // Act
-                var result = await repo.GetServiciosByDescripcionAsync("contains partial");
+                var result = await repo.GetCategoriaByDescripcionAsync("contains partial");
 
                 // Assert
                 Assert.Single(result.Data as List<Servicios>);
@@ -231,7 +231,7 @@
                 var repo = CreateRepository(context);
 
                 // Act
-                var result = await repo.GetServiciosByDescripcionAsync("@123!");
+                var result = await repo.GetCategoriaByDescripcionAsync("@123!");
 
                 // Assert
                 Assert.Single(result.Data as List<Servicios>);

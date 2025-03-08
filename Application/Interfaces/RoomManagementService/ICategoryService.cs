@@ -7,6 +7,6 @@ namespace HRMS.Application.Interfaces.RoomManagementService;
 public interface ICategoryService :  IBaseServices<CreateCategoriaDto, UpdateCategoriaDto, DeleteCategoriaDto>
 {
     Task<OperationResult> GetCategoriaByServicio(string nombreServicio);
-    Task<OperationResult> GetServiciosByDescripcion(string descripcion);
+    Task<OperationResult> GetCategoriaByDescripcion(string descripcion);
     Task<OperationResult> GetHabitacionesByCapacidad(int capacidad);
 }

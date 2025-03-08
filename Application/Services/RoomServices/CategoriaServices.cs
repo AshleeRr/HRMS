@@ -1,8 +1,9 @@
-﻿﻿using HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
+﻿using HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
 using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Interfaces.IRoomRepository;
+using HRMS.Persistence.Interfaces.IServicioRepository;
 using Microsoft.Extensions.Logging;
 
 namespace HRMS.Application.Services.RoomServices
@@ -12,13 +13,17 @@ namespace HRMS.Application.Services.RoomServices
         private readonly ILogger<CategoriaServices> _logger;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IHabitacionRepository _habitacionRepository;
+        private readonly IServicioRepository _servicioRepository;
+        private readonly ITarifaRepository _tarifaRepository;
 
         public CategoriaServices(ICategoryRepository categoryRepository, ILogger<CategoriaServices> logger, 
-                                 IHabitacionRepository habitacionRepository)
+                                 IHabitacionRepository habitacionRepository, IServicioRepository servicioRepository, ITarifaRepository tarifaRepository)
         {
             _categoryRepository = categoryRepository;
             _logger = logger;
             _habitacionRepository = habitacionRepository;
+            _servicioRepository = servicioRepository;
+            _tarifaRepository = tarifaRepository;
         }
 
         public async Task<OperationResult> GetAll()
@@ -37,7 +42,8 @@ namespace HRMS.Application.Services.RoomServices
         {
             return await ExecuteOperationAsync(async () =>
             {
-                ValidateId(id, "El ID de la categoría debe ser mayor que 0.");
+                var  validateId = ValidateId(id, "El ID de la categoría debe ser mayor que 0.");
+                if (!validateId.IsSuccess) return validateId;
                 _logger.LogInformation("Buscando categoría con ID: {Id}", id);
 
                 var category = await FindCategoryByIdAsync(id);
@@ -49,8 +55,16 @@ namespace HRMS.Application.Services.RoomServices
         {
             return await ExecuteOperationAsync(async () =>
             {
-                ValidateId(dto.IdServicio, "El ID del servicio debe ser mayor que 0.");
-                ValidateId(dto.Capacidad , "La capacidad de la categoría debe ser mayor que 0.");
+                var validateId = ValidateId(dto.IdServicio, "El ID del servicio debe ser mayor que 0.");
+                var validateCapacidad = ValidateId(dto.Capacidad , "La capacidad de la categoría debe ser mayor que 0.");
+                var validateDescription = ValidateString(dto.Descripcion, "La descripción de la categoría no puede estar vacía.");
+                if(!validateId.IsSuccess && !validateCapacidad.IsSuccess && !validateDescription.IsSuccess)
+                    return Failure( "Error al validar los datos de la categoría.");
+                
+                var servicioValidation = await ValidateServicioExistsAndActiveAsync(dto.IdServicio);
+                if (!servicioValidation.IsSuccess)
+                    return servicioValidation;
+                
                 _logger.LogInformation("Creando una nueva categoría.");
 
                 var category = new Categoria
@@ -70,9 +84,23 @@ namespace HRMS.Application.Services.RoomServices
             return await ExecuteOperationAsync(async () =>
             {
                 _logger.LogInformation("Actualizando categoría con ID: {Id}", dto.IdCategoria);
-
+                var validateDescription = ValidateString(dto.Descripcion, "La descripción de la categoría no puede estar vacía.");
+                
+                if (!validateDescription.IsSuccess) return validateDescription;
+                var validateId = ValidateId(dto.IdCategoria, "El ID de la categoría debe ser mayor que 0.");
+                if (!validateId.IsSuccess) return validateId;
+                
+                var validateServiceId = ValidateId(dto.IdServicio, "El ID del servicio debe ser mayor que 0.");
+                if (!validateServiceId.IsSuccess) return validateServiceId;
+                
+                var servicioValidation = await ValidateServicioExistsAndActiveAsync(dto.IdServicio);
+                if (!servicioValidation.IsSuccess)
+                    return servicioValidation;
+                
                 var category = await FindCategoryByIdAsync(dto.IdCategoria);
                 category.Descripcion = dto.Descripcion;
+                category.Capacidad = dto.Capacidad;
+                category.IdServicio = dto.IdServicio;
 
                 await _categoryRepository.UpdateEntityAsync(category);
                 return Success(category, "Categoría actualizada correctamente.");
@@ -86,11 +114,17 @@ namespace HRMS.Application.Services.RoomServices
                     _logger.LogInformation("Eliminando categoría con ID: {Id}", dto.IdCategoria);
 
                     var category = await FindCategoryByIdAsync(dto.IdCategoria);
-
-                    // Verifica habitaciones asociadas usando el ID de categoría
+                    var validateId = ValidateId(dto.IdCategoria, "El ID de la categoría debe ser mayor que 0.");
+                    if (!validateId.IsSuccess) return validateId;
+            
                     if (await TieneHabitacionesAsociadas(dto.IdCategoria))
                     {
                         return Failure("No se puede eliminar la categoría porque tiene habitaciones asociadas.");
+                    }
+            
+                    if (await TieneTarifasAsociadas(dto.IdCategoria))
+                    {
+                        return Failure("No se puede eliminar la categoría porque tiene tarifas activas asociadas.");
                     }
 
                     category.Estado = false;
@@ -103,9 +137,8 @@ namespace HRMS.Application.Services.RoomServices
         {
             return await ExecuteOperationAsync(async () =>
             {
-                if (string.IsNullOrWhiteSpace(nombreServicio))
-                    return Failure("El nombre del servicio no puede estar vacío.");
-
+                var validateService = ValidateString(nombreServicio, "El nombre del servicio no puede estar vacío.");
+                if (!validateService.IsSuccess) return validateService;
                 _logger.LogInformation("Buscando categoría para el servicio: {ServiceName}", nombreServicio);
                 var category = await _categoryRepository.GetCategoriaByServiciosAsync(nombreServicio);
 
@@ -115,24 +148,26 @@ namespace HRMS.Application.Services.RoomServices
             }, $"Error al obtener la categoría por servicio '{nombreServicio}'.");
         }
 
-        public async Task<OperationResult> GetServiciosByDescripcion(string descripcion)
+        public async Task<OperationResult> GetCategoriaByDescripcion(string descripcion)
         {
             return await ExecuteOperationAsync(async () =>
-            {
-                _logger.LogInformation("Buscando servicios con la descripción: {Description}", descripcion);
-                var result = await _categoryRepository.GetServiciosByDescripcionAsync(descripcion);
-
-                return result.IsSuccess && result.Data != null
-                    ? Success(result.Data, "Servicios obtenidos correctamente.")
-                    : Failure("No se encontraron servicios con esa descripción.");
-            }, "Error al buscar servicios por descripción.");
+                {
+                    var validateDescription = ValidateString(descripcion, "La descripción de la categoría no puede estar vacía.");
+                    if (!validateDescription.IsSuccess) return validateDescription;
+                    _logger.LogInformation("Buscando categorías con la descripción: {Description}", descripcion);
+                    var result = await _categoryRepository.GetCategoriaByDescripcionAsync(descripcion);
+                    
+                    return result;
+                }, $"Error al buscar categorías por descripción '{descripcion}'.");
         }
 
         public async Task<OperationResult> GetHabitacionesByCapacidad(int capacidad)
         {
             return await ExecuteOperationAsync(async () =>
             {
-                ValidateId(capacidad, "La capacidad de la habitación debe ser mayor que 0.");
+
+                var validateCapacity = ValidateId(capacidad, "La capacidad de la habitación debe ser mayor que 0.");
+                if (!validateCapacity.IsSuccess) return validateCapacity;
                 _logger.LogInformation("Buscando habitaciones con capacidad: {Capacity}", capacidad);
 
                 var categories = await _categoryRepository.GetHabitacionByCapacidad(capacidad);
@@ -144,13 +179,30 @@ namespace HRMS.Application.Services.RoomServices
         
         private async Task<bool> TieneHabitacionesAsociadas(int idCategoria)
         {
-            var habitacionesResult = await _habitacionRepository.GetByCategoriaIdAsync(idCategoria);
-            if (!habitacionesResult.IsSuccess || habitacionesResult.Data == null) return false;
-
-            var habitaciones = habitacionesResult.Data as IEnumerable<Habitacion>;
-            return habitaciones != null && habitaciones.Any();
+            try
+            {
+                return await _habitacionRepository.ExistsAsync(h => 
+                    h.IdCategoria == idCategoria && h.Estado == true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al verificar habitaciones asociadas a la categoría {idCategoria}");
+                return false; 
+            }
         }
-
+        private async Task<bool> TieneTarifasAsociadas(int idCategoria)
+        {
+            try
+            {
+                return await _tarifaRepository.ExistsAsync(t => 
+                    t.IdCategoria == idCategoria && t.Estado == true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al verificar tarifas asociadas a la categoría {idCategoria}");
+                return false; 
+            }
+        }
 
         private async Task<Categoria> FindCategoryByIdAsync(int id)
         {
@@ -171,10 +223,40 @@ namespace HRMS.Application.Services.RoomServices
                 return Failure(errorMessage);
             }
         }
-
-        private void ValidateId(int value, string message)
+        
+        private async Task<OperationResult> ValidateServicioExistsAndActiveAsync(short idServicio)
         {
-            if (value <= 0) Failure(message);
+            try
+            {
+               
+                var servicio = await _servicioRepository.GetEntityByIdAsync(idServicio);
+        
+                if (servicio == null)
+                    return Failure($"El servicio con ID {idServicio} no existe.");
+            
+                if (servicio.Estado != true)
+                    return Failure($"El servicio con ID {idServicio} está inactivo.");
+            
+                return Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al verificar el servicio con ID {idServicio}");
+                return Failure($"Error al verificar el servicio: {ex.Message}");
+            }
+        }
+
+        private OperationResult  ValidateId(int value, string message)
+        {
+            return value <= 0 
+                ? Failure(message) 
+                : new OperationResult { IsSuccess = true };
+        }
+        private OperationResult ValidateString(string description, string message)
+        {
+            return string.IsNullOrWhiteSpace(description) 
+                ? Failure(message) 
+                : new OperationResult { IsSuccess = true };
         }
 
         private static OperationResult Success(object data = null, string message = null) =>

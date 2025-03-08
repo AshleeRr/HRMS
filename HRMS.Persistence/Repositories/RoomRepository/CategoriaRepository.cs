@@ -82,17 +82,21 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                     categorias.Any() ? null : $"No se encontraron categorías para el servicio '{nombre}'.");
             });
 
-        public async Task<OperationResult> GetServiciosByDescripcionAsync(string descripcion) =>
+        public async Task<OperationResult> GetCategoriaByDescripcionAsync(string descripcion) =>
             await ExecuteOperationAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(descripcion)) 
-                    return Failure("La descripción del servicio no puede estar vacía.");
+                    return Failure("La descripción de la categoria no puede estar vacía.");
 
-                var servicios = await _context.Servicios
-                    .Where(s => s.Descripcion.Contains(descripcion , StringComparison.OrdinalIgnoreCase) && s.Estado == true)
+                var categorias = await _context.Categorias
+                    .Where(c => c.Descripcion != null && 
+                                EF.Functions.Like(c.Descripcion, $"%{descripcion}%") && 
+                                c.Estado == true)
                     .ToListAsync();
 
-                return Success(servicios, servicios.Any() ? null : "No se encontraron servicios con esa descripción.");
+                return categorias.Any() 
+                    ? Success(categorias) 
+                    : Failure($"No se encontraron categorias con esa descripción: '{descripcion}'");
             });
         
         public async Task<OperationResult> GetHabitacionByCapacidad(int capacidad) =>

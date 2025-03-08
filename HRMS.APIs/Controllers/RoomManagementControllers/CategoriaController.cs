@@ -70,7 +70,7 @@ namespace HRMS.APIs.RoomManagementControllers
         public async Task<IActionResult> GetServiciosByDescripcion(string descripcion)
         {
             _logger.LogInformation("Buscando servicios con descripción: {Descripcion}", descripcion);
-            var result = await _categoryService.GetServiciosByDescripcion(descripcion);
+            var result = await _categoryService.GetCategoriaByDescripcion(descripcion);
             return HandleOperationResult(result);
         }
 

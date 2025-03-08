@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace HRMS.Persistence.Repositories.ServiciosRepository;
 
-public class ServicioRepository : BaseRepository<Servicios, int>, IServicioRepository
+public class ServicioRepository : BaseRepository<Servicios, short>, IServicioRepository
 {
     private readonly ILogger<ServicioRepository> _logger;
     private readonly IConfiguration _configuration;
@@ -69,7 +69,7 @@ public class ServicioRepository : BaseRepository<Servicios, int>, IServicioRepos
         return result;
     }
     
-    public override async Task<Servicios> GetEntityByIdAsync(int id)
+    public override async Task<Servicios> GetEntityByIdAsync(short id)
     {
         if (id <= 0)
         {

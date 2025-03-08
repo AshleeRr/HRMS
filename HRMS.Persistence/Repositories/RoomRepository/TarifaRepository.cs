@@ -45,16 +45,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         {
             var validation = ValidarTarifa(tarifas);
             if (!validation.IsSuccess) return validation;
-    
-            if (await _context.Tarifas.AnyAsync(t => t.PrecioPorNoche == tarifas.PrecioPorNoche))
-            {
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = $"Ya existe una tarifa con el precio '{tarifas.PrecioPorNoche}'."
-                };
-            }
-    
+
             return await ExecuteDatabaseOperationAsync(async () =>
             {
                 _context.Tarifas.Add(tarifas);

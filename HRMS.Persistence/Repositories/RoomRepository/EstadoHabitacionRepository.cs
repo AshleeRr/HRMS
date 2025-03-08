@@ -82,9 +82,18 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             }
 
             var estados = await _context.EstadoHabitaciones
-                .Where(e => e.Descripcion != null && e.Descripcion.Contains(descripcionEstado, StringComparison.OrdinalIgnoreCase) && e.Estado == true)
-                .ToListAsync();
+                .Where(e => e.Descripcion != null && EF.Functions.Like
+                    (e.Descripcion, $"%{descripcionEstado}%") && e.Estado == true).
+                ToListAsync();
 
+            /*
+             *
+             *    var categorias = await _context.Categorias
+                    .Where(c => c.Descripcion != null && 
+                                EF.Functions.Like(c.Descripcion, $"%{descripcion}%") && 
+                                c.Estado == true)
+                    .ToListAsync();
+             */
             return new OperationResult
             {
                 IsSuccess = estados.Any(),

@@ -40,7 +40,7 @@ namespace HRMS.Persistence.Base
 
             return result;
         }
-        public virtual async Task<TEntity> GetEntityByIdAsync(int id)
+        public virtual async Task<TEntity> GetEntityByIdAsync(TType id)
         {
             return await Entity.FindAsync(id);
         }

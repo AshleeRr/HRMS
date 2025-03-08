@@ -35,11 +35,14 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             await ExecuteOperationAsync(async () =>
             {
                 ValidateId(idPiso, "El ID del piso debe ser mayor que cero.");
-                var habitaciones = await _context.Habitaciones.Where(h => h.IdPiso == idPiso).ToListAsync();
+                var habitaciones = await _context.Habitaciones.Where(h => h.IdPiso == idPiso 
+                && h.Estado == true).ToListAsync();
                 return habitaciones.Any() ? Success(habitaciones)
                     : Failure($"No se encontraron habitaciones en el piso {idPiso}.");
             });
 
+   
+        
         public async Task<OperationResult> GetByCategoriaAsync(string categoria) =>
             await ExecuteOperationAsync(async () =>
             {
@@ -48,15 +51,16 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 var habitaciones = await _context.Habitaciones
                     .Join(_context.Categorias, h => h.IdCategoria, c => c.IdCategoria, 
                         (h, c) => new { h, c })
-                    .Where(hc => hc.c.Descripcion != null && hc.c.Descripcion.Contains
-                        (categoria, StringComparison.OrdinalIgnoreCase) && hc.c.Estado == true)
+                    .Where(hc => hc.c.Descripcion != null && 
+                                 EF.Functions.Like(hc.c.Descripcion, $"%{categoria}%") && 
+                                 hc.c.Estado == true)
                     .Select(hc => hc.h)
                     .ToListAsync();
 
                 return habitaciones.Any() ? Success(habitaciones) 
                     : Failure("No se encontraron habitaciones con la categoría especificada.");
             });
-
+        
         public async Task<OperationResult> GetInfoHabitacionesAsync() =>
             await ExecuteOperationAsync(async () =>
             {
@@ -76,7 +80,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                             h.IdHabitacion,
                             h.Numero,
                             h.Detalle,
-                            h.Estado,
                             t.PrecioPorNoche,
                             DescripcionPiso = p.Descripcion,
                             DescripcionCategoria = c.Descripcion,
@@ -156,20 +159,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 return false;
             }
         }
-        public async Task<OperationResult> GetByCategoriaIdAsync(int idCategoria) =>
-            await ExecuteOperationAsync(async () =>
-            {
-                ValidateId(idCategoria, "El ID de la categoría debe ser mayor que cero.");
-        
-                var habitaciones = await _context.Habitaciones
-                    .Where(h => h.IdCategoria == idCategoria && h.Estado == true)
-                    .ToListAsync();
-            
-                return habitaciones.Any() 
-                    ? Success(habitaciones, "Habitaciones encontradas para la categoría especificada.") 
-                    : Failure($"No se encontraron habitaciones activas para la categoría con ID {idCategoria}.");
-            });
-        
+
         private async Task<OperationResult> ValidateUniqueRoomNumber(Habitacion habitacion, bool isUpdate = false)
         {
             if (isUpdate)
