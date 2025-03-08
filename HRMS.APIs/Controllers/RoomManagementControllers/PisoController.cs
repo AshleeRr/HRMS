@@ -7,7 +7,6 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    // [Authorize] - Comentado hasta configurar autenticación
     public class PisoController : ControllerBase
     {
         private readonly IPisoService _pisoService;

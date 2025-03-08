@@ -3,7 +3,6 @@ using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Interfaces.IRoomRepository;
-using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.Extensions.Logging;
 
 namespace HRMS.Application.Services.RoomServices;
@@ -253,9 +252,7 @@ public class TarifaServices : ITarifaService
     {
         if (idCategoria <= 0)
             return Failure($"El ID de la categoría debe ser mayor que 0. Valor proporcionado: {idCategoria}");
-
-        _logger.LogInformation("Validando existencia de la categoría con ID: {Id}", idCategoria);
-
+        
         var categoria = await _categoriaRepository.GetEntityByIdAsync(idCategoria);
 
         if (categoria == null)

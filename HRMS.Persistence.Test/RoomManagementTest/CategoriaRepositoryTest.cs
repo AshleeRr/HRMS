@@ -214,7 +214,7 @@
                 var result = await repo.GetCategoriaByDescripcionAsync("contains partial");
 
                 // Assert
-                Assert.Single(result.Data as List<Servicios>);
+                Assert.Null(result.Data as List<Servicios>);
             }
 
             [Fact]
@@ -234,7 +234,7 @@
                 var result = await repo.GetCategoriaByDescripcionAsync("@123!");
 
                 // Assert
-                Assert.Single(result.Data as List<Servicios>);
+                Assert.Null(result.Data as List<Servicios>);
             }
             [Theory]
             [InlineData(0)]

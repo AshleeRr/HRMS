@@ -1,9 +1,8 @@
 using HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos;
 using HRMS.Application.Interfaces.RoomManagementService;
-using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HRMS.APIs.RoomManagementControllers
+namespace HRMS.APIs.Controllers.RoomManagementControllers
 {
     [Route("api/[controller]")]
     [ApiController]

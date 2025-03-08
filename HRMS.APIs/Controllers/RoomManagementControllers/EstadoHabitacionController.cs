@@ -2,7 +2,7 @@
 using HRMS.Application.Interfaces.RoomManagementService;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HRMS.APIs.RoomManagementControllers
+namespace HRMS.APIs.Controllers.RoomManagementControllers
 {
     [Route("api/[controller]")]
     [ApiController]

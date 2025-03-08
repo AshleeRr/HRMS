@@ -60,35 +60,64 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 return habitaciones.Any() ? Success(habitaciones) 
                     : Failure("No se encontraron habitaciones con la categoría especificada.");
             });
-        
+
         public async Task<OperationResult> GetInfoHabitacionesAsync() =>
             await ExecuteOperationAsync(async () =>
             {
                 try
                 {
-                    var habitaciones = await (from h in _context.Habitaciones
+                    var habitacionesQuery = from h in _context.Habitaciones
                         join p in _context.Pisos on h.IdPiso equals p.IdPiso
                         join c in _context.Categorias on h.IdCategoria equals c.IdCategoria
-                        join t in _context.Tarifas on c.IdCategoria equals t.IdCategoria
-                        join s in _context.Set<Servicios>() on c.IdServicio equals s.IdServicio into serviciosGroup
-                        from s in serviciosGroup.DefaultIfEmpty()
                         where h.Estado == true
-                              && t.FechaInicio <= DateTime.Now 
-                              && t.FechaFin >= DateTime.Now
                         select new
                         {
                             h.IdHabitacion,
                             h.Numero,
                             h.Detalle,
-                            t.PrecioPorNoche,
+                            c.IdCategoria,
                             DescripcionPiso = p.Descripcion,
-                            DescripcionCategoria = c.Descripcion,
-                            NombreServicio = s != null ? s.Nombre : "Sin servicio",
-                            DescripcionServicio = s != null ? s.Descripcion : "Sin descripción"
-                        }).ToListAsync();
+                            DescripcionCategoria = c.Descripcion, 
+                            c.IdServicio
+                        };
 
-                    if (habitaciones.Any())
-                        return Success(habitaciones);
+                    var tarifasVigentes = await _context.Tarifas
+                        .Where(t => t.FechaInicio <= DateTime.Now &&
+                                    t.FechaFin >= DateTime.Now &&
+                                    t.Estado == true)
+                        .ToListAsync();
+
+                    var servicios = await _context.Set<Servicios>().ToListAsync();
+
+                    var habitacionesBase = await habitacionesQuery.ToListAsync();
+
+                    var habitacionesInfo = habitacionesBase
+                        .GroupBy(h => h.IdHabitacion) 
+                        .Select(group =>
+                        {
+                            var habitacion = group.First(); 
+
+                            var tarifa = tarifasVigentes
+                                .FirstOrDefault(t => t.IdCategoria == habitacion.IdCategoria);
+                            var servicio = servicios
+                                .FirstOrDefault(s => s.IdServicio == habitacion.IdServicio);
+
+                            return new
+                            {
+                                habitacion.IdHabitacion,
+                                habitacion.Numero,
+                                habitacion.Detalle,
+                                PrecioPorNoche = tarifa?.PrecioPorNoche ?? 0, 
+                                habitacion.DescripcionPiso,
+                                habitacion.DescripcionCategoria,
+                                NombreServicio = servicio?.Nombre ?? "Sin servicio",
+                                DescripcionServicio = servicio?.Descripcion ?? "Sin descripción"
+                            };
+                        })
+                        .ToList();
+
+                    if (habitacionesInfo.Any())
+                        return Success(habitacionesInfo);
 
                     return await HandleNoHabitacionesFound();
                 }
@@ -97,7 +126,8 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                     return Failure($"Error en la consulta: {ex.Message}");
                 }
             });
-        public async Task<OperationResult> GetByNumeroAsync(string numero) =>
+
+      public async Task<OperationResult> GetByNumeroAsync(string numero) =>
             await ExecuteOperationAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(numero)) return Failure("El número de habitación no puede estar vacío.");
