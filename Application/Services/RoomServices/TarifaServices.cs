@@ -23,29 +23,35 @@ public class TarifaServices : ITarifaService
 
     public async Task<OperationResult> GetAll()
     {
-        return await ExecuteOperationAsync(async () =>
+        return await OperationResult.ExecuteOperationAsync(async () =>
         {
             _logger.LogInformation("Buscando todas las tarifas.");
             var tarifas = await _tarifaRepository.GetAllAsync();
-            return tarifas.Any() ? Success(tarifas.Select(MapToDto)) : Failure("No se encontraron tarifas.");
-        }, "Error al buscar todas las tarifas.");
+            return tarifas.Any() ? OperationResult.Success(tarifas.Select(MapToDto)) : OperationResult.Failure("No se encontraron tarifas.");
+        });
     }
 
     public async Task<OperationResult> GetById(int id)
     {
-        return await ExecuteOperationAsync(async () =>
+        return await OperationResult.ExecuteOperationAsync(async () =>
             {
                 _logger.LogInformation("Buscando la tarifa por ID: {Id}", id);
-                if (id <= 0) return Failure("El ID de la tarifa debe ser mayor que 0.");
+                if (id <= 0) return OperationResult.Failure("El ID de la tarifa debe ser mayor que 0.");
                 var tarifa = await _tarifaRepository.GetEntityByIdAsync(id);
-                return tarifa != null ? Success(MapToDto(tarifa)) : Failure($"No se encontró la tarifa con ID {id}.");
-            }, $"Error al buscar la tarifa con ID {id}.");
+                return tarifa != null ? OperationResult.Success(MapToDto(tarifa)) :OperationResult. Failure($"No se encontró la tarifa con ID {id}.");
+            });
     }
 
     public async Task<OperationResult> Update(UpdateTarifaDto dto)
     {
-        return await ExecuteOperationAsync(async () =>
+        return await OperationResult.ExecuteOperationAsync(async () =>
         {
+            if (dto == null)
+                return OperationResult.Failure("No se proporcionaron datos para actualizar la tarifa");
+            
+            if (dto.IdTarifa <= 0)
+                return OperationResult.Failure("El ID de la tarifa debe ser mayor que 0");
+            
             var validacionDescripcion = ValidarDescripcion(dto.Descripcion);
             if (!validacionDescripcion.IsSuccess) return validacionDescripcion;
 
@@ -55,13 +61,17 @@ public class TarifaServices : ITarifaService
                 if (!validacionCategoria.IsSuccess) return validacionCategoria;
             }
 
-            ValidarFechas(dto.FechaInicio, dto.FechaFin);
-            ValidarPrecios(dto.PrecioPorNoche, dto.Descuento);
+            var validacionFechas = ValidarFechas(dto.FechaInicio, dto.FechaFin);
+            if (!validacionFechas.IsSuccess) return validacionFechas;
+        
+            var validacionPrecios = ValidarPrecios(dto.PrecioPorNoche, dto.Descuento);
+            if (!validacionPrecios.IsSuccess) return validacionPrecios;
 
             _logger.LogInformation("Actualizando la tarifa con ID: {Id}", dto.IdTarifa);
 
             var existingTarifa = await _tarifaRepository.GetEntityByIdAsync(dto.IdTarifa);
-            if (existingTarifa == null) return Failure($"No se encontró la tarifa con ID {dto.IdTarifa}.");
+            if (existingTarifa == null)
+                return OperationResult.Failure($"No se encontró la tarifa con ID {dto.IdTarifa}.");
 
             UpdateDtoFields(existingTarifa, dto);
 
@@ -72,23 +82,29 @@ public class TarifaServices : ITarifaService
 
             var result = await _tarifaRepository.UpdateEntityAsync(existingTarifa);
             return result.IsSuccess && result.Data != null
-                ? Success(MapToDto((Tarifas)result.Data), "Tarifa actualizada correctamente.")
-                : result;
-        }, "Error al actualizar la tarifa.");
+                ? OperationResult.Success(MapToDto((Tarifas)result.Data), "Tarifa actualizada correctamente.")
+                : OperationResult.Failure(result.Message ?? "Error al actualizar la tarifa.");
+        });
     }
 
     public async Task<OperationResult> Save(CreateTarifaDto dto)
     {
-        return await ExecuteOperationAsync(async () =>
+        return await OperationResult.ExecuteOperationAsync(async () =>
         {
+            if (dto == null)
+                return OperationResult.Failure("No se proporcionaron datos para la tarifa");
+            
             var validacionDescripcion = ValidarDescripcion(dto.Descripcion);
             if (!validacionDescripcion.IsSuccess) return validacionDescripcion;
 
             var validacionCategoria = await ValidarCategoria(dto.IdCategoria);
             if (!validacionCategoria.IsSuccess) return validacionCategoria;
 
-            ValidarFechas(dto.FechaInicio, dto.FechaFin);
-            ValidarPrecios(dto.PrecioPorNoche, dto.Descuento);
+            var validacionFechas = ValidarFechas(dto.FechaInicio, dto.FechaFin);
+            if (!validacionFechas.IsSuccess) return validacionFechas;
+        
+            var validacionPrecios = ValidarPrecios(dto.PrecioPorNoche, dto.Descuento);
+            if (!validacionPrecios.IsSuccess) return validacionPrecios;
 
             _logger.LogInformation("Creando una nueva tarifa.");
 
@@ -105,34 +121,34 @@ public class TarifaServices : ITarifaService
 
             var result = await _tarifaRepository.SaveEntityAsync(tarifa);
             return result.IsSuccess && result.Data != null
-                ? Success(MapToDto((Tarifas)result.Data), "Tarifa creada correctamente.")
-                : result;
-        }, "Error al crear la tarifa.");
+                ? OperationResult.Success(MapToDto((Tarifas)result.Data), "Tarifa creada correctamente.")
+                : OperationResult.Failure(result.Message ?? "Error al guardar la tarifa.");
+        });
     }
 
     public async Task<OperationResult> Remove(DeleteTarifaDto dto)
     {
-        return await ExecuteOperationAsync(async () =>
+        return await OperationResult.ExecuteOperationAsync(async () =>
             {
                 _logger.LogInformation("Eliminando la tarifa con ID: {Id}", dto.IdTarifa);
                 if (dto.IdTarifa <= 0)
-                    return Failure("El ID de la tarifa debe ser mayor que 0.");
+                    return OperationResult.Failure("El ID de la tarifa debe ser mayor que 0.");
 
                 var tarifa = await _tarifaRepository.GetEntityByIdAsync(dto.IdTarifa);
                 if (tarifa == null)
-                    return Failure($"No se encontró la tarifa con ID {dto.IdTarifa}.");
+                    return OperationResult.Failure($"No se encontró la tarifa con ID {dto.IdTarifa}.");
 
                 tarifa.Estado = false;
                 var result = await _tarifaRepository.UpdateEntityAsync(tarifa);
                 return result.IsSuccess && result.Data != null
-                    ? Success(MapToDto((Tarifas)result.Data), "Tarifa eliminada correctamente.")
+                    ? OperationResult.Success(MapToDto((Tarifas)result.Data), "Tarifa eliminada correctamente.")
                     : result;
-            }, $"Error al eliminar la tarifa con ID {dto.IdTarifa}.");
+            });
     }
 
     public async Task<OperationResult> GetTarifasVigentes(string fechaInput)
     {
-        return await ExecuteOperationAsync(async () =>
+        return await OperationResult.ExecuteOperationAsync(async () =>
         {
             _logger.LogInformation("Buscando tarifas vigentes para la fecha ingresada: {FechaInput}", fechaInput);
 
@@ -142,28 +158,28 @@ public class TarifaServices : ITarifaService
             DateTime fecha = (DateTime)fechaValidacion.Data;
 
             return await _tarifaRepository.GetTarifasVigentesAsync(fechaInput);
-        }, "Error al buscar tarifas vigentes.");
+        });
     }
 
     public async Task<OperationResult> GetHabitacionesByPrecio(decimal precio)
     {
-        try
+        return await OperationResult.ExecuteOperationAsync(async () =>
         {
             _logger.LogInformation("Buscando habitaciones con precio de tarifa: {Precio}", precio);
 
             if (precio <= 0)
-                return Failure("El precio de la tarifa debe ser mayor a 0.");
+                return OperationResult.Failure("El precio de la tarifa debe ser mayor a 0.");
 
             var operationResult = await _tarifaRepository.GetHabitacionByPrecioAsync(precio);
 
             if (!operationResult.IsSuccess)
             {
-                return Failure(operationResult.Message);
+                return OperationResult.Failure(operationResult.Message);
             }
 
             if (operationResult.Data == null)
             {
-                return Failure("No se encontraron habitaciones con el precio de tarifa indicado.");
+                return OperationResult.Failure("No se encontraron habitaciones con el precio de tarifa indicado.");
             }
 
             if (operationResult.Data is IEnumerable<Habitacion> habitacionesEnum)
@@ -171,17 +187,12 @@ public class TarifaServices : ITarifaService
                 var habitaciones = habitacionesEnum.ToList();
                 if (habitaciones.Any())
                 {
-                    return Success(habitaciones);
+                    return OperationResult.Success(habitaciones);
                 }
             }
 
-            return Failure("No se encontraron habitaciones con el precio de tarifa indicado.");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error al buscar habitaciones por precio de tarifa.");
-            return Failure("Error al buscar habitaciones por precio de tarifa.");
-        }
+            return OperationResult.Failure("No se encontraron habitaciones con el precio de tarifa indicado.");
+        });
     }
 
 
@@ -204,75 +215,59 @@ public class TarifaServices : ITarifaService
         IdCategoria = tarifas.IdCategoria,
     };
 
-    private static OperationResult Success(object data = null, string message = null) =>
-        new() { IsSuccess = true, Data = data, Message = message };
-
-    private static OperationResult Failure(string message) =>
-        new() { IsSuccess = false, Message = message };
-
-
-
-    private async Task<OperationResult> ExecuteOperationAsync(Func<Task<OperationResult>> operation,
-        string errorMessage)
-    {
-        try
-        {
-            return await operation();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, errorMessage);
-
-            return Failure($"{errorMessage} Detalles: {ex.Message}");
-        }
-    }
-
-    private static void ValidarFechas(DateTime fechaInicio, DateTime fechaFin)
+    
+    private static OperationResult ValidarFechas(DateTime fechaInicio, DateTime fechaFin)
     {
         if (fechaInicio == DateTime.MinValue)
-            throw new ArgumentException("La fecha de inicio de la tarifa es requerida.");
+            return OperationResult.Failure("La fecha de inicio de la tarifa es requerida.");
         if (fechaFin == DateTime.MinValue)
-            throw new ArgumentException("La fecha de fin de la tarifa es requerida.");
+            return OperationResult.Failure("La fecha de fin de la tarifa es requerida.");
         if (fechaInicio > fechaFin)
-            throw new ArgumentException(
+            return OperationResult.Failure(
                 $"La fecha de inicio ({fechaInicio:dd/MM/yyyy}) no puede ser mayor a la fecha de fin ({fechaFin:dd/MM/yyyy}).");
+    
+        return OperationResult.Success();
     }
 
-    private static void ValidarPrecios(decimal precio, decimal descuento)
+    private static OperationResult ValidarPrecios(decimal precio, decimal descuento)
     {
         if (precio <= 0)
-            throw new ArgumentException($"El precio de la tarifa debe ser mayor a 0. Valor actual: {precio}");
+            return OperationResult.Failure($"El precio de la tarifa debe ser mayor a 0. Valor actual: {precio}");
+        
         if (descuento < 0)
-            throw new ArgumentException($"El descuento no puede ser menor a 0. Valor actual: {descuento}");
+            return OperationResult.Failure($"El descuento no puede ser menor a 0. Valor actual: {descuento}");
+        
         if (descuento > precio)
-            throw new ArgumentException($"El descuento ({descuento}) no puede ser mayor que el precio ({precio}).");
+            return OperationResult.Failure($"El descuento ({descuento}) no puede ser mayor que el precio ({precio}).");
+        
+        return OperationResult.Success();
     }
 
     private async Task<OperationResult> ValidarCategoria(int idCategoria)
     {
         if (idCategoria <= 0)
-            return Failure($"El ID de la categoría debe ser mayor que 0. Valor proporcionado: {idCategoria}");
+            return OperationResult.Failure($"El ID de la categoría debe ser mayor que 0. Valor proporcionado: {idCategoria}");
         
         var categoria = await _categoriaRepository.GetEntityByIdAsync(idCategoria);
 
         if (categoria == null)
-            return Failure($"No existe una categoría con ID {idCategoria} en la base de datos.");
+            return OperationResult.Failure($"No existe una categoría con ID {idCategoria} en la base de datos.");
 
         if (categoria.Estado == false)
-            return Failure(
+            return OperationResult.Failure(
                 $"La categoría con ID {idCategoria} está inactiva. Active la categoría antes de asociarla a una tarifa.");
 
-        return Success();
+        return OperationResult.Success();
     }
 
     private static OperationResult ValidarDescripcion(string descripcion)
     {
         if (string.IsNullOrWhiteSpace(descripcion))
-            return Failure("La descripción de la tarifa es requerida y no puede estar vacía.");
+            return OperationResult.Failure("La descripción de la tarifa es requerida y no puede estar vacía.");
         if (descripcion.Length > 255)
-            return Failure(
+            return OperationResult.Failure(
                 $"La descripción de la tarifa no puede exceder los 255 caracteres. Longitud actual: {descripcion.Length} caracteres.");
-        return Success();
+        return OperationResult.Success();
     }
     
 

@@ -33,24 +33,20 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             return await _context.Tarifas.Where(t => t.Estado == true).ToListAsync();
         }
 
-        public override async Task<Tarifas> GetEntityByIdAsync(int id)
+        public override async Task<Tarifas?> GetEntityByIdAsync(int id)
         {
-            if (id <=0) throw new ArgumentException("ID no válido", nameof(id));
-
-            return await _context.Set<Tarifas>().FindAsync(id)
-                   ?? throw new InvalidOperationException($"No se encontró la tarifa con ID: {id}");
+            if (id <= 0) return null;
+    
+            return await _context.Set<Tarifas>().FindAsync(id);
         }
-
         public override async Task<OperationResult> SaveEntityAsync(Tarifas tarifas)
         {
             var validation = ValidarTarifa(tarifas);
             if (!validation.IsSuccess) return validation;
-
-            return await ExecuteDatabaseOperationAsync(async () =>
-            {
-                _context.Tarifas.Add(tarifas);
-                await _context.SaveChangesAsync();
-            }, "Tarifa guardada exitosamente.", tarifas);
+            
+            await _context.Tarifas.AddAsync(tarifas);
+            await _context.SaveChangesAsync();
+            return OperationResult.Success(tarifas, "Tarifa guardada correctamente.");
         }
 
         public override async Task<OperationResult> UpdateEntityAsync(Tarifas tarifas)
@@ -61,40 +57,50 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             var existingTarifa = await _context.Tarifas.FindAsync(tarifas.IdTarifa);
             if (existingTarifa == null)
             {
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = $"No se encontró la tarifa con ID: {tarifas.IdTarifa}."
-                };
+                return OperationResult.Failure("La tarifa no existe.");
             }
 
             UpdateTarifa(existingTarifa, tarifas);
-            return await ExecuteDatabaseOperationAsync(async () =>
-            {
-                await _context.SaveChangesAsync();
-            }, "Tarifa actualizada correctamente.", existingTarifa);
+            await _context.SaveChangesAsync();
+            return OperationResult.Success(existingTarifa, "Tarifa actualizada correctamente.");
+
         }
 
         public async Task<OperationResult> GetTarifasVigentesAsync(string fechaInput)
         {
-            var fechaValidation = ValidateFechaFormat(fechaInput);
-            if (!fechaValidation.IsSuccess) return fechaValidation;
+            return await OperationResult.ExecuteOperationAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(fechaInput))
+                {
+                    return OperationResult.Failure("La fecha no puede estar vacía.");
+                }
+        
+                DateTime fecha;
+                string[] formatosValidos = { "dd/MM/yyyy", "yyyy-MM-dd", "MM/dd/yyyy", "dd-MM-yyyy" };
+        
+                if (!DateTime.TryParseExact(fechaInput, formatosValidos, 
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        System.Globalization.DateTimeStyles.None, out fecha))
+                {
+                    return OperationResult.Failure("Formato de fecha no válido.");
+                }
 
-            DateTime fecha = (DateTime)fechaValidation.Data;
+                var tarifas = await _context.Tarifas
+                    .Where(t => t.Estado == true && t.FechaInicio <= fecha && t.FechaFin >= fecha)
+                    .ToListAsync();
 
-            var tarifas = await _context.Tarifas
-                .Where(t => t.Estado == true && t.FechaInicio <= fecha && t.FechaFin >= fecha)
-                .ToListAsync();
-            
-            return tarifas.Any()
-                ? new OperationResult { IsSuccess = true, Data = tarifas }
-                : new OperationResult { IsSuccess = false, Message = $"No se encontraron tarifas vigentes para la fecha {fecha:yyyy-MM-dd}." };
+                return tarifas.Any()
+                    ? OperationResult.Success(tarifas, "Tarifas encontradas")
+                    : OperationResult.Failure($"No se encontraron tarifas vigentes para la fecha {fecha:yyyy-MM-dd}.");
+            });
         }
 
         public async Task<OperationResult> GetHabitacionByPrecioAsync(decimal precio)
         {
             if (precio <= 0)
-                return new OperationResult { IsSuccess = false, Message = "El precio de la tarifa debe ser mayor a 0." };
+            {
+                return OperationResult.Failure("El precio debe ser mayor a 0.");
+            }
 
             var fechaActual = DateTime.Now;
             var tarifas = await _context.Tarifas
@@ -104,7 +110,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
             if (!tarifas.Any())
             {
-                return new OperationResult { IsSuccess = false, Message = "No se encontraron tarifas vigentes con el precio indicado." };
+                return OperationResult.Failure("No se encontraron tarifas vigentes con el precio indicado.");
             }
 
             var categoriaIds = tarifas.Select(t => t.IdCategoria).ToList();
@@ -113,8 +119,8 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                                              .ToListAsync();
 
             return habitaciones.Any()
-                ? new OperationResult { IsSuccess = true, Data = habitaciones }
-                : new OperationResult { IsSuccess = false, Message = "No se encontraron habitaciones con el precio de tarifa indicado." };
+                ? OperationResult.Success(habitaciones)
+                : OperationResult.Failure("No se encontraron habitaciones con la tarifa indicada.");
         }
 
         private OperationResult ValidarTarifa(Tarifas tarifa)
@@ -124,44 +130,12 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
         private static void UpdateTarifa(Tarifas target, Tarifas source)
         {
+            target.Descripcion = source.Descripcion;
             target.PrecioPorNoche = source.PrecioPorNoche;
+            target.Descuento = source.Descuento;
             target.FechaInicio = source.FechaInicio;
             target.FechaFin = source.FechaFin;
-            target.Estado = source.Estado;
-        }
-
-        private async Task<OperationResult> ExecuteDatabaseOperationAsync(Func<Task> operation, string successMessage, dynamic? data = null)
-        {
-            try
-            {
-                await operation();
-                return new OperationResult { IsSuccess = true, Message = successMessage, Data = data };
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                _logger.LogError("Error de concurrencia al actualizar la tarifa.");
-                return new OperationResult { IsSuccess = false, Message = "La tarifa ya ha sido modificada por otro usuario. Intente nuevamente." };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error en la operación.");
-                return new OperationResult { IsSuccess = false, Message = $"Error en la operación: {ex.Message}" };
-            }
-        }
-
-        private static OperationResult ValidateFechaFormat(string fechaInput)
-        {
-            if (string.IsNullOrWhiteSpace(fechaInput))
-                return new OperationResult { IsSuccess = false, Message = "La fecha no puede estar vacía." };
-
-            string[] formatosValidos = { "dd/MM/yyyy", "yyyy-MM-dd", "MM/dd/yyyy", "dd-MM-yyyy" };
-            if (DateTime.TryParseExact(fechaInput, formatosValidos, System.Globalization.CultureInfo.InvariantCulture,
-                System.Globalization.DateTimeStyles.None, out var fecha))
-            {
-                return new OperationResult { IsSuccess = true, Data = fecha };
-            }
-
-            return new OperationResult { IsSuccess = false, Message = "El formato de la fecha es incorrecto. Usa formatos válidos: dd/MM/yyyy, yyyy-MM-dd, MM/dd/yyyy, dd-MM-yyyy." };
+            target.IdCategoria = source.IdCategoria;
         }
     }
 }

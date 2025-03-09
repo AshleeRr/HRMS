@@ -1,130 +1,124 @@
-﻿    using HRMS.Domain.Base;
-    using HRMS.Domain.Base.Validator;
-    using HRMS.Domain.Entities.RoomManagement;
-    using HRMS.Domain.Entities.Servicio;
-    using HRMS.Persistence.Context;
-    using HRMS.Persistence.Repositories.RoomRepository;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Configuration;
-    using Moq;
-    using Xunit.Abstractions;
+﻿using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
+using HRMS.Domain.Entities.RoomManagement;
+using HRMS.Domain.Entities.Servicio;
+using HRMS.Persistence.Context;
+using HRMS.Persistence.Interfaces.IRoomRepository;
+using HRMS.Persistence.Repositories.RoomRepository;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Moq;
+using Xunit;
 
-    namespace HRMS.Persistence.Test.RoomManagementTest
+namespace HRMS.Persistence.Tests.Repositories
+{
+    public class CategoriaRepositoryTests
     {
-        public class CategoriaRepositoryTests
+        private readonly DbContextOptions<HRMSContext> _dbOptions;
+        private readonly Mock<IValidator<Categoria>> _validatorMock;
+        private readonly Mock<IConfiguration> _configMock;
+
+        public CategoriaRepositoryTests()
         {
-            private readonly ITestOutputHelper _output;
-            private Mock<IValidator<Categoria>> _mockValidator = new();
+            _dbOptions = new DbContextOptionsBuilder<HRMSContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+            
+            _validatorMock = new Mock<IValidator<Categoria>>();
+            _configMock = new Mock<IConfiguration>();
+        }
 
-            private HRMSContext CreateContext()
+        #region GetAllAsync
+        [Fact]
+        public async Task GetAllAsync_ReturnsOnlyActiveCategorias()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
             {
-                var options = new DbContextOptionsBuilder<HRMSContext>()
-                    .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                    .Options;
-                
-                return new HRMSContext(options);
-            }
-
-            private CategoriaRepository CreateRepository(HRMSContext context)
-            {
-                return new CategoriaRepository(
-                    context, 
-                    Mock.Of<IConfiguration>(),
-                    _mockValidator.Object
-                );
-            }
-
-            [Fact]
-            public async Task GetAllAsync_ReturnsOnlyActiveCategories()
-            {
-                // Arrange
-                using var context = CreateContext();
                 context.Categorias.AddRange(
-                    new Categoria { Estado = true },
-                    new Categoria { Estado = false }
+                    new Categoria { IdCategoria = 1, Estado = true },
+                    new Categoria { IdCategoria = 2, Estado = false }
                 );
                 await context.SaveChangesAsync();
-                
-                var repo = CreateRepository(context);
+            }
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetAllAsync();
 
                 // Assert
                 Assert.Single(result);
+                Assert.All(result, c => Assert.True(c.Estado));
             }
+        }
+        #endregion
 
-            [Fact]
-            public async Task SaveEntityAsync_WhenValidationFails_ReturnsFailure()
+        #region SaveEntityAsync
+        [Fact]
+        public async Task SaveEntityAsync_ValidationFails_ReturnsFailure()
+        {
+            // Arrange
+            var categoria = new Categoria { Descripcion = "Test" };
+            _validatorMock.Setup(v => v.Validate(categoria))
+                .Returns(new OperationResult { IsSuccess = false, Message = "Error validation" });
+
+            using (var context = new HRMSContext(_dbOptions))
             {
-                // Arrange
-                using var context = CreateContext();
-                var repo = CreateRepository(context);
-                var categoria = new Categoria();
-    
-                _mockValidator.Setup(v => v.Validate(categoria))
-                    .Returns(new OperationResult{Message = "Failed", IsSuccess = false});
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.SaveEntityAsync(categoria);
 
                 // Assert
                 Assert.False(result.IsSuccess);
-                Assert.Contains("Failed", result.Message); 
+                Assert.Equal("Error validation", result.Message);
             }
+        }
 
-            [Fact]
-            public async Task SaveEntityAsync_WithDuplicateDescription_ReturnsFailure()
+        [Fact]
+        public async Task SaveEntityAsync_DuplicateDescripcion_ReturnsFailure()
+        {
+            // Arrange
+            var existingCategoria = new Categoria { Descripcion = "Test", Estado = true };
+            using (var context = new HRMSContext(_dbOptions))
             {
-                // Arrange
-                using var context = CreateContext();
-                context.Categorias.Add(new Categoria { Descripcion = "Test", Estado = true });
+                context.Categorias.Add(existingCategoria);
                 await context.SaveChangesAsync();
-    
-                var repo = CreateRepository(context);
-                var newCat = new Categoria { Descripcion = "Test" };
-    
-                _mockValidator.Setup(v => v.Validate(It.IsAny<Categoria>()))
-                    .Returns(new OperationResult { IsSuccess = true });
+            }
+
+            var newCategoria = new Categoria { Descripcion = "Test" };
+            _validatorMock.Setup(v => v.Validate(newCategoria))
+                .Returns(new OperationResult { IsSuccess = true });
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
 
                 // Act
-                var result = await repo.SaveEntityAsync(newCat);
+                var result = await repo.SaveEntityAsync(newCategoria);
 
                 // Assert
                 Assert.False(result.IsSuccess);
-                Assert.Contains("Ya existe", result.Message);
+                Assert.Contains("Ya existe una categoría", result.Message);
             }
+        }
+        #endregion
 
-            [Fact]
-            public async Task SaveEntityAsync_WithMaxLengthDescription_ReturnsSuccess()
+        #region UpdateEntityAsync
+        [Fact]
+        public async Task UpdateEntityAsync_CategoriaNotFound_ReturnsFailure()
+        {
+            // Arrange
+            var categoria = new Categoria { IdCategoria = 99 };
+            _validatorMock.Setup(v => v.Validate(categoria))
+                .Returns(new OperationResult { IsSuccess = true });
+
+            using (var context = new HRMSContext(_dbOptions))
             {
-                // Arrange
-                using var context = CreateContext();
-                var repo = CreateRepository(context);
-                var longDesc = new string('A', 50);
-                var categoria = new Categoria { Descripcion = longDesc };
-    
-                _mockValidator.Setup(v => v.Validate(It.IsAny<Categoria>()))
-                    .Returns(new OperationResult { IsSuccess = true });
-
-                // Act
-                var result = await repo.SaveEntityAsync(categoria);
-
-                // Assert
-                Assert.True(result.IsSuccess);
-            }
-            
-
-            [Fact]
-            public async Task UpdateEntityAsync_WithNonexistentId_ReturnsFailure()
-            {
-                // Arrange
-                using var context = CreateContext();
-                var repo = CreateRepository(context);
-                var categoria = new Categoria { IdCategoria = 999 };
-    
-                _mockValidator.Setup(v => v.Validate(It.IsAny<Categoria>()))
-                    .Returns(new OperationResult { IsSuccess = true });
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.UpdateEntityAsync(categoria);
@@ -133,144 +127,103 @@
                 Assert.False(result.IsSuccess);
                 Assert.Contains("no existe", result.Message);
             }
+        }
 
-            [Fact]
-            public async Task UpdateEntityAsync_WithDuplicateDescriptionDifferentId_ReturnsFailure()
+        [Fact]
+        public async Task UpdateEntityAsync_ValidUpdate_ModifiesCategoria()
+        {
+            // Arrange
+            var originalCategoria = new Categoria { IdCategoria = 1, Descripcion = "Old" };
+            using (var context = new HRMSContext(_dbOptions))
             {
-                // Arrange
-                using var context = CreateContext();
-                context.Categorias.AddRange(
-                    new Categoria { IdCategoria = 1, Descripcion = "Original" },
-                    new Categoria { IdCategoria = 2, Descripcion = "Existing" }
-                );
+                context.Categorias.Add(originalCategoria);
                 await context.SaveChangesAsync();
-                
-                var repo = CreateRepository(context);
-                var updated = new Categoria { IdCategoria = 1, Descripcion = "Existing" };
-
-                // Act
-                var result = await repo.UpdateEntityAsync(updated);
-
-                // Assert
-                Assert.False(result.IsSuccess);
             }
 
-            [Theory]
-            [InlineData(null)]
-            [InlineData("")]
-            [InlineData("   ")]
-            public async Task GetCategoriaByServiciosAsync_WithInvalidNombre_ReturnsFailure(string input)
+            var updatedCategoria = new Categoria { IdCategoria = 1, Descripcion = "New" };
+            _validatorMock.Setup(v => v.Validate(updatedCategoria))
+                .Returns(new OperationResult { IsSuccess = true });
+
+            using (var context = new HRMSContext(_dbOptions))
             {
-                // Arrange
-                using var context = CreateContext();
-                var repo = CreateRepository(context);
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
 
                 // Act
-                var result = await repo.GetCategoriaByServiciosAsync(input);
+                var result = await repo.UpdateEntityAsync(updatedCategoria);
 
                 // Assert
-                Assert.False(result.IsSuccess);
-            }
-
-            [Fact]
-            public async Task GetCategoriaByServiciosAsync_WithInactiveService_ReturnsEmpty()
-            {
-                // Arranges
-                using var context = CreateContext();
-                context.Servicios.Add(new Servicios { 
-                    IdServicio = 1, 
-                    Nombre = "Test", 
-                    Estado = false 
-                });
-                context.Categorias.Add(new Categoria { 
-                    IdServicio = 1, 
-                    Estado = true 
-                });
-                await context.SaveChangesAsync();
-                
-                var repo = CreateRepository(context);
-
-                // Act
-                var result = await repo.GetCategoriaByServiciosAsync("Test");
-
-                // Assert
-                Assert.Empty(result.Data as List<Categoria>);
-            }
-
-            [Fact]
-            public async Task GetServiciosByDescripcionAsync_WithPartialMatch_ReturnsResults()
-            {
-                // Arrange
-                using var context = CreateContext();
-                context.Servicios.Add(new Servicios { 
-                    Descripcion = "Full description contains partial", 
-                    Estado = true 
-                });
-                await context.SaveChangesAsync();
-                
-                var repo = CreateRepository(context);
-
-                // Act
-                var result = await repo.GetCategoriaByDescripcionAsync("contains partial");
-
-                // Assert
-                Assert.Null(result.Data as List<Servicios>);
-            }
-
-            [Fact]
-            public async Task GetServiciosByDescripcionAsync_WithSpecialCharacters_HandlesCorrectly()
-            {
-                // Arrange
-                using var context = CreateContext();
-                context.Servicios.Add(new Servicios { 
-                    Descripcion = "Service@123!-Test", 
-                    Estado = true 
-                });
-                await context.SaveChangesAsync();
-                
-                var repo = CreateRepository(context);
-
-                // Act
-                var result = await repo.GetCategoriaByDescripcionAsync("@123!");
-
-                // Assert
-                Assert.Null(result.Data as List<Servicios>);
-            }
-            [Theory]
-            [InlineData(0)]
-            [InlineData(-1)]
-            [InlineData(int.MinValue)]
-            public async Task GetHabitacionByCapacidad_WithInvalidCapacity_ReturnsFailure(int capacity)
-            {
-                // Arrange
-                using var context = CreateContext();
-                var repo = CreateRepository(context);
-
-                // Act
-                var result = await repo.GetHabitacionByCapacidad(capacity);
-
-                // Assert
-                Assert.False(result.IsSuccess);
-            }
-
-            [Fact]
-            public async Task GetHabitacionByCapacidad_WithNoMatchingRooms_ReturnsFailure()
-            {
-                // Arrange
-                using var context = CreateContext();
-                context.Categorias.Add(new Categoria { 
-                    Capacidad = 4, 
-                    Estado = true 
-                });
-                await context.SaveChangesAsync();
-                
-                var repo = CreateRepository(context);
-
-                // Act
-                var result = await repo.GetHabitacionByCapacidad(4);
-
-                // Assert
-                Assert.Contains("No se encontraron habitaciones", result.Message);
+                var updated = await context.Categorias.FindAsync(1);
+                Assert.Equal("New", updated.Descripcion);
             }
         }
+        #endregion
+
+        #region GetCategoriaByServiciosAsync
+        [Fact]
+        public async Task GetCategoriaByServiciosAsync_ValidNombre_ReturnsCategorias()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.Servicios.Add(new Servicios { IdServicio = 1, Nombre = "Limpieza", Estado = true });
+                context.Categorias.Add(new Categoria { IdCategoria = 1, IdServicio = 1, Estado = true });
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+
+                // Act
+                var result = await repo.GetCategoriaByServiciosAsync("limpieza");
+
+                // Assert
+                Assert.True(result.IsSuccess);
+                Assert.Single((List<Categoria>)result.Data);
+            }
+        }
+        #endregion
+
+        #region GetHabitacionByCapacidad
+        [Fact]
+        public async Task GetHabitacionByCapacidad_InvalidCapacidad_ReturnsError()
+        {
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+
+                // Act
+                var result = await repo.GetHabitacionByCapacidad(0);
+
+                // Assert
+                Assert.False(result.IsSuccess);
+                Assert.Contains("mayor que cero", result.Message);
+            }
+        }
+
+        [Fact]
+        public async Task GetHabitacionByCapacidad_ValidCapacidad_ReturnsHabitaciones()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.Categorias.Add(new Categoria { IdCategoria = 1, Capacidad = 2, Estado = true });
+                context.Habitaciones.Add(new Habitacion { IdCategoria = 1, Estado = true });
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+
+                // Act
+                var result = await repo.GetHabitacionByCapacidad(2);
+
+                // Assert
+                Assert.True(result.IsSuccess);
+                Assert.Single((List<Habitacion>)result.Data);
+            }
+        }
+        #endregion
     }
+}

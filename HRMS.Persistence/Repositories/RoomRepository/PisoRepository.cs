@@ -36,69 +36,46 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
         public async Task<OperationResult> GetPisoByDescripcion(string descripcion)
         {
-            return await GetByFilterAsync(
-                "La descripción del piso no puede estar vacía.",
-                descripcion,
-                _context.Pisos.Where(p => p.Descripcion != null && EF.Functions.Like(p.Descripcion , 
-                $"%{descripcion}%" ) && p.Estado == true),
-                $"No se encontraron pisos con la descripción '{descripcion}'."
-            );
+            return await OperationResult.ExecuteOperationAsync(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(descripcion))
+                    return OperationResult.Failure("La descripción del piso no puede estar vacía.");
+            
+                var pisos = await _context.Pisos
+                    .Where(p => p.Descripcion != null && 
+                                EF.Functions.Like(p.Descripcion, $"%{descripcion}%") && 
+                                p.Estado == true)
+                    .ToListAsync();
+            
+                return pisos.Any() 
+                    ? OperationResult.Success(pisos) 
+                    : OperationResult.Failure($"No se encontraron pisos con la descripción '{descripcion}'.");
+            });
         }
-          
 
         public override async Task<OperationResult> UpdateEntityAsync(Piso piso)
         {
-            var result = ValidatePiso(piso);
-            if (!result.IsSuccess) return result;
-
-            try
+            return await OperationResult.ExecuteOperationAsync(async () =>
             {
+                var result = ValidatePiso(piso);
+                if (!result.IsSuccess) return result;
+
                 var existingPiso = await _context.Pisos.FindAsync(piso.IdPiso);
                 if (existingPiso == null)
                 {
-                    return new OperationResult
-                    {
-                        IsSuccess = false,
-                        Message = "El piso no existe."
-                    };
+                    return OperationResult.Failure("El piso no existe.");
                 }
 
                 if (await _context.Pisos.AnyAsync(p => p.Descripcion == piso.Descripcion && p.IdPiso != piso.IdPiso))
                 {
-                    return new OperationResult
-                    {
-                        IsSuccess = false,
-                        Message = $"Ya existe otro piso con la descripción '{piso.Descripcion}'."
-                    };
+                    return OperationResult.Failure($"Ya existe un piso con la descripción '{piso.Descripcion}'.");
                 }
 
                 UpdatePiso(existingPiso, piso);
                 await _context.SaveChangesAsync();
 
-                return new OperationResult
-                {
-                    IsSuccess = true,
-                    Message = "Piso actualizado correctamente.",
-                    Data = existingPiso
-                };
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = "El piso fue modificado por otro usuario. Intente nuevamente."
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error actualizando el piso.");
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = $"Ocurrió un error actualizando el piso: {ex.Message}"
-                };
-            }
+                return OperationResult.Success(existingPiso, "Piso actualizado correctamente.");
+            });
         }
 
 
@@ -112,36 +89,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         {
             existing.Descripcion = updated.Descripcion;
             existing.Estado = updated.Estado;
-        }
-
-        private async Task<OperationResult> GetByFilterAsync<T>(
-            string? validationMessage, string? filterValue,
-            IQueryable<T> query, string notFoundMessage)
-        {
-            if (!string.IsNullOrWhiteSpace(validationMessage) && string.IsNullOrWhiteSpace(filterValue))
-            {
-                return new OperationResult { IsSuccess = false, Message = validationMessage };
-            }
-
-            try
-            {
-                var resultList = await query.ToListAsync();
-                return new OperationResult
-                {
-                    IsSuccess = resultList.Any(),
-                    Message = resultList.Any() ? null : notFoundMessage,
-                    Data = resultList
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error obteniendo datos.");
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = $"Ocurrió un error obteniendo datos: {ex.Message}"
-                };
-            }
         }
     }
 }

@@ -25,45 +25,41 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             await _context.Categorias.Where(c => c.Estado == true).ToListAsync();
 
         public override async Task<OperationResult> SaveEntityAsync(Categoria categoria) =>
-            await ExecuteOperationAsync(async () =>
+            await OperationResult.ExecuteOperationAsync(async () =>
             {
                 var validation = _validator.Validate(categoria);
                 if (!validation.IsSuccess) return validation;
 
                 if (await ExistsAsync(c => c.Descripcion == categoria.Descripcion))
-                    return Failure($"Ya existe una categoría con la descripción '{categoria.Descripcion}'.");
+                    return OperationResult.Failure($"Ya existe una categoría con la descripción '{categoria.Descripcion}'.");
 
                 await _context.Categorias.AddAsync(categoria);
                 await _context.SaveChangesAsync();
 
-                return Success(categoria, "Categoría guardada correctamente.");
+                return OperationResult.Success(categoria, "Categoría guardada correctamente.");
             });
-
         public override async Task<OperationResult> UpdateEntityAsync(Categoria categoria) =>
-            await ExecuteOperationAsync(async () =>
+            await OperationResult.ExecuteOperationAsync(async () =>
             {
                 var validation = _validator.Validate(categoria);
                 if (!validation.IsSuccess) return validation;
 
                 var existingCategoria = await _context.Categorias.FindAsync(categoria.IdCategoria);
-                if (existingCategoria == null) return Failure("La categoría no existe.");
+                if (existingCategoria == null) return OperationResult.Failure("La categoría no existe.");
 
                 if (await ExistsAsync(c => c.Descripcion == categoria.Descripcion && c.IdCategoria != categoria.IdCategoria))
-                    return Failure($"Ya existe otra categoría con la descripción '{categoria.Descripcion}'.");
+                    return OperationResult.Failure($"Ya existe otra categoría con la descripción '{categoria.Descripcion}'.");
 
                 UpdateCategoria(existingCategoria, categoria);
                 await _context.SaveChangesAsync();
 
-                return Success(existingCategoria, "Categoría actualizada correctamente.");
+                return OperationResult.Success(existingCategoria, "Categoría actualizada correctamente.");
             });
-
+        
+        
         public async Task<OperationResult> GetCategoriaByServiciosAsync(string nombre) =>
-            await ExecuteOperationAsync(async () =>
+            await OperationResult.ExecuteOperationAsync(async () =>
             {
-                if (string.IsNullOrWhiteSpace(nombre))
-                    return Failure("El nombre del servicio no puede estar vacío.");
-
-               
                 var categoriasYServicios = await _context.Categorias
                     .Join(_context.Servicios,
                         c => c.IdServicio,
@@ -76,17 +72,16 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                     .Where(cs => cs.Servicio.Nombre.Contains(nombre, StringComparison.OrdinalIgnoreCase))
                     .Select(cs => cs.Categoria)
                     .ToList();
-                
-
-                return Success(categorias,
+            
+                return OperationResult.Success(categorias, 
                     categorias.Any() ? null : $"No se encontraron categorías para el servicio '{nombre}'.");
             });
 
         public async Task<OperationResult> GetCategoriaByDescripcionAsync(string descripcion) =>
-            await ExecuteOperationAsync(async () =>
+            await OperationResult.ExecuteOperationAsync(async () =>
             {
                 if (string.IsNullOrWhiteSpace(descripcion)) 
-                    return Failure("La descripción de la categoria no puede estar vacía.");
+                    return OperationResult.Failure("La descripción de la categoria no puede estar vacía.");
 
                 var categorias = await _context.Categorias
                     .Where(c => c.Descripcion != null && 
@@ -95,14 +90,14 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                     .ToListAsync();
 
                 return categorias.Any() 
-                    ? Success(categorias) 
-                    : Failure($"No se encontraron categorias con esa descripción: '{descripcion}'");
+                    ? OperationResult.Success(categorias) 
+                    : OperationResult.Failure($"No se encontraron categorias con esa descripción: '{descripcion}'");
             });
         
         public async Task<OperationResult> GetHabitacionByCapacidad(int capacidad) =>
-            await ExecuteOperationAsync(async () =>
+            await OperationResult.ExecuteOperationAsync(async () =>
             {
-                if (capacidad <= 0) return Failure("La capacidad debe ser mayor que cero.");
+                if (capacidad <= 0) return OperationResult.Failure("La capacidad debe ser mayor que cero.");
 
                 var categoriasIds = await _context.Categorias
                     .Where(c => c.Capacidad == capacidad && c.Estado == true)
@@ -110,13 +105,13 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                     .ToListAsync();
 
                 if (!categoriasIds.Any())
-                    return Failure($"No se encontraron categorías con capacidad para {capacidad} personas.");
+                    return OperationResult.Failure($"No se encontraron categorías con capacidad para {capacidad} personas.");
 
                 var habitaciones = await _context.Habitaciones
                     .Where(h => h.IdCategoria.HasValue && categoriasIds.Contains(h.IdCategoria.Value) && h.Estado == true)
                     .ToListAsync();
 
-                return Success(habitaciones, habitaciones.Any() ? null : $"No se encontraron habitaciones con capacidad para {capacidad} personas.");
+                return OperationResult.Success(habitaciones, habitaciones.Any() ? null : $"No se encontraron habitaciones con capacidad para {capacidad} personas.");
             });
 
 
@@ -127,23 +122,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             existing.Capacidad = updated.Capacidad;
             existing.Estado = updated.Estado;
         }
-
-        private async Task<OperationResult> ExecuteOperationAsync(Func<Task<OperationResult>> operation)
-        {
-            try
-            {
-                return await operation();
-            }
-            catch (Exception ex)
-            {
-                return Failure($"Ocurrió un error: {ex.Message}");
-            }
-        }
-
-        private static OperationResult Success(object data = null, string message = null) =>
-            new() { IsSuccess = true, Data = data, Message = message };
-
-        private static OperationResult Failure(string message) =>
-            new() { IsSuccess = false, Message = message };
+        
     }
 }

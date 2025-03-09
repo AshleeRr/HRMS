@@ -24,7 +24,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             _validator = validator;
         }
 
-        public override async Task<EstadoHabitacion?> GetEntityByIdAsync(int id)
+        public override async Task<EstadoHabitacion> GetEntityByIdAsync(int id)
         {
             return id == 0 ? null : await _context.EstadoHabitaciones
                 .FirstOrDefaultAsync(e => e.IdEstadoHabitacion == id && e.Estado == true);
@@ -39,67 +39,42 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
         public override async Task<OperationResult> SaveEntityAsync(EstadoHabitacion estadoHabitacion)
         {
-            var validation = ValidateEstado(estadoHabitacion);
-            if (!validation.IsSuccess) return validation;
-
-            if (await ExistsAsync(e => e.Descripcion == estadoHabitacion.Descripcion))
-            {
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = $"Ya existe un estado de habitación con la descripción '{estadoHabitacion.Descripcion}'."
-                };
-            }
-
             try
             {
+                var validation = _validator.Validate(estadoHabitacion);
+                if (!validation.IsSuccess) return validation;
+
                 await _context.EstadoHabitaciones.AddAsync(estadoHabitacion);
                 await _context.SaveChangesAsync();
-
-                return new OperationResult
-                {
-                    IsSuccess = true,
-                    Message = "Estado de habitación guardado correctamente.",
-                    Data = estadoHabitacion
-                };
+        
+                return OperationResult.Success(estadoHabitacion, "Estado de habitación guardado correctamente");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error guardando el estado de habitación.");
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = $"Ocurrió un error guardando el estado de habitación: {ex.Message}"
-                };
+                _logger.LogError(ex, "Error guardando el estado de habitación");
+                return OperationResult.Failure($"Error al guardar: {ex.Message}");
             }
         }
-
-        public async Task<OperationResult> GetEstadoByDescripcionAsync(string descripcionEstado)
+        public async Task<OperationResult> GetEstadoByDescripcionAsync(string descripcion)
         {
-            if (string.IsNullOrWhiteSpace(descripcionEstado))
+            try
             {
-                return new OperationResult { IsSuccess = false, Message = "La descripción del estado no puede estar vacía." };
-            }
-
-            var estados = await _context.EstadoHabitaciones
-                .Where(e => e.Descripcion != null && EF.Functions.Like
-                    (e.Descripcion, $"%{descripcionEstado}%") && e.Estado == true).
-                ToListAsync();
-
-            /*
-             *
-             *    var categorias = await _context.Categorias
-                    .Where(c => c.Descripcion != null && 
-                                EF.Functions.Like(c.Descripcion, $"%{descripcion}%") && 
-                                c.Estado == true)
+                var estados = await _context.EstadoHabitaciones
+                    .Where(e => e.Descripcion != null && 
+                                EF.Functions.Like(e.Descripcion, $"%{descripcion}%") && 
+                                e.Estado == true)
                     .ToListAsync();
-             */
-            return new OperationResult
+
+                return OperationResult.Success(
+                    estados, 
+                    estados.Any() ? "Estados encontrados correctamente" : $"No se encontraron estados con la descripción '{descripcion}'"
+                );
+            }
+            catch (Exception ex)
             {
-                IsSuccess = estados.Any(),
-                Message = estados.Any() ? null : $"No se encontró un estado de habitación con la descripción '{descripcionEstado}'.",
-                Data = estados
-            };
+                _logger.LogError(ex, $"Error al buscar estados por descripción '{descripcion}'");
+                return OperationResult.Failure($"Error al buscar estados: {ex.Message}");
+            }
         }
 
         public override async Task<OperationResult> UpdateEntityAsync(EstadoHabitacion estadoHabitacion)
@@ -107,77 +82,67 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             var validation = ValidateEstado(estadoHabitacion);
             if (!validation.IsSuccess) return validation;
 
-            var existingEstado = await _context.EstadoHabitaciones.FindAsync(estadoHabitacion.IdEstadoHabitacion);
+            var existingEstado = await GetExistingEstadoAsync(estadoHabitacion.IdEstadoHabitacion);
             if (existingEstado == null)
             {
-                return new OperationResult { IsSuccess = false, Message = "El estado de habitación no existe." };
+                return OperationResult.Failure("El estado de habitación no existe.");
             }
 
-            if (await _context.EstadoHabitaciones.AnyAsync(e =>
-                    e.Descripcion == estadoHabitacion.Descripcion &&
-                    e.IdEstadoHabitacion != estadoHabitacion.IdEstadoHabitacion))
-            {
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = $"Ya existe un estado de habitación con la descripción '{estadoHabitacion.Descripcion}'."
-                };
-            }
-
-            if (existingEstado.Estado == true && estadoHabitacion.Estado == false)
-            {
-                var habitacionesAsociadas = await _context.Habitaciones
-                    .Where(h => h.IdEstadoHabitacion == existingEstado.IdEstadoHabitacion)
-                    .ToListAsync();
-
-                if (habitacionesAsociadas.Any())
-                {
-                    return new OperationResult
-                    {
-                        IsSuccess = false,
-                        Message = "No se puede desactivar este estado porque hay habitaciones asociadas a él."
-                    };
-                }
-            }
-
-            try
-            {
-                existingEstado.Descripcion = estadoHabitacion.Descripcion;
-                existingEstado.Estado = estadoHabitacion.Estado;
-                await _context.SaveChangesAsync();
-
-                return new OperationResult
-                {
-                    IsSuccess = true,
-                    Message = estadoHabitacion.Estado == false
-                        ? "Estado de habitación desactivado correctamente."
-                        : "Estado de habitación actualizado correctamente.",
-                    Data = existingEstado
-                };
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = "El estado de habitación fue modificado por otro usuario. Intente nuevamente."
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error actualizando el estado de habitación.");
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = $"Ocurrió un error actualizando el estado de habitación: {ex.Message}"
-                };
-            }
+            var uniqueDescripcionResult = await ValidateUniqueDescripcionForUpdateAsync(estadoHabitacion);
+            if (!uniqueDescripcionResult.IsSuccess) return uniqueDescripcionResult;
+            
+            
+            return await ExecuteUpdateOperationAsync(existingEstado, estadoHabitacion);
         }
+
 
         private OperationResult ValidateEstado(EstadoHabitacion estadoHabitacion)
         {
             var validation = _validator.Validate(estadoHabitacion);
             return validation.IsSuccess ? new OperationResult { IsSuccess = true } : validation;
         }
+
+
+        
+        private async Task<OperationResult> ValidateUniqueDescripcionForUpdateAsync(EstadoHabitacion estadoHabitacion)
+        {
+            if (await _context.EstadoHabitaciones.AnyAsync(e =>
+                    e.Descripcion == estadoHabitacion.Descripcion &&
+                    e.IdEstadoHabitacion != estadoHabitacion.IdEstadoHabitacion))
+            {
+                return OperationResult.Failure($"Ya existe un estado de habitación con la descripción '{estadoHabitacion.Descripcion}'.");
+            }
+
+            return new OperationResult { IsSuccess = true };
+        }
+        
+        private async Task<EstadoHabitacion?> GetExistingEstadoAsync(int idEstadoHabitacion)
+        {
+            return await _context.EstadoHabitaciones.FindAsync(idEstadoHabitacion);
+        }
+
+        
+        private async Task<OperationResult> ExecuteUpdateOperationAsync(
+            EstadoHabitacion existingEstado, EstadoHabitacion updatedEstado)
+        {
+            try
+            {
+                existingEstado.Descripcion = updatedEstado.Descripcion;
+                existingEstado.Estado = updatedEstado.Estado;
+                await _context.SaveChangesAsync();
+
+                return OperationResult.Success( existingEstado, "Estado de habitación actualizado correctamente.");
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return OperationResult.Failure("El estado de habitación fue modificado por otro usuario. Intente nuevamente.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error actualizando el estado de habitación.");
+                return OperationResult.Failure($"Ocurrió un error actualizando el estado de habitación: {ex.Message}");
+            }
+        }
+        
     }
 }
