@@ -29,7 +29,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             {
                 var validation = _validator.Validate(categoria);
                 if (!validation.IsSuccess) return validation;
-
+                
                 if (await ExistsAsync(c => c.Descripcion == categoria.Descripcion))
                     return OperationResult.Failure($"Ya existe una categoría con la descripción '{categoria.Descripcion}'.");
 
@@ -38,6 +38,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
                 return OperationResult.Success(categoria, "Categoría guardada correctamente.");
             });
+        
         public override async Task<OperationResult> UpdateEntityAsync(Categoria categoria) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
@@ -113,7 +114,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
                 return OperationResult.Success(habitaciones, habitaciones.Any() ? null : $"No se encontraron habitaciones con capacidad para {capacidad} personas.");
             });
-
 
         private static void UpdateCategoria(Categoria existing, Categoria updated)
         {

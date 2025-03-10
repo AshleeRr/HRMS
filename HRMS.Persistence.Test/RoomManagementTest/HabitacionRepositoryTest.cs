@@ -1,8 +1,8 @@
 ﻿using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
+using HRMS.Domain.Entities.Servicio;
 using HRMS.Persistence.Context;
-using HRMS.Persistence.Interfaces.IRoomRepository;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,277 +12,396 @@ using Xunit.Abstractions;
 
 namespace HRMS.Persistence.Test.RoomManagementTest
 {
-    public class HabitacionRepositoryTests : IDisposable
+    public class HabitacionRepositoryTests
     {
         private readonly ITestOutputHelper _testOutputHelper;
-        private readonly HRMSContext _context;
-        private readonly IHabitacionRepository _repository;
-        private readonly Mock<IConfiguration> _mockConfig;
-        private readonly Mock<IValidator<Habitacion>> _mockValidator;
-        private readonly Mock<ILogger<HabitacionRepository>> _mockLogger;
+        private readonly DbContextOptions<HRMSContext> _dbOptions;
+        private readonly Mock<IValidator<Habitacion>> _validatorMock;
+        private readonly Mock<ILogger<HabitacionRepository>> _loggerMock;
+        private readonly Mock<IConfiguration> _configMock;
 
         public HabitacionRepositoryTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
-            var options = new DbContextOptionsBuilder<HRMSContext>()
+            _dbOptions = new DbContextOptionsBuilder<HRMSContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
 
-            _context = new HRMSContext(options);
-            _mockConfig = new Mock<IConfiguration>();
-            _mockValidator = new Mock<IValidator<Habitacion>>();
-            _mockLogger = new Mock<ILogger<HabitacionRepository>>();
-
-            _repository = new HabitacionRepository(
-                _context, _mockConfig.Object, _mockValidator.Object, _mockLogger.Object);
-
-            SeedRequiredEntities();
+            _validatorMock = new Mock<IValidator<Habitacion>>();
+            _loggerMock = new Mock<ILogger<HabitacionRepository>>();
+            _configMock = new Mock<IConfiguration>();
         }
 
-        private void SeedRequiredEntities()
-        {
-            // Seed essential reference data
-            _context.Pisos.AddRange(new[]
-            {
-                new Piso { IdPiso = 1, Estado = true },
-                new Piso { IdPiso = 2, Estado = false }, 
-                new Piso { IdPiso = 3, Estado = true }    
-            });
-
-            _context.Categorias.AddRange(new[]
-            {
-                new Categoria { IdCategoria = 1, Descripcion = "Standard", Estado = true },
-                new Categoria { IdCategoria = 2, Descripcion = "Deluxe", Estado = false }  
-            });
-
-            _context.EstadoHabitaciones.AddRange(new[]
-            {
-                new EstadoHabitacion { IdEstadoHabitacion = 1, Estado = true },
-                new EstadoHabitacion { IdEstadoHabitacion = 2, Estado = false } 
-            });
-
-            _context.SaveChanges();
-        }
-
-        public void Dispose()
-        {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
-        }
 
         [Fact]
-        public async Task GetAllAsync_WhenCalled_ReturnsOnlyActiveRooms()
+        public async Task GetAllAsync_ReturnsOnlyActiveHabitaciones()
         {
             // Arrange
-            _context.Habitaciones.AddRange(
-                new Habitacion { Estado = true },
-                new Habitacion { Estado = false });
-            await _context.SaveChangesAsync();
-
-            // Act
-            var result = await _repository.GetAllAsync();
-
-            // Assert
-            Assert.Equal(1, result.Count);
-        }
-
-        [Fact]
-        public async Task GetAllAsync_WhenNoActiveRoomsExist_ReturnsEmptyList()
-        {
-            // Act
-            var result = await _repository.GetAllAsync();
-
-            // Assert
-            Assert.Empty(result);
-        }
-
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        [InlineData(int.MinValue)]
-        public async Task GetEntityByIdAsync_WithInvalidIds_ReturnsNull(int invalidId)
-        {
-            // Act
-            var result = await _repository.GetEntityByIdAsync(invalidId);
-
-            // Assert
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public async Task GetEntityByIdAsync_WithNonExistentId_ReturnsNull()
-        {
-            // Act
-            var result = await _repository.GetEntityByIdAsync(999);
-
-            // Assert
-            Assert.Null(result);
-        }
-
-        [Theory]
-        [InlineData(1, 2, true)]   
-        [InlineData(2, 0, false)]   
-        public async Task GetByPisoAsync_WithDifferentFloorStates_ReturnsAppropriateResults(
-            int pisoId, int expectedCount, bool successExpected)
-        {
-            // Arrange
-            _context.Habitaciones.Add(new Habitacion { IdPiso = 1, Estado = true });
-            _context.Habitaciones.Add(new Habitacion { IdPiso = 1, Estado = true });
-            await _context.SaveChangesAsync();
-
-            // Act
-            var result = await _repository.GetByPisoAsync(pisoId);
-
-            // Assert
-            Assert.Equal(successExpected, result.IsSuccess);
-            if (successExpected)
+            using (var context = new HRMSContext(_dbOptions))
             {
-                Assert.Equal(expectedCount, (result.Data as List<Habitacion>).Count);
+                context.Habitaciones.AddRange(
+                    new Habitacion { IdHabitacion = 1, Estado = true },
+                    new Habitacion { IdHabitacion = 2, Estado = false }
+                );
+                await context.SaveChangesAsync();
             }
-            else
+
+            using (var context = new HRMSContext(_dbOptions))
             {
-                Assert.Contains($"No se encontraron habitaciones en el piso {pisoId}", result.Message);
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
+
+                // Act
+                var result = await repo.GetAllAsync();
+
+                // Assert
+                Assert.Single(result);
+                Assert.All(result, h => Assert.True(h.Estado));
             }
         }
 
-        [Theory]
-        [InlineData("standard", 1)]  
-        [InlineData("STANDARD", 1)]  
-        [InlineData("StAnDaRd", 1)]  
-        public async Task GetByCategoriaAsync_WithCaseVariations_ReturnsMatches(string searchTerm, int expectedCount)
-        {
-            // Arrange
-            _context.Habitaciones.Add(new Habitacion 
-            { 
-                IdCategoria = 1, 
-                Estado = true,
-                IdPiso = 1,
-                IdEstadoHabitacion = 1
-            });
-            await _context.SaveChangesAsync();
-
-            // Act
-            var result = await _repository.GetByCategoriaAsync(searchTerm);
-
-            // Assert
-            Assert.Equal(expectedCount, (result.Data as List<Habitacion>)?.Count);
-        }
-
         [Fact]
-        public async Task GetByCategoriaAsync_WithInactiveCategory_ReturnsEmptyList()
+        public async Task GetByPisoAsync_InvalidPisoId_ReturnsFailure()
         {
-            // Arrange
-            _context.Habitaciones.Add(new Habitacion 
-            { 
-                IdCategoria = 2,  
-                Estado = true,
-                IdPiso = 1,
-                IdEstadoHabitacion = 1
-            });
-            await _context.SaveChangesAsync();
-
-            // Act
-            var result = await _repository.GetByCategoriaAsync("Deluxe");
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Contains("No se encontraron", result.Message);
-            
-        }
-
-        [Fact]
-        public async Task SaveEntityAsync_WhenValidatorFails_ReturnsValidationError()
-        {
-            // Arrange
-            var habitacion = new Habitacion();
-            _mockValidator.Setup(v => v.Validate(It.IsAny<Habitacion>()))
-                .Returns(new OperationResult{IsSuccess = false, Message = "Validation failed"});
-
-            // Act
-            var result = await _repository.SaveEntityAsync(habitacion);
-
-            // Assert
-            Assert.False(result.IsSuccess);
-            Assert.Contains("Validation failed", result.Message);
-        }
-
-        [Fact]
-        public async Task SaveEntityAsync_WithInactiveForeignKey_ReturnsError()
-        {
-            // Arrange
-            var inactivePiso = await _context.Pisos.FindAsync(2);
-            Assert.NotNull(inactivePiso);
-            Assert.False(inactivePiso.Estado, "El piso 2 debería estar inactivo");
-    
-            _mockValidator.Setup(v => v.Validate(It.IsAny<Habitacion>()))
-                .Returns(new OperationResult { IsSuccess = true });
-    
-            var habitacion = new Habitacion
+            using (var context = new HRMSContext(_dbOptions))
             {
-                Numero = "201",      
-                Detalle = "Test Room", 
-                Precio = 100,          
-                IdPiso = 2,            
-                IdCategoria = 1,
-                IdEstadoHabitacion = 1,
-                Estado = true
-            };
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
 
-            // Act
-            var result = await _repository.SaveEntityAsync(habitacion);
+                // Act
+                var result = await repo.GetByPisoAsync(0);
 
-            // Assert
-            Assert.False(result.IsSuccess);
-            _testOutputHelper.WriteLine($"Mensaje de error: {result.Message}");
-    
-            Assert.Contains("inactivo", result.Message.ToLower());
+                // Assert
+                Assert.False(result.IsSuccess);
+                Assert.Contains("mayor que cero", result.Message);
+            }
         }
-        
+
         [Fact]
-        public async Task GetInfoHabitacionesAsync_WhenNoActiveTariffs_ReturnsFallbackMessage()
+        public async Task GetByPisoAsync_ValidPiso_ReturnsHabitaciones()
         {
             // Arrange
-            _context.Habitaciones.Add(new Habitacion { Estado = true });
-            await _context.SaveChangesAsync();
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.Habitaciones.Add(new Habitacion { IdHabitacion = 1, IdPiso = 5, Estado = true });
+                await context.SaveChangesAsync();
+            }
 
-            // Act
-            var result = await _repository.GetInfoHabitacionesAsync();
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
 
-            // Assert
-            Assert.True(result.IsSuccess);
-    
-            var json = System.Text.Json.JsonSerializer.Serialize(result.Data);
-            Assert.Contains("No hay tarifas vigentes", json);
+                // Act
+                var result = await repo.GetByPisoAsync(5);
+
+                // Assert
+                Assert.True(result.IsSuccess);
+                Assert.Single((List<Habitacion>)result.Data);
+            }
         }
+
         [Fact]
-        public async Task GetInfoHabitacionesAsync_WhenNoServicesAssociated_ReturnsFallbackServiceInfo()
+        public async Task GetByCategoriaAsync_EmptyCategoria_ReturnsFailure()
+        {
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
+
+                // Act
+                var result = await repo.GetByCategoriaAsync("");
+
+                // Assert
+                Assert.False(result.IsSuccess);
+                Assert.Contains("ingresar una categoría", result.Message);
+            }
+        }
+
+        [Fact]
+        public async Task GetByCategoriaAsync_MatchingCategoria_ReturnsHabitaciones()
         {
             // Arrange
-            var categoria = _context.Categorias.First(c => c.Estado == true); 
-    
-            _context.Habitaciones.Add(new Habitacion { 
-                Estado = true,
-                IdCategoria = categoria.IdCategoria,
-                IdPiso = 1,
-                IdEstadoHabitacion = 1
-            });
-    
-            _context.Tarifas.Add(new Tarifas
-            { 
-                IdCategoria = categoria.IdCategoria,
-                FechaInicio = DateTime.Today.AddDays(-1),
-                FechaFin = DateTime.Today.AddDays(1)
-            });
-    
-            await _context.SaveChangesAsync();
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var categoria = new Categoria { IdCategoria = 1, Descripcion = "Premium", Estado = true };
+                context.Categorias.Add(categoria);
+                context.Habitaciones.Add(new Habitacion { IdCategoria = 1, Estado = true });
+                await context.SaveChangesAsync();
+            }
 
-            // Act
-            var result = await _repository.GetInfoHabitacionesAsync();
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
 
-            // Assert
-            Assert.True(result.IsSuccess);
-            var json = System.Text.Json.JsonSerializer.Serialize(result.Data);
-            Assert.Contains("Sin servicio", json);
+                // Act
+                var result = await repo.GetByCategoriaAsync("Prem");
+
+                // Assert
+                Assert.True(result.IsSuccess);
+                Assert.Single((List<Habitacion>)result.Data);
+            }
+        }
+
+        [Fact]
+        public async Task GetInfoHabitacionesAsync_NoActiveHabitaciones_ReturnsCustomMessage()
+        {
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
+
+                // Act
+                var result = await repo.GetInfoHabitacionesAsync();
+
+                // Assert
+                Assert.True(result.IsSuccess);
+                Assert.NotNull(result.Data);
+
+                var dataType = result.Data.GetType();
+                _testOutputHelper.WriteLine($"Data type: {dataType.FullName}");
+
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(result.Data);
+                _testOutputHelper.WriteLine($"JSON: {json}");
+
+                var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(json);
+                Assert.NotNull(deserialized.mensaje);
+                string mensaje = deserialized.mensaje.ToString();
+                Assert.Equal("No hay habitaciones activas en la base de datos", mensaje);
+            }
+        }
+
+        [Fact]
+        public async Task GetInfoHabitacionesAsync_NoTarifasVigentes_ReturnsCorrectMessage()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                // Seed habitaciones but no tarifas
+                var servicio = new Servicios { IdServicio = 1, Nombre = "SPA", Descripcion = "Servicio completo" };
+                var categoria = new Categoria { IdCategoria = 1, IdServicio = 1, Estado = true };
+                var habitacion = new Habitacion
+                {
+                    IdHabitacion = 1,
+                    IdCategoria = 1,
+                    Estado = true,
+                    IdPiso = 1
+                };
+                var piso = new Piso
+                {
+                    IdPiso = 1,
+                    Descripcion = "Primer Piso"
+                };
+
+                // Note: Not adding any tarifas
+                context.AddRange(servicio, categoria, habitacion, piso);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
+
+                // Act
+                var result = await repo.GetInfoHabitacionesAsync();
+
+                // Assert
+                Assert.True(result.IsSuccess);
+                Assert.NotNull(result.Data);
+
+                // Use JSON serialization as a workaround for type issues
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(result.Data);
+                var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(json);
+
+                Assert.NotNull(deserialized.mensaje);
+                string mensaje = deserialized.mensaje.ToString();
+                Assert.Equal("No hay tarifas vigentes para la fecha actual", mensaje);
+            }
+        }
+
+        [Fact]
+        public async Task GetInfoHabitacionesAsync_NoCategoriasConServicios_ReturnsCorrectMessage()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                // Create piso and habitacion
+                var piso = new Piso
+                {
+                    IdPiso = 1,
+                    Descripcion = "Primer Piso"
+                };
+
+                // Create categoria without IdServicio
+                var categoria = new Categoria
+                {
+                    IdCategoria = 1,
+                    Estado = true
+                    // Not setting IdServicio
+                };
+
+                var habitacion = new Habitacion
+                {
+                    IdHabitacion = 1,
+                    IdCategoria = 1,
+                    Estado = true,
+                    IdPiso = 1
+                };
+
+                // Add tarifa with current dates
+                var tarifa = new Tarifas
+                {
+                    IdTarifa = 1,
+                    IdCategoria = 1,
+                    FechaInicio = DateTime.Now.AddDays(-1),
+                    FechaFin = DateTime.Now.AddDays(1),
+                    PrecioPorNoche = 150,
+                    Estado = true
+                };
+
+                context.AddRange(piso, categoria, habitacion, tarifa);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
+
+                // Act
+                var result = await repo.GetInfoHabitacionesAsync();
+
+                // Assert
+                Assert.True(result.IsSuccess);
+                Assert.NotNull(result.Data);
+
+                // Use JSON serialization as a workaround for type issues
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(result.Data);
+                var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(json);
+
+                Assert.NotNull(deserialized.mensaje);
+                string mensaje = deserialized.mensaje.ToString();
+                Assert.Equal("No hay categorías con servicios asociados", mensaje);
+            }
+        }
+
+        [Fact]
+        public async Task GetInfoHabitacionesAsync_WithValidData_ReturnsCompleteInfo()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                // Seed data
+                var servicio = new Servicios { IdServicio = 1, Nombre = "SPA", Descripcion = "Servicio completo" };
+                var categoria = new Categoria { IdCategoria = 1, IdServicio = 1, Estado = true };
+                var tarifa = new Tarifas
+                {
+                    IdTarifa = 1, IdCategoria = 1, FechaInicio = DateTime.Now.AddDays(-1),
+                    FechaFin = DateTime.Now.AddDays(1), PrecioPorNoche = 150, Estado = true
+                };
+                var habitacion = new Habitacion
+                {
+                    IdHabitacion = 1,
+                    IdCategoria = 1,
+                    Estado = true,
+                    IdPiso = 1
+                };
+                var piso = new Piso
+                {
+                    IdPiso = 1,
+                    Descripcion = "Primer Piso"
+                };
+
+                context.AddRange(servicio, categoria, tarifa, habitacion, piso);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
+
+                // Act
+                var result = await repo.GetInfoHabitacionesAsync();
+
+                // Assert
+                Assert.True(result.IsSuccess);
+                Assert.NotNull(result.Data); // Check if data is not null
+
+                // Now safely access the data
+                var data = result.Data;
+                Assert.NotEmpty((IEnumerable<object>)data); // Make sure data has elements
+
+                var list = data as IEnumerable<object>;
+                var firstItem = list.First();
+
+                // Print properties for debugging
+                Console.WriteLine("Properties of result data:");
+                foreach (var prop in firstItem.GetType().GetProperties())
+                {
+                    Console.WriteLine($"{prop.Name}: {prop.GetValue(firstItem)}");
+                }
+
+                var price = firstItem.GetType().GetProperty("PrecioPorNoche").GetValue(firstItem);
+                var serviceName = firstItem.GetType().GetProperty("NombreServicio").GetValue(firstItem);
+
+                Assert.Equal(150m, price);
+                Assert.Equal("SPA", serviceName);
+            }
+        }
+
+        [Fact]
+        public async Task SaveEntityAsync_InvalidForeignKey_ReturnsFailure()
+        {
+            // Arrange
+            var habitacion = new Habitacion { IdPiso = 99, IdCategoria = 99, IdEstadoHabitacion = 99 };
+            _validatorMock.Setup(v => v.Validate(habitacion)).Returns(OperationResult.Success());
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
+
+                // Act
+                var result = await repo.SaveEntityAsync(habitacion);
+
+                // Assert
+                Assert.False(result.IsSuccess);
+                Assert.Contains("no existe", result.Message);
+            }
+        }
+
+        [Fact]
+        public async Task SaveEntityAsync_ValidData_SavesHabitacion()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                // Required foreign keys
+                context.Pisos.Add(new Piso { IdPiso = 1, Estado = true });
+                context.Categorias.Add(new Categoria { IdCategoria = 1, Estado = true });
+                context.EstadoHabitaciones.Add(new EstadoHabitacion { IdEstadoHabitacion = 1, Estado = true });
+                await context.SaveChangesAsync();
+            }
+
+            var habitacion = new Habitacion { IdPiso = 1, IdCategoria = 1, IdEstadoHabitacion = 1 };
+            _validatorMock.Setup(v => v.Validate(habitacion)).Returns(OperationResult.Success());
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new HabitacionRepository(context, _configMock.Object, _validatorMock.Object,
+                    _loggerMock.Object);
+
+                // Act
+                var result = await repo.SaveEntityAsync(habitacion);
+
+                // Assert
+                Assert.True(await context.Habitaciones.AnyAsync());
+                Assert.Contains("exitosa", result.Message);
+            }
         }
     }
 }

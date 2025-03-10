@@ -20,15 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HRMS.IOC\HRMS.IOC.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HRMS.IOC\HRMS.IOC.csproj" />
+    <ProjectReference Include="..\HRMS.Persistence\HRMS.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

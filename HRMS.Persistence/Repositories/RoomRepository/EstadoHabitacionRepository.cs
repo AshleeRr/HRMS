@@ -26,8 +26,8 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
         public override async Task<EstadoHabitacion> GetEntityByIdAsync(int id)
         {
-            return id == 0 ? null : await _context.EstadoHabitaciones
-                .FirstOrDefaultAsync(e => e.IdEstadoHabitacion == id && e.Estado == true);
+            return (id == 0 ? null : await _context.EstadoHabitaciones
+                .FirstOrDefaultAsync(e => e.IdEstadoHabitacion == id && e.Estado == true))!;
         }
 
         public override async Task<List<EstadoHabitacion>> GetAllAsync()

@@ -1,4 +1,6 @@
-﻿using HRMS.Application.Interfaces.RoomManagementService;
+﻿using HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos;
+using HRMS.Application.DTOs.RoomManagementDto.Validations;
+using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Application.Services.RoomServices;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.RoomValidations;
@@ -18,6 +20,7 @@ public static class RoomDependency
         services.AddScoped<IHabitacionRepository, HabitacionRepository>();
         services.AddScoped<IValidator<Habitacion>, HabitacionValidator>();
         services.AddScoped<IHabitacionService, HabitacionServices>();
+        services.AddScoped<IValidator<CreateHabitacionDTo>, HabitacionServiceValidation>();
         services.AddScoped<ILoggingServices, LoggingServices>();
         return services;
     }

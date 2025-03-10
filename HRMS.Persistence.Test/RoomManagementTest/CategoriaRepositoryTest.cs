@@ -3,14 +3,12 @@ using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Domain.Entities.Servicio;
 using HRMS.Persistence.Context;
-using HRMS.Persistence.Interfaces.IRoomRepository;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using Xunit;
 
-namespace HRMS.Persistence.Tests.Repositories
+namespace HRMS.Persistence.Test.RoomManagementTest
 {
     public class CategoriaRepositoryTests
     {
@@ -27,8 +25,7 @@ namespace HRMS.Persistence.Tests.Repositories
             _validatorMock = new Mock<IValidator<Categoria>>();
             _configMock = new Mock<IConfiguration>();
         }
-
-        #region GetAllAsync
+        
         [Fact]
         public async Task GetAllAsync_ReturnsOnlyActiveCategorias()
         {
@@ -54,9 +51,7 @@ namespace HRMS.Persistence.Tests.Repositories
                 Assert.All(result, c => Assert.True(c.Estado));
             }
         }
-        #endregion
 
-        #region SaveEntityAsync
         [Fact]
         public async Task SaveEntityAsync_ValidationFails_ReturnsFailure()
         {
@@ -105,9 +100,7 @@ namespace HRMS.Persistence.Tests.Repositories
                 Assert.Contains("Ya existe una categoría", result.Message);
             }
         }
-        #endregion
 
-        #region UpdateEntityAsync
         [Fact]
         public async Task UpdateEntityAsync_CategoriaNotFound_ReturnsFailure()
         {
@@ -156,9 +149,7 @@ namespace HRMS.Persistence.Tests.Repositories
                 Assert.Equal("New", updated.Descripcion);
             }
         }
-        #endregion
 
-        #region GetCategoriaByServiciosAsync
         [Fact]
         public async Task GetCategoriaByServiciosAsync_ValidNombre_ReturnsCategorias()
         {
@@ -182,9 +173,7 @@ namespace HRMS.Persistence.Tests.Repositories
                 Assert.Single((List<Categoria>)result.Data);
             }
         }
-        #endregion
 
-        #region GetHabitacionByCapacidad
         [Fact]
         public async Task GetHabitacionByCapacidad_InvalidCapacidad_ReturnsError()
         {
@@ -224,6 +213,5 @@ namespace HRMS.Persistence.Tests.Repositories
                 Assert.Single((List<Habitacion>)result.Data);
             }
         }
-        #endregion
     }
 }

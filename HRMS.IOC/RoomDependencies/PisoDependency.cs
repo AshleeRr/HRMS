@@ -1,4 +1,6 @@
-﻿using HRMS.Application.Interfaces.RoomManagementService;
+﻿using HRMS.Application.DTOs.RoomManagementDto.PisoDtos;
+using HRMS.Application.DTOs.RoomManagementDto.Validations;
+using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Application.Services.RoomServices;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.RoomValidations;
@@ -18,6 +20,7 @@ public static class PisoDependency
         services.AddScoped<IPisoRepository, PisoRepository>();
         services.AddScoped<IValidator<Piso>, PisoValidator>();
         services.AddScoped<IPisoService, PisoServices>();
+        services.AddScoped<IValidator<CreatePisoDto>, PisoServiceValidator>();
         services.AddScoped<ILoggingServices, LoggingServices>();
 
         return services;

@@ -1,6 +1,8 @@
-﻿using HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos;
+﻿using HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
+using HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos;
 using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.Extensions.Logging;
@@ -11,11 +13,14 @@ namespace HRMS.Application.Services.RoomServices
     {
         private readonly ILogger<HabitacionServices> _logger;
         private readonly IHabitacionRepository _habitacionRepository;
+        private readonly IValidator<CreateHabitacionDTo> _habitacionValidator;
 
-        public HabitacionServices(IHabitacionRepository habitacionRepository, ILogger<HabitacionServices> logger)
+        public HabitacionServices(IHabitacionRepository habitacionRepository,
+            ILogger<HabitacionServices> logger, IValidator<CreateCategoriaDto> categoriaValidator, IValidator<CreateHabitacionDTo> habitacionValidator)
         {
             _habitacionRepository = habitacionRepository;
             _logger = logger;
+            _habitacionValidator = habitacionValidator;
         }
         
         public async Task<OperationResult> GetAll()
@@ -40,11 +45,11 @@ namespace HRMS.Application.Services.RoomServices
 
         public async Task<OperationResult> GetById(int id)
         {
-            if (id <= 0) 
-                return OperationResult.Failure("El id de la habitación no puede ser menor o igual a 0");
-            
             try
             {
+                
+                var validation = ValidateId(id, "El ID de la habitación no es válido");
+                if (!validation.IsSuccess) return validation;
                 _logger.LogInformation($"Obteniendo habitación por id: {id}");
                 var habitacion = await _habitacionRepository.GetEntityByIdAsync(id);
                 
@@ -63,15 +68,8 @@ namespace HRMS.Application.Services.RoomServices
 
         public async Task<OperationResult> Save(CreateHabitacionDTo dto)
         {
-            if (dto == null) 
-                return OperationResult.Failure("No se proporcionaron datos para la habitación");
-
-            if (string.IsNullOrWhiteSpace(dto.Numero))
-                return OperationResult.Failure("El número de habitación es requerido");
-
-            if (dto.Precio <= 0)
-                return OperationResult.Failure("El precio debe ser mayor que cero");
-
+            var validation = _habitacionValidator.Validate(dto);
+            if (!validation.IsSuccess) return validation;
             try
             {
                 _logger.LogInformation($"Creando habitación con número: {dto.Numero}");
@@ -101,12 +99,12 @@ namespace HRMS.Application.Services.RoomServices
 
         public async Task<OperationResult> Update(UpdateHabitacionDto dto)
         {
-            if (dto == null)
-                return OperationResult.Failure("No se proporcionaron datos para actualizar la habitación");
-
-            if (dto.IdHabitacion <= 0)
-                return OperationResult.Failure("El ID de la habitación no es válido");
-
+            
+            var validation = ValidateId(dto.IdHabitacion, "El ID de la habitación no es válido");
+            if (!validation.IsSuccess) return validation;
+            var validationDto = _habitacionValidator.Validate(dto);
+            if (!validationDto.IsSuccess) return validationDto;
+            
             try
             {
                 _logger.LogInformation($"Actualizando habitación con ID: {dto.IdHabitacion}");
@@ -134,9 +132,10 @@ namespace HRMS.Application.Services.RoomServices
 
         public async Task<OperationResult> Remove(DeleteHabitacionDto dto)
         {
-            if (dto == null || dto.IdHabitacion <= 0) 
-                return OperationResult.Failure("ID de habitación inválido");
-
+            
+            var validation = ValidateId(dto.IdHabitacion, "El ID de la habitación no es válido");
+            if (!validation.IsSuccess) return validation;
+            
             try
             {
                 _logger.LogInformation($"Eliminando habitación con ID: {dto.IdHabitacion}");
@@ -161,11 +160,11 @@ namespace HRMS.Application.Services.RoomServices
         
         public async Task<OperationResult> GetByPiso(int idPiso)
         {
-            if (idPiso <= 0) 
-                return OperationResult.Failure("El id del piso no puede ser menor o igual a 0");
-        
+           
             try
             {
+                var validation = ValidateId(idPiso, "El ID del piso debe ser mayor que 0");
+                if (!validation.IsSuccess) return validation;
                 _logger.LogInformation("Obteniendo habitaciones por piso");
                 
                 var operationResult = await _habitacionRepository.GetByPisoAsync(idPiso);
@@ -189,9 +188,9 @@ namespace HRMS.Application.Services.RoomServices
 
         public async Task<OperationResult> GetByCategoria(string categoria)
         {
-            if (string.IsNullOrEmpty(categoria)) 
-                return OperationResult.Failure("La descripción de la categoría no puede estar vacía");
-                
+            
+            var validation = ValidateString(categoria, "La categoría de la habitación no puede estar vacía");
+            if (!validation.IsSuccess) return validation;
             try
             {
                 _logger.LogInformation($"Obteniendo habitaciones por categoría: {categoria}");
@@ -217,9 +216,8 @@ namespace HRMS.Application.Services.RoomServices
 
         public async Task<OperationResult> GetByNumero(string numero)
         {
-            if(string.IsNullOrEmpty(numero)) 
-                return OperationResult.Failure("El número de habitación no puede estar vacío");
-
+            var validation = ValidateString(numero, "El número de la habitación no puede estar vacío");
+            if (!validation.IsSuccess) return validation;
             try
             {
                 _logger.LogInformation($"Obteniendo habitación por número: {numero}");
@@ -240,6 +238,20 @@ namespace HRMS.Application.Services.RoomServices
                 _logger.LogError(ex, $"Error al obtener la habitación con número {numero}");
                 return OperationResult.Failure($"Error al obtener la habitación con número {numero}: {ex.Message}");
             }
+        }
+        
+        private static OperationResult ValidateId( int? id, string message)
+        {
+            return id <= 0 
+                ? OperationResult.Failure(message) 
+                : OperationResult.Success();
+        }
+        
+        private static OperationResult ValidateString(string value, string message)
+        {
+            return string.IsNullOrWhiteSpace(value) 
+                ? OperationResult.Failure(message) 
+                : OperationResult.Success();
         }
 
         public async Task<OperationResult> GetInfoHabitacionesAsync()

@@ -10,22 +10,32 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="Validaciones a la capa de servicios hecha">
+    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/CategoryServiceValidator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/EstadoHabitacionServiceValidator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/HabitacionServiceValidation.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/PisoServiceValidator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/TarifaServiceValidation.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/EstadoHabitacionServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/EstadoHabitacionServices.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/PisoServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/PisoServices.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/TarifaServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/TarifaServices.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Base/OperationResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Base/OperationResult.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/CategoriaValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/CategoriaValidator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/CategoriaDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/CategoriaDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/EstadoHabitacionDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/EstadoHabitacionDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/RoomDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/RoomDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/TarifaDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/TarifaDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/HRMS.Persistence.Test.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/HRMS.Persistence.Test.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/CategoriaRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/CategoriaRepositoryTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/EstadoHabitacionRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/EstadoHabitacionRepositoryTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/HabitacionRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/HabitacionRepositoryTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/PisoRepositoryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/PisoRepositoryTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/TarifaRepositoryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/TarifaRepositoryTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/PisoRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/PisoRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +48,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="HabitFloors-20240045" />
+        <entry key="$PROJECT_DIR$" value="2afc80fa045df96a8b52bba850bd157bb084c9f3" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -95,6 +105,21 @@
   }
 }</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.APIs: http">
+    <configuration name="Unnamed" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false" temporary="true">
+      <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.Persistence.Test/HRMS.Persistence.Test.csproj" />
+      <option name="PROJECT_TFM" value="" />
+      <option name="LAUNCH_PROFILE_NAME" value="" />
+      <option name="TRACK_ARGUMENTS" value="1" />
+      <option name="ARGUMENTS" value="" />
+      <option name="TRACK_WORKING_DIRECTORY" value="1" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="TRACK_ENVS" value="1" />
+      <option name="USE_PODMAN_RUNTIME" value="0" />
+      <option name="TRACK_URL" value="1" />
+      <method v="2">
+        <option name="Build" />
+      </method>
+    </configuration>
     <configuration name="HRMS.APIs | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/HRMS.APIs/HRMS.APIs.http" executionIdentifier="#1" runType="Run single request">
       <method v="2" />
     </configuration>
@@ -160,6 +185,8 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Aspire Host.Unnamed" />
+        <item itemvalue="HTTP Request.HRMS.APIs | #1" />
         <item itemvalue="HTTP Request.HRMS.APIs | #1" />
       </list>
     </recent_temporary>
@@ -205,6 +232,7 @@
       <workItem from="1741277093134" duration="9021000" />
       <workItem from="1741304358191" duration="40054000" />
       <workItem from="1741467943533" duration="18649000" />
+      <workItem from="1741546745786" duration="15312000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
@@ -357,19 +385,6 @@
           </properties>
           <option name="timeStamp" value="2" />
         </breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/CategoriaRepositoryTest.cs</url>
-          <line>168</line>
-          <properties documentPath="C:\HRMS\HRMS.Persistence.Test\RoomManagementTest\CategoriaRepositoryTest.cs" containingFunctionPresentation="Method 'GetCategoriaByServiciosAsync_ValidNombre_ReturnsCategorias'">
-            <startOffsets>
-              <option value="6167" />
-            </startOffsets>
-            <endOffsets>
-              <option value="6256" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>

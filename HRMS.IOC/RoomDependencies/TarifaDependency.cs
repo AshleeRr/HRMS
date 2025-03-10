@@ -1,4 +1,6 @@
-﻿using HRMS.Application.Interfaces.RoomManagementService;
+﻿using HRMS.Application.DTOs.RoomManagementDto.TarifaDtos;
+using HRMS.Application.DTOs.RoomManagementDto.Validations;
+using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Application.Services.RoomServices;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.ServiceValidations;
@@ -19,7 +21,7 @@ public static class TarifaDependency
         services.AddScoped<IValidator<Tarifas>, TarifasValidator>();
         services.AddScoped<ITarifaService, TarifaServices>();
         services.AddScoped<ILoggingServices, LoggingServices>();
-        services.AddScoped<ICategoryRepository, CategoriaRepository>();
+        services.AddScoped<IValidator<CreateTarifaDto>, TarifaServiceValidation>();
         return services;
     }
     

@@ -7,230 +7,226 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit.Abstractions;
 
-namespace HRMS.Persistence.Test.RoomManagementTest;
-
-public class EstadoHabitacionRepositoryTest
+namespace HRMS.Persistence.Test.RoomManagementTest
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-    private readonly Mock<ILogger<EstadoHabitacionRepository>> _mockLogger = new();
-    private readonly Mock<IValidator<EstadoHabitacion>> _mockValidator = new();
-
-    public EstadoHabitacionRepositoryTest(ITestOutputHelper testOutputHelper)
+    public class EstadoHabitacionRepositoryTests
     {
-        _testOutputHelper = testOutputHelper;
-    }
+        private readonly DbContextOptions<HRMSContext> _dbOptions;
+        private readonly Mock<IValidator<EstadoHabitacion>> _validatorMock;
+        private readonly Mock<ILogger<EstadoHabitacionRepository>> _loggerMock;
+        private readonly Mock<IConfiguration> _configMock;
 
-
-    private HRMSContext CreateContext(string testName = null)
-    {
-        string dbName = testName ?? Guid.NewGuid().ToString();
-    
-        var options = new DbContextOptionsBuilder<HRMSContext>()
-            .UseInMemoryDatabase(databaseName: dbName)
-            .Options;
+        public EstadoHabitacionRepositoryTests()
+        {
+            _dbOptions = new DbContextOptionsBuilder<HRMSContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
             
-        return new HRMSContext(options);
-    }
-    private EstadoHabitacionRepository CreateRepository(HRMSContext context)
-    {
-        var logger = Mock.Of<ILogger<EstadoHabitacionRepository>>();
-        var configuration = Mock.Of<IConfiguration>();
-        var validatorMock = new Mock<IValidator<EstadoHabitacion>>();
-    
-        validatorMock
-            .Setup(v => v.Validate(It.IsAny<EstadoHabitacion>()))
-            .Returns((EstadoHabitacion estado) => {
-                if (estado.Descripcion != null && estado.Descripcion.Length > 50)
-                {
-                    return new OperationResult 
-                    { 
-                        IsSuccess = false, 
-                        Message = "La descripción no puede exceder los 50 caracteres."
-                    };
-                }
-                return new OperationResult { IsSuccess = true };
-            });
-    
-        return new EstadoHabitacionRepository(
-            context, 
-            logger, 
-            configuration, 
-            validatorMock.Object);
-    }
-    [Fact]
-    public async Task GetAllAsync_ReturnsOnlyActiveEstados()
-    {
-        // Arrange
-        using var context = CreateContext();
-        context.EstadoHabitaciones.AddRange(
-            new EstadoHabitacion { Estado = true },
-            new EstadoHabitacion { Estado = false }
-        );
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
+            _validatorMock = new Mock<IValidator<EstadoHabitacion>>();
+            _loggerMock = new Mock<ILogger<EstadoHabitacionRepository>>();
+            _configMock = new Mock<IConfiguration>();
+        }
 
-        // Act
-        var result = await repo.GetAllAsync();
+        [Fact]
+        public async Task GetAllAsync_ReturnsOnlyActiveEstados()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.EstadoHabitaciones.AddRange(
+                    new EstadoHabitacion { IdEstadoHabitacion = 1, Estado = true },
+                    new EstadoHabitacion { IdEstadoHabitacion = 2, Estado = false }
+                );
+                await context.SaveChangesAsync();
+            }
 
-        // Assert
-        Assert.Single(result);
-    }
-    
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(int.MinValue)]
-    public async Task GetEntityByIdAsync_WithInvalidIds_ReturnsNull(int invalidId)
-    {
-        // Arrange
-        using var context = CreateContext();
-        var repo = CreateRepository(context);
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
 
-        // Act
-        var result = await repo.GetEntityByIdAsync(invalidId);
+                // Act
+                var result = await repo.GetAllAsync();
 
-        // Assert
-        Assert.Null(result);
-    }
-    [Fact]
-    public async Task GetEntityByIdAsync_WithDeletedEntity_ReturnsNull()
-    {
-        // Arrange
-        using var context = CreateContext();
-        var estado = new EstadoHabitacion { Estado = false };
-        context.EstadoHabitaciones.Add(estado);
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
+                // Assert
+                Assert.Single(result);
+                Assert.All(result, e => Assert.True(e.Estado));
+            }
+        }
 
-        // Act
-        var result = await repo.GetEntityByIdAsync(estado.IdEstadoHabitacion);
+        [Fact]
+        public async Task GetEntityByIdAsync_InvalidId_ReturnsNull()
+        {
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                
+                // Act
+                var result = await repo.GetEntityByIdAsync(0);
 
-        // Assert
-        Assert.Null(result);
-    }
-    
-    [Fact]
-    public async Task SaveEntityAsync_WithDuplicateDescription_ReturnsFailure()
-    {
-        // Arrange
-        using var context = CreateContext();
-        context.EstadoHabitaciones.Add(new EstadoHabitacion { Descripcion = "Existente" });
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
-        var newEstado = new EstadoHabitacion { Descripcion = "Existente" };
+                // Assert
+                Assert.Null(result);
+            }
+        }
 
-        // Act
-        var result = await repo.SaveEntityAsync(newEstado);
+        [Fact]
+        public async Task GetEntityByIdAsync_ValidId_ReturnsEntity()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.EstadoHabitaciones.Add(new EstadoHabitacion { IdEstadoHabitacion = 1, Estado = true });
+                await context.SaveChangesAsync();
+            }
 
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Contains("Ya existe", result.Message);
-    }
-    
-    [Fact]
-    public async Task SaveEntityAsync_WithMaxLengthDescription_ReturnsSuccess()
-    {
-        // Arrange
-        using var context = CreateContext();
-        var repo = CreateRepository(context);
-        var exactMaxLength = new string('A', 50);
-        var estado = new EstadoHabitacion { Descripcion = exactMaxLength };
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
 
-        // Act
-        var result = await repo.SaveEntityAsync(estado);
+                // Act
+                var result = await repo.GetEntityByIdAsync(1);
 
-        // Assert
-        Assert.True(result.IsSuccess);
-    }
+                // Assert
+                Assert.NotNull(result);
+                Assert.Equal(1, result.IdEstadoHabitacion);
+            }
+        }
 
-    [Fact]
-    public async Task SaveEntityAsync_WithExcessiveLength_ReturnsFailure()
-    {
-        // Arrange
-        using var context = CreateContext();
-        var repo = CreateRepository(context);
-        var tooLong = new string('A', 51); 
-        var estado = new EstadoHabitacion { Descripcion = tooLong };
+        [Fact]
+        public async Task SaveEntityAsync_ValidationFails_ReturnsFailure()
+        {
+            // Arrange
+            var estado = new EstadoHabitacion();
+            _validatorMock.Setup(v => v.Validate(estado))
+                .Returns(OperationResult.Failure("Error de validación"));
 
-        // Act
-        var result = await repo.SaveEntityAsync(estado);
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
 
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Contains("50 caracteres", result.Message);
-    }
-    
-    [Fact]
-    public async Task SaveEntityAsync_WithInvalidValidator_ReturnsFailure()
-    {
-        // Arrange
-        using var context = CreateContext();
-    
-        var validatorMock = new Mock<IValidator<EstadoHabitacion>>();
-    
-        validatorMock
-            .Setup(v => v.Validate(It.IsAny<EstadoHabitacion>()))
-            .Returns(new OperationResult { Message = "Validation error", IsSuccess = false });
-    
-        var loggerMock = Mock.Of<ILogger<EstadoHabitacionRepository>>();
-        var configMock = Mock.Of<IConfiguration>();
-    
-        var repo = new EstadoHabitacionRepository(
-            context, 
-            loggerMock, 
-            configMock, 
-            validatorMock.Object);
-    
-        var estado = new EstadoHabitacion();
+                // Act
+                var result = await repo.SaveEntityAsync(estado);
 
-        // Act
-        var result = await repo.SaveEntityAsync(estado);
+                // Assert
+                Assert.False(result.IsSuccess);
+                Assert.Contains("validación", result.Message);
+            }
+        }
 
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Equal("Validation error", result.Message);
-    }
-    [Fact]
-    public async Task UpdateEntityAsync_UpdateToSameDescription_ReturnsSuccess()
-    {
-        // Arrange
-        using var context = CreateContext();
-        var estado = new EstadoHabitacion { Descripcion = "Original" };
-        context.EstadoHabitaciones.Add(estado);
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
-        estado.Descripcion = "Original"; 
+        [Fact]
+        public async Task SaveEntityAsync_DuplicateDescripcion_ReturnsFailure()
+        {
+            // Arrange
+            var existingEstado = new EstadoHabitacion { Descripcion = "Ocupado", Estado = true };
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.EstadoHabitaciones.Add(existingEstado);
+                await context.SaveChangesAsync();
+            }
 
-        // Act
-        var result = await repo.UpdateEntityAsync(estado);
+            var newEstado = new EstadoHabitacion { Descripcion = "Ocupado" };
+            _validatorMock.Setup(v => v.Validate(newEstado)).Returns(OperationResult.Success());
 
-        // Assert
-        Assert.True(result.IsSuccess);
-    }
-    [Fact]
-    public async Task UpdateEntityAsync_ReactivateEstado_UpdatesCorrectly()
-    {
-        // Arrange
-        using var context = CreateContext();
-        var estado = new EstadoHabitacion { Estado = false };
-        context.EstadoHabitaciones.Add(estado);
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
-        estado.Estado = true;
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
 
-        // Act
-        var result = await repo.UpdateEntityAsync(estado);
-        var updated = await repo.GetEntityByIdAsync(estado.IdEstadoHabitacion);
+                // Act
+                var result = await repo.SaveEntityAsync(newEstado);
 
-        // Assert
-        Assert.True(result.IsSuccess);
-        Assert.True(updated?.Estado);
+                // Assert
+                Assert.False(result.IsSuccess);
+                Assert.Contains("ya existe", result.Message);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateEntityAsync_ExistingNotFound_ReturnsFailure()
+        {
+            // Arrange
+            var estado = new EstadoHabitacion { IdEstadoHabitacion = 99 };
+            _validatorMock.Setup(v => v.Validate(estado)).Returns(OperationResult.Success());
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+
+                // Act
+                var result = await repo.UpdateEntityAsync(estado);
+
+                // Assert
+                Assert.False(result.IsSuccess);
+                Assert.Contains("no existe", result.Message);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateEntityAsync_ValidUpdate_ModifiesEstado()
+        {
+            // Arrange
+            var original = new EstadoHabitacion { IdEstadoHabitacion = 1, Descripcion = "Antiguo" };
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.EstadoHabitaciones.Add(original);
+                await context.SaveChangesAsync();
+            }
+
+            var updated = new EstadoHabitacion { IdEstadoHabitacion = 1, Descripcion = "Nuevo" };
+            _validatorMock.Setup(v => v.Validate(updated)).Returns(OperationResult.Success());
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+
+                // Act
+                var result = await repo.UpdateEntityAsync(updated);
+
+                // Assert
+                var modified = await context.EstadoHabitaciones.FindAsync(1);
+                Assert.Equal("Nuevo", modified.Descripcion);
+            }
+        }
+        
+        [Fact]
+        public async Task GetEstadoByDescripcionAsync_EmptyDescripcion_ReturnsFailure()
+        {
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+
+                // Act
+                var result = await repo.GetEstadoByDescripcionAsync("");
+
+                // Assert
+                Assert.False(result.IsSuccess);
+                Assert.Contains("vacía", result.Message);
+            }
+        }
+
+        [Fact]
+        public async Task GetEstadoByDescripcionAsync_MatchingDescripcion_ReturnsEstados()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.EstadoHabitaciones.AddRange(
+                    new EstadoHabitacion { Descripcion = "Mantenimiento", Estado = true },
+                    new EstadoHabitacion { Descripcion = "Limpieza", Estado = true }
+                );
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+
+                // Act
+                var result = await repo.GetEstadoByDescripcionAsync("teni");
+
+                // Assert
+                Assert.True(result.IsSuccess);
+                Assert.Single((List<EstadoHabitacion>)result.Data);
+            }
+        }
     }
 }

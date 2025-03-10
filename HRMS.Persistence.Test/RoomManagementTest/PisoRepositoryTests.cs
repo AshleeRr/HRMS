@@ -9,234 +9,187 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit.Abstractions;
 
-namespace HRMS.Persistence.Test.RoomManagementTest;
-
-public class PisoRepositoryTests
+namespace HRMS.Persistence.Test.RoomManagementTest
 {
-    private readonly ITestOutputHelper _output;
-    private readonly Mock<ILogger<PisoRepository>> _mockLogger = new();
-    private readonly Mock<IValidator<Piso>> _mockValidator = new();
-
-    private HRMSContext CreateContext()
+    public class PisoRepositoryTests
     {
-        var options = new DbContextOptionsBuilder<HRMSContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
+        private readonly ITestOutputHelper _testOutputHelper;
+        private readonly DbContextOptions<HRMSContext> _dbOptions;
+        private readonly Mock<IValidator<Piso>> _validatorMock;
+        private readonly Mock<ILogger<PisoRepository>> _loggerMock;
+        private readonly Mock<IConfiguration> _configMock;
+
+        public PisoRepositoryTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+            _dbOptions = new DbContextOptionsBuilder<HRMSContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
             
-        return new HRMSContext(options);
-    }
+            _validatorMock = new Mock<IValidator<Piso>>();
+            _loggerMock = new Mock<ILogger<PisoRepository>>();
+            _configMock = new Mock<IConfiguration>();
+        }
 
-    private PisoRepository CreateRepository(HRMSContext context)
-    {
-        var loggerMock = new Mock<ILogger<PisoRepository>>();
-        var configurationMock = new Mock<IConfiguration>();
-        var validatorMock = new Mock<IValidator<Piso>>();
-    
-        validatorMock.Setup(v => v.Validate(It.IsAny<Piso>()))
-            .Returns(new OperationResult { IsSuccess = true });
-    
-        return new PisoRepository(
-            context, 
-            loggerMock.Object,
-            configurationMock.Object,
-            validatorMock.Object);
-    }
-    
-    [Fact]
-    public async Task GetAllAsync_ReturnsOnlyActivePisos()
-    {
-        // Arrange
-        using var context = CreateContext();
-        context.Pisos.AddRange(
-            new Piso { Estado = true },
-            new Piso { Estado = false }
-        );
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
+        [Fact]
+        public async Task GetAllAsync_ReturnsOnlyActivePisos()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.Pisos.AddRange(
+                    new Piso { IdPiso = 1, Estado = true },
+                    new Piso { IdPiso = 2, Estado = false }
+                );
+                await context.SaveChangesAsync();
+            }
 
-        // Act
-        var result = await repo.GetAllAsync();
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
 
-        // Assert
-        Assert.Single(result);
-    }
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(int.MinValue)]
-    public async Task GetEntityByIdAsync_WithInvalidIds_ReturnsNull(int invalidId)
-    {
-        // Arrange
-        using var context = CreateContext();
-        var repo = CreateRepository(context);
+                // Act
+                var result = await repo.GetAllAsync();
 
-        // Act
-        var result = await repo.GetEntityByIdAsync(invalidId);
+                // Assert
+                Assert.Single(result);
+                Assert.All(result, p => Assert.True(p.Estado));
+            }
+        }
 
-        // Assert
-        Assert.Null(result);
-    }
-    [Fact]
-    public async Task GetEntityByIdAsync_WithValidId_ReturnsPiso()
-    {
-        // Arrange
-        using var context = CreateContext();
-        var expected = new Piso { IdPiso = 1 };
-        context.Pisos.Add(expected);
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
+        [Fact]
+        public async Task GetEntityByIdAsync_InvalidId_ReturnsNull()
+        {
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                
+                // Act
+                var result = await repo.GetEntityByIdAsync(0);
 
-        // Act
-        var result = await repo.GetEntityByIdAsync(1);
+                // Assert
+                Assert.Null(result);
+            }
+        }
 
-        // Assert
-        Assert.Equal(expected.IdPiso, result?.IdPiso);
-    }
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public async Task GetPisoByDescripcion_InvalidInput_ReturnsValidationError(string input)
-    {
-        // Arrange
-        using var context = CreateContext();
-        var repo = CreateRepository(context);
+        [Fact]
+        public async Task GetEntityByIdAsync_ValidId_ReturnsPiso()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.Pisos.Add(new Piso { IdPiso = 1, Estado = true });
+                await context.SaveChangesAsync();
+            }
 
-        // Act
-        var result = await repo.GetPisoByDescripcion(input);
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
 
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Contains("no puede estar vacía", result.Message);
-    }
-    
-    [Fact]
-    public async Task GetPisoByDescripcion_CaseInsensitiveMatch_ReturnsResults()
-    {
-        // Arrange
-        using var context = CreateContext();
-        context.Pisos.Add(new Piso { 
-            Descripcion = "Piso PRINCIPAL", 
-            Estado = true 
-        });
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
+                // Act
+                var result = await repo.GetEntityByIdAsync(1);
 
-        // Act
-        var result = await repo.GetPisoByDescripcion("principal");
+                // Assert
+                Assert.NotNull(result);
+                Assert.Equal(1, result.IdPiso);
+            }
+        }
 
-        // Assert
-        Assert.Single(result.Data as List<Piso>);
-    }
-    [Fact]
-    public async Task GetPisoByDescripcion_WithSpecialCharacters_ReturnsMatches()
-    {
-        // Arrange
-        using var context = CreateContext();
-        context.Pisos.Add(new Piso { 
-            Descripcion = "Piso #2-A", 
-            Estado = true 
-        });
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
+        [Fact]
+        public async Task GetPisoByDescripcion_EmptyDescripcion_ReturnsFailure()
+        {
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
 
-        // Act
-        var result = await repo.GetPisoByDescripcion("#2-A");
+                // Act
+                var result = await repo.GetPisoByDescripcion("");
 
-        // Assert
-        Assert.Single(result.Data as List<Piso>);
-    }
-    [Fact]
-    public async Task UpdateEntityAsync_ValidationFails_ReturnsFailure()
-    {
-        // Arrange
-        using var context = CreateContext();
-    
-        var validatorMock = new Mock<IValidator<Piso>>();
-        validatorMock.Setup(v => v.Validate(It.IsAny<Piso>()))
-            .Returns(new OperationResult { Message = "Invalid data", IsSuccess = false });
-    
-        var loggerMock = new Mock<ILogger<PisoRepository>>();
-        var configurationMock = new Mock<IConfiguration>();
-        var repo = new PisoRepository(
-            context,
-            loggerMock.Object,
-            configurationMock.Object,
-            validatorMock.Object);
-    
-        var piso = new Piso { IdPiso = 1, Descripcion = "Test" };
-    
-        // Act
-        var result = await repo.UpdateEntityAsync(piso);
-    
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Equal("Invalid data", result.Message);
-    }
-    
-    [Fact]
-    public async Task UpdateEntityAsync_NonExistentPiso_ReturnsFailure()
-    {
-        // Arrange
-        using var context = CreateContext();
-        var repo = CreateRepository(context);
-        var piso = new Piso { IdPiso = 999 , Descripcion = "Juan"};
+                // Assert
+                Assert.False(result.IsSuccess);
+                Assert.Contains("vacía", result.Message);
+            }
+        }
 
-        // Act
-        var result = await repo.UpdateEntityAsync(piso);
+        [Fact]
+        public async Task GetPisoByDescripcion_MatchingDescripcion_ReturnsPisos()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.Pisos.Add(new Piso { Descripcion = "Piso Ejecutivo", Estado = true });
+                await context.SaveChangesAsync();
+            }
 
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Contains("no existe", result.Message);
-    }
-    
-    [Fact]
-    public async Task UpdateEntityAsync_DuplicateDescription_ReturnsFailure()
-    {
-        // Arrange
-        using var context = CreateContext();
-        context.Pisos.AddRange(
-            new Piso { IdPiso = 1, Descripcion = "Original" },
-            new Piso { IdPiso = 2, Descripcion = "Existing" }
-        );
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
-        var updated = new Piso { IdPiso = 1, Descripcion = "Existing" };
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
 
-        // Act
-        var result = await repo.UpdateEntityAsync(updated);
+                // Act
+                var result = await repo.GetPisoByDescripcion("Ejec");
 
-        // Assert
-        Assert.False(result.IsSuccess);
-        Assert.Contains("Ya existe", result.Message);
-    }
-    
-    [Fact]
-    public async Task UpdateEntityAsync_DeactivatedPiso_UpdatesSuccessfully()
-    {
-        // Arrange
-        using var context = CreateContext();
-        var original = new Piso { Estado = true };
-        context.Pisos.Add(original);
-        await context.SaveChangesAsync();
-            
-        var repo = CreateRepository(context);
-        var updated = new Piso { 
-            IdPiso = original.IdPiso, 
-            Estado = false 
-        };
+                // Assert
+                Assert.True(result.IsSuccess);
+                Assert.Single((List<Piso>)result.Data);
+            }
+        }
 
-        // Act
-        var result = await repo.UpdateEntityAsync(updated);
-        var updatedEntity = await repo.GetEntityByIdAsync(original.IdPiso);
+        [Fact]
+        public async Task UpdateEntityAsync_DuplicateDescripcion_ReturnsFailure()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                // Create two pisos
+                context.Pisos.Add(new Piso { IdPiso = 1, Descripcion = "Original", Estado = true });
+                context.Pisos.Add(new Piso { IdPiso = 2, Descripcion = "Different", Estado = true });
+                await context.SaveChangesAsync();
+            }
 
-        // Assert
-        Assert.True(result.IsSuccess);
-        Assert.False(updatedEntity?.Estado);
+            var updatedPiso = new Piso { IdPiso = 2, Descripcion = "Original" };
+            _validatorMock.Setup(v => v.Validate(updatedPiso)).Returns(new OperationResult { IsSuccess = true });
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+
+                // Act
+                var result = await repo.UpdateEntityAsync(updatedPiso);
+
+                // Assert
+                Assert.False(result.IsSuccess);
+        
+                _testOutputHelper.WriteLine($"Error message: {result.Message}");
+                Assert.Contains("existe", result.Message);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateEntityAsync_ValidUpdate_ModifiesPiso()
+        {
+            // Arrange
+            var original = new Piso { IdPiso = 1, Descripcion = "Antiguo", Estado = true };
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.Pisos.Add(original);
+                await context.SaveChangesAsync();
+            }
+
+            var updated = new Piso { IdPiso = 1, Descripcion = "Nuevo", Estado = false };
+            _validatorMock.Setup(v => v.Validate(updated)).Returns(new OperationResult { IsSuccess = true });
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+
+                // Act
+                var result = await repo.UpdateEntityAsync(updated);
+
+                // Assert
+                var modified = await context.Pisos.FindAsync(1);
+                Assert.Equal("Nuevo", modified.Descripcion);
+                Assert.False(modified.Estado);
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
 using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using HRMS.Persistence.Interfaces.IServicioRepository;
@@ -15,15 +16,17 @@ namespace HRMS.Application.Services.RoomServices
         private readonly IHabitacionRepository _habitacionRepository;
         private readonly IServicioRepository _servicioRepository;
         private readonly ITarifaRepository _tarifaRepository;
+        private readonly IValidator<CreateCategoriaDto> _validator;
 
         public CategoriaServices(ICategoryRepository categoryRepository, ILogger<CategoriaServices> logger, 
-                                 IHabitacionRepository habitacionRepository, IServicioRepository servicioRepository, ITarifaRepository tarifaRepository)
+                                 IHabitacionRepository habitacionRepository, IServicioRepository servicioRepository, ITarifaRepository tarifaRepository, IValidator<CreateCategoriaDto> validator)
         {
             _categoryRepository = categoryRepository;
             _logger = logger;
             _habitacionRepository = habitacionRepository;
             _servicioRepository = servicioRepository;
             _tarifaRepository = tarifaRepository;
+            _validator = validator;
         }
 
         public async Task<OperationResult> GetAll()
@@ -55,13 +58,10 @@ namespace HRMS.Application.Services.RoomServices
         {
             return await OperationResult.ExecuteOperationAsync(async () =>
             {
-                var validateId = ValidateId(dto.IdServicio, "El ID del servicio debe ser mayor que 0.");
-                var validateCapacidad = ValidateId(dto.Capacidad, "La capacidad de la categoría debe ser mayor que 0.");
-                var validateDescription = ValidateString(dto.Descripcion, "La descripción de la categoría no puede estar vacía.");
-            
-                if (!validateId.IsSuccess || !validateCapacidad.IsSuccess || !validateDescription.IsSuccess)
-                    return OperationResult.Failure("Error al validar los datos de la categoría.");
-            
+                
+                var validation = _validator.Validate(dto);
+                if (!validation.IsSuccess)
+                    return OperationResult.Failure(validation.Message);
                 var servicioValidation = await ValidateServicioExistsAndActiveAsync(dto.IdServicio);
                 if (!servicioValidation.IsSuccess)
                     return servicioValidation;
@@ -89,13 +89,10 @@ namespace HRMS.Application.Services.RoomServices
                 {
                     var validateId = ValidateId(dto.IdCategoria, "El ID de la categoría debe ser mayor que 0.");
                     if (!validateId.IsSuccess) return validateId;
-
-                    var validateDescription = ValidateString(dto.Descripcion,
-                        "La descripción de la categoría no puede estar vacía.");
-                    if (!validateDescription.IsSuccess) return validateDescription;
-
-                    var validateServiceId = ValidateId(dto.IdServicio, "El ID del servicio debe ser mayor que 0.");
-                    if (!validateServiceId.IsSuccess) return validateServiceId;
+                    
+                    var validation = _validator.Validate(dto);
+                    if (!validation.IsSuccess)
+                        return OperationResult.Failure(validation.Message);
 
                     var category = await FindCategoryByIdAsync(dto.IdCategoria);
                     if (category == null)

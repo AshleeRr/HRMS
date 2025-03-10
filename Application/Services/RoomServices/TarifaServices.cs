@@ -4,6 +4,7 @@ using HRMS.Domain.Base;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.Extensions.Logging;
+using MyValidator.Validator;
 
 namespace HRMS.Application.Services.RoomServices;
 
@@ -12,13 +13,15 @@ public class TarifaServices : ITarifaService
     private readonly ITarifaRepository _tarifaRepository;
     private readonly ILogger<TarifaServices> _logger;
     private readonly ICategoryRepository _categoriaRepository;
+    private readonly Validator<CreateTarifaDto> _validator;
 
     public TarifaServices(ITarifaRepository tarifaRepository, ILogger<TarifaServices> logger,
-        ICategoryRepository categoriaRepository)
+        ICategoryRepository categoriaRepository, Validator<CreateTarifaDto> validator)
     {
         _tarifaRepository = tarifaRepository;
         _logger = logger;
         _categoriaRepository = categoriaRepository;
+        _validator = validator;
     }
 
     public async Task<OperationResult> GetAll()
@@ -33,6 +36,8 @@ public class TarifaServices : ITarifaService
 
     public async Task<OperationResult> GetById(int id)
     {
+        var validarId = validateId(id, "El ID de la tarifa debe ser mayor que 0.");
+        if (!validarId.IsSuccess) return validarId;
         return await OperationResult.ExecuteOperationAsync(async () =>
             {
                 _logger.LogInformation("Buscando la tarifa por ID: {Id}", id);
@@ -41,32 +46,23 @@ public class TarifaServices : ITarifaService
                 return tarifa != null ? OperationResult.Success(MapToDto(tarifa)) :OperationResult. Failure($"No se encontró la tarifa con ID {id}.");
             });
     }
-
+    
     public async Task<OperationResult> Update(UpdateTarifaDto dto)
     {
         return await OperationResult.ExecuteOperationAsync(async () =>
         {
-            if (dto == null)
-                return OperationResult.Failure("No se proporcionaron datos para actualizar la tarifa");
-            
-            if (dto.IdTarifa <= 0)
-                return OperationResult.Failure("El ID de la tarifa debe ser mayor que 0");
-            
-            var validacionDescripcion = ValidarDescripcion(dto.Descripcion);
-            if (!validacionDescripcion.IsSuccess) return validacionDescripcion;
+           
+            var validarId = validateId(dto.IdTarifa, "El ID de la tarifa debe ser mayor que 0.");
+            if (!validarId.IsSuccess) return validarId;
+            var validar = _validator.Validate(dto);
+            if (!validar.IsSuccess) return validar;
 
             if (dto.IdCategoria > 0)
             {
                 var validacionCategoria = await ValidarCategoria(dto.IdCategoria);
                 if (!validacionCategoria.IsSuccess) return validacionCategoria;
             }
-
-            var validacionFechas = ValidarFechas(dto.FechaInicio, dto.FechaFin);
-            if (!validacionFechas.IsSuccess) return validacionFechas;
-        
-            var validacionPrecios = ValidarPrecios(dto.PrecioPorNoche, dto.Descuento);
-            if (!validacionPrecios.IsSuccess) return validacionPrecios;
-
+            
             _logger.LogInformation("Actualizando la tarifa con ID: {Id}", dto.IdTarifa);
 
             var existingTarifa = await _tarifaRepository.GetEntityByIdAsync(dto.IdTarifa);
@@ -91,20 +87,11 @@ public class TarifaServices : ITarifaService
     {
         return await OperationResult.ExecuteOperationAsync(async () =>
         {
-            if (dto == null)
-                return OperationResult.Failure("No se proporcionaron datos para la tarifa");
-            
-            var validacionDescripcion = ValidarDescripcion(dto.Descripcion);
-            if (!validacionDescripcion.IsSuccess) return validacionDescripcion;
-
+            var validation = _validator.Validate(dto);
+            if (!validation.IsSuccess) return validation;
             var validacionCategoria = await ValidarCategoria(dto.IdCategoria);
             if (!validacionCategoria.IsSuccess) return validacionCategoria;
-
-            var validacionFechas = ValidarFechas(dto.FechaInicio, dto.FechaFin);
-            if (!validacionFechas.IsSuccess) return validacionFechas;
-        
-            var validacionPrecios = ValidarPrecios(dto.PrecioPorNoche, dto.Descuento);
-            if (!validacionPrecios.IsSuccess) return validacionPrecios;
+            
 
             _logger.LogInformation("Creando una nueva tarifa.");
 
@@ -216,37 +203,9 @@ public class TarifaServices : ITarifaService
     };
 
     
-    private static OperationResult ValidarFechas(DateTime fechaInicio, DateTime fechaFin)
-    {
-        if (fechaInicio == DateTime.MinValue)
-            return OperationResult.Failure("La fecha de inicio de la tarifa es requerida.");
-        if (fechaFin == DateTime.MinValue)
-            return OperationResult.Failure("La fecha de fin de la tarifa es requerida.");
-        if (fechaInicio > fechaFin)
-            return OperationResult.Failure(
-                $"La fecha de inicio ({fechaInicio:dd/MM/yyyy}) no puede ser mayor a la fecha de fin ({fechaFin:dd/MM/yyyy}).");
-    
-        return OperationResult.Success();
-    }
-
-    private static OperationResult ValidarPrecios(decimal precio, decimal descuento)
-    {
-        if (precio <= 0)
-            return OperationResult.Failure($"El precio de la tarifa debe ser mayor a 0. Valor actual: {precio}");
-        
-        if (descuento < 0)
-            return OperationResult.Failure($"El descuento no puede ser menor a 0. Valor actual: {descuento}");
-        
-        if (descuento > precio)
-            return OperationResult.Failure($"El descuento ({descuento}) no puede ser mayor que el precio ({precio}).");
-        
-        return OperationResult.Success();
-    }
 
     private async Task<OperationResult> ValidarCategoria(int idCategoria)
     {
-        if (idCategoria <= 0)
-            return OperationResult.Failure($"El ID de la categoría debe ser mayor que 0. Valor proporcionado: {idCategoria}");
         
         var categoria = await _categoriaRepository.GetEntityByIdAsync(idCategoria);
 
@@ -259,17 +218,14 @@ public class TarifaServices : ITarifaService
 
         return OperationResult.Success();
     }
-
-    private static OperationResult ValidarDescripcion(string descripcion)
+    
+    
+    private static OperationResult validateId(int id, string message)
     {
-        if (string.IsNullOrWhiteSpace(descripcion))
-            return OperationResult.Failure("La descripción de la tarifa es requerida y no puede estar vacía.");
-        if (descripcion.Length > 255)
-            return OperationResult.Failure(
-                $"La descripción de la tarifa no puede exceder los 255 caracteres. Longitud actual: {descripcion.Length} caracteres.");
+        if (id <= 0)
+            return OperationResult.Failure(message);
         return OperationResult.Success();
     }
-    
 
     private static OperationResult ValidateFechaFormat(string fechaInput)
     {

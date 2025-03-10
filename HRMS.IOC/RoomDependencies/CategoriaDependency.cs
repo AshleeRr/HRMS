@@ -1,4 +1,6 @@
-﻿using HRMS.Application.Interfaces.RoomManagementService;
+﻿using HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
+using HRMS.Application.DTOs.RoomManagementDto.Validations;
+using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Application.Services.RoomServices;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.RoomValidations;
@@ -6,9 +8,7 @@ using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Infraestructure.Logging;
 using HRMS.Persistence.Interfaces.IRoomRepository;
-using HRMS.Persistence.Interfaces.IServicioRepository;
 using HRMS.Persistence.Repositories.RoomRepository;
-using HRMS.Persistence.Repositories.ServiciosRepository;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HRMS.IOC.RoomDependencies;
@@ -20,9 +20,8 @@ public static class CategoriaDependency
         services.AddScoped<ICategoryRepository, CategoriaRepository>();
         services.AddScoped<IValidator<Categoria>, CategoriaValidator>();
         services.AddScoped<ILoggingServices, LoggingServices>();
+        services.AddScoped<IValidator<CreateCategoriaDto>, CategoryServiceValidator>();
         services.AddScoped<ICategoryService, CategoriaServices>();
-        services.AddScoped<IServicioRepository, ServicioRepository>();
-
         return services;
     }
 }

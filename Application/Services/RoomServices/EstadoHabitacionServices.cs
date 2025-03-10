@@ -51,23 +51,22 @@ namespace HRMS.Application.Services.RoomServices
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(dto.Descripcion))
-                    return OperationResult.Failure("La descripción del estado de habitación es requerida.");
-
-                if (dto.Descripcion.Length > 50)
-                    return OperationResult.Failure("La descripción no puede exceder los 50 caracteres.");
+                var validacion = ValidarEstado(dto.Descripcion);
+                if (!validacion.IsSuccess) return validacion;
 
                 if (await _estadoHabitacionRepository.ExistsAsync(e =>
                         e.Descripcion == dto.Descripcion && e.Estado == true))
                     return OperationResult.Failure($"Ya existe un estado con la descripción '{dto.Descripcion}'.");
-
-                var estadoHabitacion = new EstadoHabitacion { Descripcion = dto.Descripcion, Estado = true };
-                var result = await _estadoHabitacionRepository.SaveEntityAsync(estadoHabitacion);
-
-                return result.IsSuccess && result.Data != null
-                    ? OperationResult.Success(MapToDto((EstadoHabitacion)result.Data),
-                        "Estado de habitación creado correctamente")
-                    : result;
+                
+                _logger.LogInformation("Guardando el estado de habitación.");
+                
+                var estado = new EstadoHabitacion
+                {
+                    Descripcion = dto.Descripcion,
+                };
+                await _estadoHabitacionRepository.SaveEntityAsync(estado);
+                return OperationResult.Success(MapToDto(estado), 
+                    "La descripción del estado de habitación ha sido guardada correctamente.");
             }
             catch (Exception ex)
             {
@@ -75,13 +74,14 @@ namespace HRMS.Application.Services.RoomServices
                 return OperationResult.Failure($"Error al guardar el estado de habitación: {ex.Message}");
             }
         }
-
+        
         public async Task<OperationResult> Remove(DeleteEstadoHabitacionDto dto)
         {
             try
             {
-                if (dto.IdEstadoHabitacion <= 0)
-                    return OperationResult.Failure("El ID debe ser mayor que cero");
+                var valId = ValidateId(dto.IdEstadoHabitacion,
+                    "Para eliminar el estado de habitación, el ID debe ser mayor que cero.");
+                if (!valId.IsSuccess) return valId;
 
                 var estado = await _estadoHabitacionRepository.GetEntityByIdAsync(dto.IdEstadoHabitacion);
                 if (estado == null)
@@ -153,22 +153,7 @@ namespace HRMS.Application.Services.RoomServices
                 };
             });
         }
-
-
-        private async Task<bool> VerificarHabitacionesConEstado(int idEstado)
-        {
-            try
-            {
-                return await _habitacionRepository.ExistsAsync(h => h.IdEstadoHabitacion == idEstado);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    $"Error al verificar si hay habitaciones con el estado de habitación ID {idEstado}.");
-                return true;
-            }
-        }
-
+        
         private static OperationResult ValidarEstado(string descripcion)
         {
             if (string.IsNullOrWhiteSpace(descripcion))

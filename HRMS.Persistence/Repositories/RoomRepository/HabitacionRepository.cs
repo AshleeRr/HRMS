@@ -170,17 +170,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
               return OperationResult.Success(existingRoom, "Habitación actualizada correctamente.");
           });
-        
-        public async Task<bool> ExisteNumeroHabitacion(string numero, int? idExcluir = null)
-        {
-            var query = _context.Habitaciones.AsQueryable();
-    
-            if (idExcluir.HasValue)
-                query = query.Where(h => h.IdHabitacion != idExcluir.Value);
-        
-            return await query.AnyAsync(h => h.Numero == numero);
-        }
-
+      
         private async Task<OperationResult> ValidateForeignKeys(Habitacion habitacion)
         {
             if (!await _context.Pisos.AnyAsync(p => p.IdPiso == habitacion.IdPiso))
@@ -207,9 +197,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             existing.IdCategoria = updated.IdCategoria;
             existing.IdEstadoHabitacion = updated.IdEstadoHabitacion;
         }
-
-        private OperationResult ValidateHabitacion(Habitacion habitacion) => _validator.Validate(habitacion);
-
+        
         private static void ValidateId(int value, string message)
         {
             if (value <= 0) throw new ArgumentException(message);
