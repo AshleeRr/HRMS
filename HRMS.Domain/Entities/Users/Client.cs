@@ -15,5 +15,6 @@ namespace HRMS.Domain.Entities.Users
         public string? Documento { get; set; }
         [ForeignKey("IdUsuario")]
         public int? IdUsuario { get; set; } 
+        public string? Clave { get; set; }
     }
 }

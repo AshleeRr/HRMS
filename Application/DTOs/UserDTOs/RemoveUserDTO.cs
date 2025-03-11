@@ -2,6 +2,6 @@
 {
     public class RemoveUserDTO : DTOBase
     {
-        public int IdUser { get; set; }
+        public int IdUsuario { get; set; }
     }
 }

@@ -1,4 +1,3 @@
-using HRMS.IOC.AuditDependencies;
 using HRMS.IOC.UsersDependencies;
 using HRMS.IOC.ReservationDepedencies;
 using HRMS.Persistence.Context;
@@ -25,7 +24,6 @@ namespace HRMS.APIs
             builder.Services.AddClientDependencies();
             builder.Services.AddUserDependencies();
             builder.Services.AddUserRoleDependencies();
-            builder.Services.AddAuditDependencies();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
