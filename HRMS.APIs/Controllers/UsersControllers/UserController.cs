@@ -1,4 +1,6 @@
-﻿using HRMS.Domain.Entities.Users;
+﻿using HRMS.Application.DTOs.UserDTOs;
+using HRMS.Application.Interfaces.IUsersServices;
+using HRMS.Domain.Base.Validator;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,133 +13,203 @@ namespace HRMS.APIs.Controllers.UsersControllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
+        private readonly IValidator<SaveUserDTO> _validatorSave;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserRepository userRepository, ILogger<UserController> logger)
+        public UserController(IUserRepository userRepository, IUserService userService,
+                              IValidator<SaveUserDTO> validatorSave, ILogger<UserController> logger)
         {
             _userRepository = userRepository;
+            _userService = userService;
+            _validatorSave = validatorSave;
             _logger = logger;
         }
 
+        // POST api/<UserController>
+        [HttpPost("/user")]
+        public async Task<IActionResult> SaveUser([FromBody] SaveUserDTO user)
+        {
+            var validDTO = _validatorSave.Validate(user);
+            if (validDTO.IsSuccess)
+            {
+                var createdUser = await _userService.Save(user);
+                _logger.LogInformation("Usuario creado correctamente");
+                return Ok(createdUser);
+            }
+            return BadRequest("Error al crear un usuario");
+        }
+
         // GET: api/<UserController>
-        [HttpGet("GetUsers")]
+        [HttpGet("/users")]
         public async Task<IActionResult> GetAllUsers()
         {
-            try
+            var usuarios = await _userService.GetAll();
+            if (!usuarios.IsSuccess)
             {
-                var users = await _userRepository.GetAllAsync();
-                if (users == null || !users.Any())
-                {
-                    return NotFound("No hay usuarios guardados");
-                }
-                 return Ok(users);
-            } catch(Exception e)
-            {
-                _logger.LogError(e, "Error obteniendo los usuarios");
-                return StatusCode(500, "Error interno del servidor");
+                return BadRequest("Error obteniendo todos los usuarios");
             }
+            return Ok(usuarios);
             
         }
 
         // GET api/<UserController>/5
-        [HttpGet("{id}")]
+        [HttpGet("/user/{id}")]
         public async Task<IActionResult> GetUsersById(int id)
         {
-            try
+            ValidateId(id);
+            var usuario = await _userService.GetById(id);
+            if(usuario == null)
             {
-                var users = await _userRepository.GetEntityByIdAsync(id);
-                if (users == null)
-                {
-                    return NotFound($"No hay un usuario con este id: {id}");
-                }
-                return Ok(users);
+                return BadRequest($"No se ha encontrado ningun usuario con este id: {id}");
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error obteniendo usuario por id");
-                return StatusCode(500, "Error interno del servidor");
-            }
+            return Ok(usuario);
         }
 
-        // POST api/<UserController>
-        [HttpPost("SaveUser")]
-        public async Task<IActionResult> SaveUser ([FromBody] User user)
+        [HttpGet("/user/complete-name")]
+        public async Task<IActionResult> GetUsersByName(string nombreCompleto)
         {
-            try
+            ValidateNull(nombreCompleto, "nombre completo");
+            var usuario = await _userRepository.GetUsersByNameAsync(nombreCompleto);
+            if(usuario == null)
             {
-                var createdUser = await _userRepository.SaveEntityAsync(user);
-                return Ok(createdUser);
-
-            } catch(Exception e)
-            {
-                _logger.LogError(e, "Error guardando usuario");
-                return StatusCode(500, "Error interno del servidor");
+                return BadRequest($"No se han encontrado usuarios con este nombre: {nombreCompleto}");
             }
+            return Ok(usuario);
+        }
+
+        [HttpGet("/user/email")]
+        public async Task<IActionResult> GetUserByEmailAsync(string correo)
+        {
+            ValidateNull(correo, "correo");
+            var usuario = await _userRepository.GetUserByEmailAsync(correo);
+            if (usuario == null)
+            {  
+               return BadRequest($"No se ha encontrado un usuario con este correo: {correo}");
+            }
+            return Ok(usuario);
+            
+        }
+
+        [HttpGet("/user/document")]
+        public async Task<IActionResult> GetUserByDocumentAsync(string documento)
+        {
+            ValidateNull(documento, "documento");
+            var usuario = await _userRepository.GetUserByDocumentAsync(documento);
+            if (usuario == null)
+            {
+                return BadRequest($"No se ha encontrado un usuario con este correo: {documento}");
+            }
+            return Ok(usuario);
+        }
+
+        [HttpGet("/user/type-document")]
+        public async Task<IActionResult> GetUsersByTypeDocumentAsync(string tipoDocumento)
+        {
+            ValidateNull(tipoDocumento, "tipo documento");
+            var usuario = await _userRepository.GetUserByDocumentAsync(tipoDocumento);
+            if (usuario == null)
+            {
+                return BadRequest($"No se ha encontrado un usuario con este correo: {tipoDocumento}");
+            }
+            return Ok(usuario);
         }
 
         // PUT api/<UserController>/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
+        [HttpPut("/user/{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDTO user)
         {
-            try
+            ValidateId(id);
+            var existentUser = await _userService.GetById(id);
+            if (existentUser.IsSuccess)
             {
-                var existingUser = await _userRepository.GetEntityByIdAsync(id);
-                if(existingUser == null)
-                {
-                    return NotFound($"No se ha encontrado un usuario con id: {id}");
-                }
-                var uptadedUser = await _userRepository.UpdateEntityAsync(user);
-                return Ok(uptadedUser);
+                var updatedUser = await _userService.Update(user);
+                _logger.LogInformation("Usuario actualizado correctamente");
+                return Ok(updatedUser);
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error actualizando el usuario");
-                return StatusCode(500, "Error interno del servidor");
-            }
+            return BadRequest($"No se ha podido encontrar un usuario con este id:{id}");
         }
 
-        [HttpGet("completeName")]
-        public async Task<IActionResult> GetUserByName(string nombreCompleto)
+        [HttpPatch("/user/{id}/nombre-completo")]
+        public async Task<IActionResult> UpdateNombreCompletoAsync(int id, string nuevoNombre)
         {
-            try
+            ValidateId(id);
+            ValidateNull(nuevoNombre, "nuevoNombre");
+            var user = await _userService.UpdateNombreCompletoAsync(id, nuevoNombre);
+            if (user.IsSuccess)
             {
-                if (string.IsNullOrEmpty(nombreCompleto))
-                {
-                    return BadRequest("El nombre no puede estar vacio. Asegurese de escribirlo correctamente ");
-                }
-                var users = await _userRepository.GetUsersByNameAsync(nombreCompleto);
-                if(users == null || !users.Any())
-                {
-                    return NotFound($"No se han encontrado usuarios con el nombre: {nombreCompleto}");
-                }
-                return Ok(users);
+                return Ok(user);
             }
-            catch (Exception e)
+            return BadRequest("Error actualizando el nombre del usuario");
+        }
+        [HttpPatch("/user/{id}/role")]
+        public async Task<IActionResult> UpdateUserRoleToUserAsync(int id, int idUserRole)
+        {
+            ValidateId(id);
+            ValidateId(idUserRole);
+            var user = await _userService.UpdateUserRoleToUserAsync(id, idUserRole);
+            if (user.IsSuccess)
             {
-                _logger.LogError(e, $"Error obteniendo usuarios con el nombre: {nombreCompleto}");
-                return StatusCode(500, "Error interno del servidor");
+                return Ok(user);
             }
+            return BadRequest("Error actualizando el rol del usuario");
         }
 
-        [HttpGet("GetUsersByRole/{id}")]
-        public async Task<IActionResult> GetUsersByUserRole(int id)
+        [HttpPatch("/user/{id}/type-document-and-document")]
+        public async Task<IActionResult> UpdateTipoDocumentoAndDocumentoAsync(int id, string tipoDocumento, string documento)
         {
-            try
-            {
-                var userByRole = await _userRepository.GetUsersByUserRoleIdAsync(id);
-                return Ok(userByRole);
+            ValidateId(id);
+            ValidateNull(documento, "documento");
+            ValidateNull(tipoDocumento, "tipo documento");
 
-            }
-            catch (Exception e)
+            var user = await _userService.UpdateTipoDocumentoAndDocumentoAsync(id, tipoDocumento, documento);
+            if (user.IsSuccess)
             {
-                _logger.LogError(e, "Error obteniendo los usuarios");
-                return StatusCode(500, "Error interno del servidor");
+                return Ok(user);
             }
+            return BadRequest("Error actualizando el documento y el tipo del documento del usuario");
+        }
+        [HttpPatch("/users/{id}/password")]
+        public async Task<IActionResult> UpdatePasswordAsync(int id, string nuevaClave)
+        {
+            ValidateId(id);
+            ValidateNull(nuevaClave, "nueva clave");
+
+            var user = await _userService.UpdatePasswordAsync(id, nuevaClave);
+            if (user.IsSuccess)
+            {
+                return Ok(user);
+            }
+            return BadRequest("Error actualizando la clave del usuario");
         }
         // DELETE api/<UserController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("/user/{id}")]
+        public async Task<IActionResult> Delete([FromBody] RemoveUserDTO user)
         {
+            var userDeleted = await _userService.Remove(user);
+            if (!userDeleted.IsSuccess)
+            {
+                return BadRequest("Error al eliminar el usuario");
+            }
+            _logger.LogInformation("Usuario eliminado correctamente");
+            return Ok(userDeleted);
+        }
+
+        private IActionResult ValidateId(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("El id debe ser mayor que 0");
+            }
+            return Ok();
+        }
+        private IActionResult ValidateNull(string x, string comment)
+        {
+            if (string.IsNullOrEmpty(x))
+            {
+                return BadRequest($"El campo {comment}, no puede estar vacio. Asegurese de escribirlo correctamente");
+            }
+            return Ok();
         }
     }
 }
