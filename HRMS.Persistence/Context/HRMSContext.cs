@@ -1,8 +1,9 @@
 using HRMS.Domain.Entities.Servicio;
-using HRMS.Domain.Entities.Reservation;
+using HRMS.Domain.Entities.Reservations;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
+using HRMS.Persistence.Context.Configurations;
 
 namespace HRMS.Persistence.Context
 {
@@ -20,7 +21,16 @@ namespace HRMS.Persistence.Context
         public DbSet<Piso> Pisos { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Tarifas> Tarifas { get; set; }
+        public DbSet<ServicioPorCategoria> ServicioPorCategorias { get; set; }
+        public DbSet<ServicioPorReservacion> ServicioPorReservacions { get; set; }
 
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new ServiciePerReservationConfig());
+            modelBuilder.ApplyConfiguration(new ServicePerCategoryConfig());
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
