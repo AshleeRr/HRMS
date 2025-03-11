@@ -38,12 +38,19 @@ namespace MyValidator.Validator
         {
             OperationResult result = new OperationResult();
             List<string> errors = new List<string>();
-            foreach(RuleValidation<T> rule in Rules)
+            if(entity == null)
             {
-                var res = rule.Evaluate(entity);
-                if (!res.IsSuccess)
+                errors.Add("La entidad a guardar no puede ser nula");
+            }
+            else
+            {
+                foreach (RuleValidation<T> rule in Rules)
                 {
-                    errors.Add(res.Message);
+                    var res = rule.Evaluate(entity);
+                    if (!res.IsSuccess)
+                    {
+                        errors.Add(res.Message);
+                    }
                 }
             }
             if(errors.Count > 0)

@@ -10,11 +10,11 @@ namespace HRMS.Domain.Repository
         Task<OperationResult> GetDisponibleRoomsOfCategoryInTimeLapse(DateTime start, DateTime end, int categoriaId);
 
         Task<OperationResult> GetPricesForServicesinRoomCategory(int categoryId, IEnumerable<int> servicesIds);
-        Task<bool> HasRoomCapacity(int categoryId, int people);
-        Task<OperationResult> GetCategoryForReserv(int categoryId, int people, DateTime start, DateTime end);
+        Task<OperationResult> HasRoomCapacity(int categoryId, int people);
+        Task<OperationResult> GetCategoryForReserv(int categoryId, DateTime start, DateTime end);
 
         Task<OperationResult> GetDisponibleRoomsOfCategoryInTimeLapse(DateTime start, DateTime end, int categoriaId, int ignoringResev);
-        Task<OperationResult> GetCategoryForReservByRoom(int rommId, int people, DateTime start, DateTime end);
+        Task<OperationResult> GetCategoryForReservByRoom(int rommId,  DateTime start, DateTime end);
 
         Task<OperationResult> GetTotalForServices(int reservationId);
         Task<OperationResult> ExistUser(int userId);

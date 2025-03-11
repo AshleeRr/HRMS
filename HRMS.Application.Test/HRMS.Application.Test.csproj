@@ -17,7 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application\HRMS.Application.csproj" />
     <ProjectReference Include="..\HRMS.IOC\HRMS.IOC.csproj" />
+    <ProjectReference Include="..\HRMS.Persistence.Test\HRMS.Persistence.Test.csproj" />
   </ItemGroup>
 
   <ItemGroup>

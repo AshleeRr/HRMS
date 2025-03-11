@@ -8,9 +8,9 @@ namespace HRMS.Domain.Base.Validator.ReservationValidator
         {
             AddRule(r => r != null)
                 .WithErrorMessage("La reserva no puede ser nula");
-            AddRule(r => r.IdCliente != 0)
+            AddRule(r => r.IdCliente > 0)
                 .WithErrorMessage("El ID del cliente no puede ser cero");
-            AddRule(r => r.IdHabitacion != 0)
+            AddRule(r => r.IdHabitacion > 0)
                 .WithErrorMessage("El ID de la habitación no puede ser cero");
             AddRule(r => r.FechaEntrada.HasValue)
                 .WithErrorMessage("La fecha de entrada no puede ser nula");
