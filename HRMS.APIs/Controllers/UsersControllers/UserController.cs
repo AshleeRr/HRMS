@@ -14,15 +14,13 @@ namespace HRMS.APIs.Controllers.UsersControllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
-        private readonly IValidator<SaveUserDTO> _validatorSave;
         private readonly ILogger<UserController> _logger;
 
         public UserController(IUserRepository userRepository, IUserService userService,
-                              IValidator<SaveUserDTO> validatorSave, ILogger<UserController> logger)
+                              ILogger<UserController> logger)
         {
             _userRepository = userRepository;
             _userService = userService;
-            _validatorSave = validatorSave;
             _logger = logger;
         }
 
@@ -30,10 +28,9 @@ namespace HRMS.APIs.Controllers.UsersControllers
         [HttpPost("/user")]
         public async Task<IActionResult> SaveUser([FromBody] SaveUserDTO user)
         {
-            var validDTO = _validatorSave.Validate(user);
-            if (validDTO.IsSuccess)
+            var createdUser = await _userService.Save(user);
+            if (createdUser.IsSuccess)
             {
-                var createdUser = await _userService.Save(user);
                 _logger.LogInformation("Usuario creado correctamente");
                 return Ok(createdUser);
             }
@@ -169,6 +166,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
             return BadRequest("Error actualizando el documento y el tipo del documento del usuario");
         }
+
         [HttpPatch("/users/{id}/password")]
         public async Task<IActionResult> UpdatePasswordAsync(int id, string nuevaClave)
         {

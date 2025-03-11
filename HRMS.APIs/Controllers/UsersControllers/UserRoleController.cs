@@ -12,28 +12,26 @@ namespace HRMS.APIs.Controllers.UsersControllers
     {
         private readonly IUserRoleRepository _userRoleRepository;
         private readonly IUserRoleService _userRoleService;
-        private readonly IValidator<SaveUserRoleDTO> _validatorSave;
         private readonly ILogger<UserRoleController> _logger;
         public UserRoleController(IUserRoleRepository userRoleRepository,
                                   IUserRoleService userRoleService,
-                                  IValidator<SaveUserRoleDTO> validator, ILogger<UserRoleController> logger)
+                                  ILogger<UserRoleController> logger)
         {
             _userRoleRepository = userRoleRepository;
             _logger = logger;
             _userRoleService = userRoleService;
-            _validatorSave = validator;
         }
 
         [HttpPost("/role")]
         public async Task<IActionResult> SaveUserRole([FromBody] SaveUserRoleDTO userRole)
         {
-            var validDTO = _validatorSave.Validate(userRole);
-            if (validDTO.IsSuccess)
+            var createdUserRole = await _userRoleService.Save(userRole);
+            if (createdUserRole.IsSuccess)
             {
-                var createdUserRole = await _userRoleService.Save(userRole);
                 _logger.LogInformation("Rol de usuario creado correctamente");
                 return Ok(createdUserRole);
             }
+
             return BadRequest("Error al crear un nuevo rol");
         }
 
@@ -96,7 +94,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(users);
         }
 
-        [HttpPost("role/{id}")]
+        [HttpPut("role/{id}")]
         public async Task<IActionResult> UpdateUserRole(int id, [FromBody] UpdateUserRoleDTO userRole)
         {
             ValidateNull(userRole.Descripcion, "descripcion");
@@ -142,7 +140,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(rolNewName);
         }
 
-        [HttpDelete("/user/{id}")]
+        [HttpDelete("/role/{id}")]
         public async Task<IActionResult> Delete([FromBody] RemoveUserRoleDTO userRole)
         {
             var rol = await _userRoleService.Remove(userRole);
