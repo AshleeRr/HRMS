@@ -9,7 +9,7 @@ public class EstadoHabitacionServiceValidator : Validator<CreateEstadoHabitacion
     public EstadoHabitacionServiceValidator()
     {
         AddRule(r => r.Descripcion.Length <= 50).WithErrorMessage("La descripción no puede exceder los 50 caracteres.");
-        AddRule(r => r.Descripcion.IsNullOrEmpty()).WithErrorMessage("La descripción es requerida.");
-        
+        AddRule(r => !r.Descripcion.IsNullOrEmpty()).WithErrorMessage("La descripción es requerida.");
+        AddRule(r => r.Descripcion.Length >= 3).WithErrorMessage("La descripción debe tener al menos 3 caracteres.");
     }
 }

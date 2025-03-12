@@ -1,6 +1,7 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.EstadoHabitacionDtos;
 using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.Extensions.Logging;
@@ -12,13 +13,15 @@ namespace HRMS.Application.Services.RoomServices
         private readonly IEstadoHabitacionRepository _estadoHabitacionRepository;
         private readonly IHabitacionRepository _habitacionRepository;
         private readonly ILogger<EstadoHabitacionService> _logger;
+        private readonly IValidator<CreateEstadoHabitacionDto> _validator;
 
         public EstadoHabitacionService(IEstadoHabitacionRepository estadoHabitacionRepository,
-            ILogger<EstadoHabitacionService> logger, IHabitacionRepository habitacionRepository)
+            ILogger<EstadoHabitacionService> logger, IHabitacionRepository habitacionRepository, IValidator<CreateEstadoHabitacionDto> validator)
         {
             _estadoHabitacionRepository = estadoHabitacionRepository;
             _logger = logger;
             _habitacionRepository = habitacionRepository;
+            _validator = validator;
         }
 
         public async Task<OperationResult> GetAll()
@@ -26,9 +29,11 @@ namespace HRMS.Application.Services.RoomServices
             return await OperationResult.ExecuteOperationAsync(async () =>
             {
                 var estados = await _estadoHabitacionRepository.GetAllAsync();
-                return estados.Any()
-                    ? OperationResult.Success(estados.Select(MapToDto))
-                    : OperationResult.Failure("No se encontraron estados de habitación.");
+                if (!estados.Any())
+                    return OperationResult.Failure("No se encontraron estados de habitación.");
+                
+                var estadosDto = estados.Select(MapToDto).ToList();
+                return OperationResult.Success(estadosDto);
             });
         }
 
@@ -36,14 +41,17 @@ namespace HRMS.Application.Services.RoomServices
         {
             return await OperationResult.ExecuteOperationAsync(async () =>
             {
-
                 var validacion = ValidateId(id, "Para obtener el estado de habitación, el ID debe ser mayor que cero.");
                 if (!validacion.IsSuccess) return validacion;
 
                 var estado = await _estadoHabitacionRepository.GetEntityByIdAsync(id);
-                return estado != null
-                    ? OperationResult.Success(MapToDto(estado))
-                    : OperationResult.Failure($"No se encontró el estado con ID {id}.");
+                if (estado == null)
+                {
+                    return OperationResult.Failure($"No se encontró el estado con ID {id}.");
+                }
+
+                var estadoDto = MapToDto(estado);
+                return OperationResult.Success(estadoDto, $"Se ha encontrado el estado con el id {id}");
             });
         }
 
@@ -51,9 +59,9 @@ namespace HRMS.Application.Services.RoomServices
         {
             try
             {
-                var validacion = ValidarEstado(dto.Descripcion);
-                if (!validacion.IsSuccess) return validacion;
-
+                var validation = _validator.Validate(dto);
+                if (!validation.IsSuccess) return validation;
+                
                 if (await _estadoHabitacionRepository.ExistsAsync(e =>
                         e.Descripcion == dto.Descripcion && e.Estado == true))
                     return OperationResult.Failure($"Ya existe un estado con la descripción '{dto.Descripcion}'.");
@@ -65,7 +73,9 @@ namespace HRMS.Application.Services.RoomServices
                     Descripcion = dto.Descripcion,
                 };
                 await _estadoHabitacionRepository.SaveEntityAsync(estado);
-                return OperationResult.Success(MapToDto(estado), 
+                
+                var estadoDto = MapToDto(estado);
+                return OperationResult.Success(estadoDto, 
                     "La descripción del estado de habitación ha sido guardada correctamente.");
             }
             catch (Exception ex)
@@ -94,15 +104,18 @@ namespace HRMS.Application.Services.RoomServices
                 estado.Estado = false;
                 var result = await _estadoHabitacionRepository.UpdateEntityAsync(estado);
 
-                return result.IsSuccess
-                    ? OperationResult.Success(
+                if (result.IsSuccess && result.Data is EstadoHabitacion estadoActualizado)
+                {
+                    var estadoDto = MapToDto(estadoActualizado);
+                    return OperationResult.Success(
                         new
                         {
-                            Mensaje =
-                                $"Se ha eliminado correctamente el estado de habitación con ID: {dto.IdEstadoHabitacion}",
-                            Estado = MapToDto((EstadoHabitacion)result.Data)
-                        })
-                    : result;
+                            Mensaje = $"Se ha eliminado correctamente el estado de habitación con ID: {dto.IdEstadoHabitacion}",
+                            Estado = estadoDto
+                        });
+                }
+                
+                return result;
             }
             catch (Exception ex)
             {
@@ -118,8 +131,9 @@ namespace HRMS.Application.Services.RoomServices
                 var valId = ValidateId(dto.IdEstadoHabitacion,
                     "Para actualizar el estado de habitación, el ID debe ser mayor que cero.");
                 if (!valId.IsSuccess) return valId;
-                var validacion = ValidarEstado(dto.Descripcion);
-                if (!validacion.IsSuccess) return validacion;
+
+                var validation = _validator.Validate(dto);
+                if (!validation.IsSuccess) return validation;
 
                 var estadoHabitacion = await _estadoHabitacionRepository.GetEntityByIdAsync(dto.IdEstadoHabitacion);
                 if (estadoHabitacion == null)
@@ -128,13 +142,16 @@ namespace HRMS.Application.Services.RoomServices
                 estadoHabitacion.Descripcion = dto.Descripcion;
                 var result = await _estadoHabitacionRepository.UpdateEntityAsync(estadoHabitacion);
 
-                return result.IsSuccess && result.Data != null
-                    ? OperationResult.Success(MapToDto((EstadoHabitacion)result.Data))
-                    : result;
+                if (result.IsSuccess && result.Data is EstadoHabitacion estadoActualizado)
+                {
+                    var estadoDto = MapToDto(estadoActualizado);
+                    return OperationResult.Success(estadoDto);
+                }
+                
+                return result;
             });
         }
-
-
+        
         public async Task<OperationResult> GetEstadoByDescripcion(string descripcion)
         {
             return await OperationResult.ExecuteOperationAsync(async () =>
@@ -147,21 +164,18 @@ namespace HRMS.Application.Services.RoomServices
 
                 return result.Data switch
                 {
-                    List<EstadoHabitacion> estados => OperationResult.Success(estados.Select(MapToDto)),
+                    List<EstadoHabitacion> estados => OperationResult.Success(estados.Select(MapToDto).ToList()),
                     EstadoHabitacion estado => OperationResult.Success(MapToDto(estado)),
                     _ => OperationResult.Failure("No se encontraron resultados.")
                 };
             });
         }
         
-        private static OperationResult ValidarEstado(string descripcion)
-        {
-            if (string.IsNullOrWhiteSpace(descripcion))
-                return OperationResult.Failure("La descripción del estado de habitación es requerida.");
-            if (descripcion.Length > 50)
-                return OperationResult.Failure("La descripción no puede exceder los 50 caracteres.");
-            return OperationResult.Success();
-        }
+        private static EstadoHabitacionDto MapToDto(EstadoHabitacion estado)
+            => new EstadoHabitacionDto()
+            {
+                Descripcion = estado.Descripcion
+            };
 
         private OperationResult ValidateId(int value, string message)
         {
@@ -169,11 +183,5 @@ namespace HRMS.Application.Services.RoomServices
                 ? OperationResult.Failure(message)
                 : OperationResult.Success();
         }
-
-        private static EstadoHabitacionDto MapToDto(EstadoHabitacion estado) => new()
-        {
-            Descripcion = estado.Descripcion,
-        };
-
     }
 }

@@ -132,9 +132,9 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <returns>Tarifa actualizada</returns>
         [HttpPut]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update([FromBody] UpdateTarifaDto dto)
         {
             if (!ModelState.IsValid)
@@ -159,24 +159,32 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <returns>Resultado de la operación</returns>
         [HttpDelete]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete([FromBody] DeleteTarifaDto dto)
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Delete(int id)
         {
+            _logger.LogInformation("Eliminando tarifa ID: {Id}", id);
+    
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Modelo inválido para eliminar tarifa");
                 return BadRequest(ModelState);
             }
 
-            _logger.LogInformation($"Eliminando tarifa con ID: {dto.IdTarifa}");
+            var dto = new DeleteTarifaDto() { IdTarifa = id };
+
             var result = await _tarifaService.Remove(dto);
-            
+    
+            if (!result.IsSuccess)
+                _logger.LogWarning("Error al eliminar la tarifa ID {Id}: {Message}", 
+                    dto.IdTarifa, result.Message);
+        
             return result.IsSuccess 
-                ? Ok(result) 
+                ? Ok(result.Data) 
                 : result.Message.Contains("No se encontró") 
-                    ? NotFound(result) 
-                    : BadRequest(result);
+                    ? NotFound(new { message = result.Message }) 
+                    : BadRequest(new { message = result.Message });
         }
     }
 }

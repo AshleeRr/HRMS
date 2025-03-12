@@ -1,10 +1,10 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.TarifaDtos;
 using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.Extensions.Logging;
-using MyValidator.Validator;
 
 namespace HRMS.Application.Services.RoomServices;
 
@@ -13,10 +13,10 @@ public class TarifaServices : ITarifaService
     private readonly ITarifaRepository _tarifaRepository;
     private readonly ILogger<TarifaServices> _logger;
     private readonly ICategoryRepository _categoriaRepository;
-    private readonly Validator<CreateTarifaDto> _validator;
+    private readonly IValidator<CreateTarifaDto> _validator;
 
     public TarifaServices(ITarifaRepository tarifaRepository, ILogger<TarifaServices> logger,
-        ICategoryRepository categoriaRepository, Validator<CreateTarifaDto> validator)
+        ICategoryRepository categoriaRepository, IValidator<CreateTarifaDto> validator)
     {
         _tarifaRepository = tarifaRepository;
         _logger = logger;
@@ -30,30 +30,38 @@ public class TarifaServices : ITarifaService
         {
             _logger.LogInformation("Buscando todas las tarifas.");
             var tarifas = await _tarifaRepository.GetAllAsync();
-            return tarifas.Any() ? OperationResult.Success(tarifas.Select(MapToDto)) : OperationResult.Failure("No se encontraron tarifas.");
+            return tarifas.Any() 
+                ? OperationResult.Success(tarifas.Select(MapToDto).ToList(), "Tarifas obtenidas correctamente.") 
+                : OperationResult.Failure("No se encontraron tarifas.");
         });
     }
 
     public async Task<OperationResult> GetById(int id)
     {
-        var validarId = validateId(id, "El ID de la tarifa debe ser mayor que 0.");
+        var validarId = ValidateId(id, "El ID de la tarifa debe ser mayor que 0.");
         if (!validarId.IsSuccess) return validarId;
+        
         return await OperationResult.ExecuteOperationAsync(async () =>
-            {
-                _logger.LogInformation("Buscando la tarifa por ID: {Id}", id);
-                if (id <= 0) return OperationResult.Failure("El ID de la tarifa debe ser mayor que 0.");
-                var tarifa = await _tarifaRepository.GetEntityByIdAsync(id);
-                return tarifa != null ? OperationResult.Success(MapToDto(tarifa)) :OperationResult. Failure($"No se encontró la tarifa con ID {id}.");
-            });
+        {
+            _logger.LogInformation("Buscando la tarifa por ID: {Id}", id);
+            var tarifa = await _tarifaRepository.GetEntityByIdAsync(id);
+            return tarifa != null 
+                ? OperationResult.Success(MapToDto(tarifa), "Tarifa obtenida correctamente.") 
+                : OperationResult.Failure($"No se encontró la tarifa con ID {id}.");
+        });
     }
     
     public async Task<OperationResult> Update(UpdateTarifaDto dto)
     {
         return await OperationResult.ExecuteOperationAsync(async () =>
         {
-           
-            var validarId = validateId(dto.IdTarifa, "El ID de la tarifa debe ser mayor que 0.");
+            var validarId = ValidateId(dto.IdTarifa, "El ID de la tarifa debe ser mayor que 0.");
             if (!validarId.IsSuccess) return validarId;
+            
+            var existingTarifa = await _tarifaRepository.GetEntityByIdAsync(dto.IdTarifa);
+            if (existingTarifa == null)
+                return OperationResult.Failure($"No se encontró la tarifa con ID {dto.IdTarifa}.");
+            
             var validar = _validator.Validate(dto);
             if (!validar.IsSuccess) return validar;
 
@@ -64,11 +72,7 @@ public class TarifaServices : ITarifaService
             }
             
             _logger.LogInformation("Actualizando la tarifa con ID: {Id}", dto.IdTarifa);
-
-            var existingTarifa = await _tarifaRepository.GetEntityByIdAsync(dto.IdTarifa);
-            if (existingTarifa == null)
-                return OperationResult.Failure($"No se encontró la tarifa con ID {dto.IdTarifa}.");
-
+            
             UpdateDtoFields(existingTarifa, dto);
 
             if (dto.IdCategoria > 0)
@@ -89,10 +93,10 @@ public class TarifaServices : ITarifaService
         {
             var validation = _validator.Validate(dto);
             if (!validation.IsSuccess) return validation;
+            
             var validacionCategoria = await ValidarCategoria(dto.IdCategoria);
             if (!validacionCategoria.IsSuccess) return validacionCategoria;
             
-
             _logger.LogInformation("Creando una nueva tarifa.");
 
             var tarifa = new Tarifas
@@ -116,21 +120,22 @@ public class TarifaServices : ITarifaService
     public async Task<OperationResult> Remove(DeleteTarifaDto dto)
     {
         return await OperationResult.ExecuteOperationAsync(async () =>
-            {
-                _logger.LogInformation("Eliminando la tarifa con ID: {Id}", dto.IdTarifa);
-                if (dto.IdTarifa <= 0)
-                    return OperationResult.Failure("El ID de la tarifa debe ser mayor que 0.");
+        {
+            var validarId = ValidateId(dto.IdTarifa, "El ID de la tarifa debe ser mayor que 0.");
+            if (!validarId.IsSuccess) return validarId;
+            
+            _logger.LogInformation("Eliminando la tarifa con ID: {Id}", dto.IdTarifa);
 
-                var tarifa = await _tarifaRepository.GetEntityByIdAsync(dto.IdTarifa);
-                if (tarifa == null)
-                    return OperationResult.Failure($"No se encontró la tarifa con ID {dto.IdTarifa}.");
+            var tarifa = await _tarifaRepository.GetEntityByIdAsync(dto.IdTarifa);
+            if (tarifa == null)
+                return OperationResult.Failure($"No se encontró la tarifa con ID {dto.IdTarifa}.");
 
-                tarifa.Estado = false;
-                var result = await _tarifaRepository.UpdateEntityAsync(tarifa);
-                return result.IsSuccess && result.Data != null
-                    ? OperationResult.Success(MapToDto((Tarifas)result.Data), "Tarifa eliminada correctamente.")
-                    : result;
-            });
+            tarifa.Estado = false;
+            var result = await _tarifaRepository.UpdateEntityAsync(tarifa);
+            return result.IsSuccess && result.Data != null
+                ? OperationResult.Success(MapToDto((Tarifas)result.Data), "Tarifa eliminada correctamente.")
+                : result;
+        });
     }
 
     public async Task<OperationResult> GetTarifasVigentes(string fechaInput)
@@ -144,7 +149,22 @@ public class TarifaServices : ITarifaService
 
             DateTime fecha = (DateTime)fechaValidacion.Data;
 
-            return await _tarifaRepository.GetTarifasVigentesAsync(fechaInput);
+            var result = await _tarifaRepository.GetTarifasVigentesAsync(fechaInput);
+            
+            if (result.IsSuccess && result.Data != null)
+            {
+                if (result.Data is IEnumerable<Tarifas> tarifas)
+                {
+                    var tarifasList = tarifas.ToList();
+                    if (tarifasList.Any())
+                    {
+                        var tarifasDto = tarifasList.Select(MapToDto).ToList();
+                        return OperationResult.Success(tarifasDto, "Tarifas vigentes obtenidas correctamente.");
+                    }
+                }
+            }
+            
+            return result;
         });
     }
 
@@ -174,7 +194,7 @@ public class TarifaServices : ITarifaService
                 var habitaciones = habitacionesEnum.ToList();
                 if (habitaciones.Any())
                 {
-                    return OperationResult.Success(habitaciones);
+                    return OperationResult.Success(habitaciones, "Habitaciones obtenidas correctamente.");
                 }
             }
 
@@ -203,10 +223,8 @@ public class TarifaServices : ITarifaService
     };
 
     
-
     private async Task<OperationResult> ValidarCategoria(int idCategoria)
     {
-        
         var categoria = await _categoriaRepository.GetEntityByIdAsync(idCategoria);
 
         if (categoria == null)
@@ -219,8 +237,7 @@ public class TarifaServices : ITarifaService
         return OperationResult.Success();
     }
     
-    
-    private static OperationResult validateId(int id, string message)
+    private static OperationResult ValidateId(int id, string message)
     {
         if (id <= 0)
             return OperationResult.Failure(message);

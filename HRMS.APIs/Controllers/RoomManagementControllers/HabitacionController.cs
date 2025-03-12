@@ -1,5 +1,6 @@
 using HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos;
 using HRMS.Application.Interfaces.RoomManagementService;
+using HRMS.Domain.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRMS.APIs.Controllers.RoomManagementControllers
@@ -70,20 +71,31 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <param name="dto">Datos actualizados de la habitación</param>
         /// <returns>Resultado de la operación</returns>
         [HttpPut("(UpdateHabitacionBy){id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateHabitacionDto dto)
         {
-            if (id != dto.IdHabitacion)
-                return BadRequest(new { IsSuccess = false, Message = "El ID en la URL no coincide con el ID en el cuerpo de la solicitud" });
-
-            _logger.LogInformation($"Actualizando habitación con ID: {id}");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if(id != dto.IdHabitacion)
+                return BadRequest(new ProblemDetails { 
+                    Title = "El ID no coincide", 
+                    Detail = "El ID en la URL no coincide con el ID en el cuerpo de la solicitud",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            
+            _logger.LogInformation($"Actualizando habitacion con ID: {dto.IdPiso}");
             var result = await _habitacionService.Update(dto);
             
-            if (!result.IsSuccess) return BadRequest(result);
-            return result.Data == null ? NotFound(result) : Ok(result);
+            return result.IsSuccess 
+                ? Ok(result) 
+                : result.Message.Contains("No se encontró") 
+                    ? NotFound(result) 
+                    : BadRequest(result);
         }
 
         /// <summary>

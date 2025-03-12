@@ -14,7 +14,7 @@ public class HabitacionServiceValidation : Validator<CreateHabitacionDTo>
         AddRule(h => h.IdCategoria <= 0).WithErrorMessage("El id de la categoria no puede ser cero o negativo");
         AddRule(h => h.IdEstadoHabitacion <= 0).WithErrorMessage("El estado de la habitación no puede ser cero o negativo");
         AddRule(h=> h.Precio <= 0).WithErrorMessage("El precio de habitación no puede ser cero o negativo");
-        AddRule(h => h.Detalle.IsNullOrEmpty()).WithErrorMessage("El detalle de la habitación no puede ser nula o vacía");
+        AddRule(h => !h.Detalle.IsNullOrEmpty()).WithErrorMessage("El detalle de la habitación no puede ser nula o vacía");
         AddRule(h => h.Detalle.Length >= 100).WithErrorMessage("El detalle de la habitación no puede exceder los 100 caracteres");
     }
 }

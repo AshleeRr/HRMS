@@ -30,9 +30,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 var validation = _validator.Validate(categoria);
                 if (!validation.IsSuccess) return validation;
                 
-                if (await ExistsAsync(c => c.Descripcion == categoria.Descripcion))
-                    return OperationResult.Failure($"Ya existe una categoría con la descripción '{categoria.Descripcion}'.");
-
                 await _context.Categorias.AddAsync(categoria);
                 await _context.SaveChangesAsync();
 
@@ -57,7 +54,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 return OperationResult.Success(existingCategoria, "Categoría actualizada correctamente.");
             });
         
-        
         public async Task<OperationResult> GetCategoriaByServiciosAsync(string nombre) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
@@ -70,14 +66,14 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                     .ToListAsync();
 
                 var categorias = categoriasYServicios
-                    .Where(cs => cs.Servicio.Nombre.Contains(nombre, StringComparison.OrdinalIgnoreCase))
+                    .Where(cs => EF.Functions.Like(cs.Servicio.Nombre, $"%{nombre}%"))
                     .Select(cs => cs.Categoria)
                     .ToList();
-            
+    
                 return OperationResult.Success(categorias, 
                     categorias.Any() ? null : $"No se encontraron categorías para el servicio '{nombre}'.");
             });
-
+        
         public async Task<OperationResult> GetCategoriaByDescripcionAsync(string descripcion) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
@@ -98,8 +94,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         public async Task<OperationResult> GetHabitacionByCapacidad(int capacidad) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
-                if (capacidad <= 0) return OperationResult.Failure("La capacidad debe ser mayor que cero.");
-
                 var categoriasIds = await _context.Categorias
                     .Where(c => c.Capacidad == capacidad && c.Estado == true)
                     .Select(c => c.IdCategoria)
@@ -109,12 +103,15 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                     return OperationResult.Failure($"No se encontraron categorías con capacidad para {capacidad} personas.");
 
                 var habitaciones = await _context.Habitaciones
-                    .Where(h => h.IdCategoria.HasValue && categoriasIds.Contains(h.IdCategoria.Value) && h.Estado == true)
+                    .Where(h => h.IdCategoria.HasValue && categoriasIds.Contains(h.IdCategoria.Value))
                     .ToListAsync();
 
-                return OperationResult.Success(habitaciones, habitaciones.Any() ? null : $"No se encontraron habitaciones con capacidad para {capacidad} personas.");
-            });
+                if (!habitaciones.Any())
+                    return OperationResult.Failure($"Se encontraron categorías con capacidad para {capacidad} personas, pero no tienen habitaciones asociadas.");
 
+                return OperationResult.Success(habitaciones, "Habitaciones obtenidas correctamente.");
+            });
+        
         private static void UpdateCategoria(Categoria existing, Categoria updated)
         {
             existing.Descripcion = updated.Descripcion;

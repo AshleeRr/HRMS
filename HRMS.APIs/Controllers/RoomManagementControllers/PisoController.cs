@@ -105,16 +105,22 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <returns>Piso actualizado</returns>
         [HttpPut]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Update([FromBody] UpdatePisoDto dto)
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdatePisoDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
+            if(id != dto.IdPiso)
+                return BadRequest(new ProblemDetails { 
+                Title = "El ID no coincide", 
+                Detail = "El ID en la URL no coincide con el ID en el cuerpo de la solicitud",
+                Status = StatusCodes.Status400BadRequest
+            });
+            
             _logger.LogInformation($"Actualizando piso con ID: {dto.IdPiso}");
             var result = await _pisoService.Update(dto);
             
@@ -135,21 +141,15 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete([FromBody] DeletePisoDto dto)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            _logger.LogInformation($"Eliminando piso con ID: {dto.IdPiso}");
+            _logger.LogInformation("Eliminando el piso con el id {id}", id);
+            var dto = new DeletePisoDto { IdPiso = id };
             var result = await _pisoService.Remove(dto);
-            
-            return result.IsSuccess 
-                ? Ok(result) 
-                : result.Message.Contains("No se encontró") 
-                    ? NotFound(result) 
-                    : BadRequest(result);
+    
+            if (!result.IsSuccess) 
+                return BadRequest(result);
+            return result.Data == null ? NotFound(result) : Ok(result);
         }
     }
 }

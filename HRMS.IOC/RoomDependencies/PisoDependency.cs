@@ -20,7 +20,7 @@ public static class PisoDependency
         services.AddScoped<IPisoRepository, PisoRepository>();
         services.AddScoped<IValidator<Piso>, PisoValidator>();
         services.AddScoped<IPisoService, PisoServices>();
-        services.AddScoped<IValidator<CreatePisoDto>, PisoServiceValidator>();
+        services.AddScoped<IValidator<PisoDto>, PisoServiceValidator>();
         services.AddScoped<ILoggingServices, LoggingServices>();
 
         return services;

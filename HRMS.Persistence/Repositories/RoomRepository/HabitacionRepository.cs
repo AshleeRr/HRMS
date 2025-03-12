@@ -164,31 +164,36 @@ namespace HRMS.Persistence.Repositories.RoomRepository
               var foreignKeyValidation = await ValidateForeignKeys(habitacion);
               if (!foreignKeyValidation.IsSuccess) return foreignKeyValidation;
 
-
               UpdateHabitacion(existingRoom, habitacion);
               await _context.SaveChangesAsync();
 
               return OperationResult.Success(existingRoom, "Habitación actualizada correctamente.");
           });
-      
-        private async Task<OperationResult> ValidateForeignKeys(Habitacion habitacion)
-        {
-            if (!await _context.Pisos.AnyAsync(p => p.IdPiso == habitacion.IdPiso))
-                return OperationResult.Failure($"El piso con ID {habitacion.IdPiso} no existe.");
-        
-            if (!await _context.Pisos.AnyAsync(p => p.IdPiso == habitacion.IdPiso && p.Estado == true))
-                return OperationResult.Failure($"El piso con ID {habitacion.IdPiso} está inactivo.");
 
-            if (!await _context.Categorias.AnyAsync(c => c.IdCategoria == habitacion.IdCategoria && c.Estado == true))
-                return OperationResult.Failure($"La categoría con ID {habitacion.IdCategoria} no existe o está inactiva.");
+      private async Task<OperationResult> ValidateForeignKeys(Habitacion habitacion)
+      {
+          var pisosTask = _context.Pisos.AnyAsync(p => p.IdPiso == habitacion.IdPiso && p.Estado == true);
+          var categoriasTask =
+              _context.Categorias.AnyAsync(c => c.IdCategoria == habitacion.IdCategoria && c.Estado == true);
+          var estadosTask = _context.EstadoHabitaciones.AnyAsync(e =>
+              e.IdEstadoHabitacion == habitacion.IdEstadoHabitacion && e.Estado == true);
 
-            if (!await _context.EstadoHabitaciones.AnyAsync(e => e.IdEstadoHabitacion == habitacion.IdEstadoHabitacion && e.Estado == true))
-                return OperationResult.Failure($"El estado de habitación con ID {habitacion.IdEstadoHabitacion} no existe o está inactivo.");
+          await Task.WhenAll(pisosTask, categoriasTask, estadosTask);
 
-            return OperationResult.Success();
-        }
+          if (!pisosTask.Result)
+              return OperationResult.Failure($"El piso con ID {habitacion.IdPiso} no existe o está inactivo.");
+          if (!categoriasTask.Result)
+              return OperationResult.Failure(
+                  $"La categoría con ID {habitacion.IdCategoria} no existe o está inactiva.");
+          if (!estadosTask.Result)
+              return OperationResult.Failure(
+                  $"El estado con ID {habitacion.IdEstadoHabitacion} no existe o está inactivo.");
 
-        private static void UpdateHabitacion(Habitacion existing, Habitacion updated)
+          return OperationResult.Success();
+      }
+
+
+      private static void UpdateHabitacion(Habitacion existing, Habitacion updated)
         {
             existing.Numero = updated.Numero;
             existing.Detalle = updated.Detalle;

@@ -2,6 +2,7 @@
 
 public class TarifaDto : DTOBase
 {
+    public int IdTarifa { get; set; }
     public DateTime FechaInicio { get; set; }
     public DateTime FechaFin { get; set; }
     public decimal PrecioPorNoche { get; set; }

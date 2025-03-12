@@ -1,5 +1,6 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.EstadoHabitacionDtos;
 using HRMS.Application.Interfaces.RoomManagementService;
+using HRMS.Domain.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRMS.APIs.Controllers.RoomManagementControllers
@@ -134,31 +135,31 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <param name="dto">Datos del estado de habitación</param>
         /// <returns>Estado de habitación actualizado</returns>
         [HttpPut]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Update([FromBody] UpdateEstadoHabitacionDto dto)
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateEstadoHabitacionDto dto)
         {
-            _logger.LogInformation("Actualizando estado de habitación ID: {Id}", dto.IdEstadoHabitacion);
-            
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Modelo inválido para actualizar estado de habitación");
                 return BadRequest(ModelState);
             }
-
+            if(id != dto.IdEstadoHabitacion)
+                return BadRequest(new ProblemDetails { 
+                    Title = "El ID no coincide", 
+                    Detail = "El ID en la URL no coincide con el ID en el cuerpo de la solicitud",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            
+            _logger.LogInformation($"Actualizando EstadoHabitacion con ID: {dto.IdEstadoHabitacion}");
             var result = await _estadoHabitacionService.Update(dto);
             
-            if (!result.IsSuccess)
-                _logger.LogWarning("Error al actualizar estado de habitación ID {Id}: {Message}", 
-                    dto.IdEstadoHabitacion, result.Message);
-                
             return result.IsSuccess 
-                ? Ok(result.Data) 
+                ? Ok(result) 
                 : result.Message.Contains("No se encontró") 
-                    ? NotFound(new { message = result.Message }) 
-                    : BadRequest(new { message = result.Message });
+                    ? NotFound(result) 
+                    : BadRequest(result);
         }
 
         /// <summary>
@@ -171,22 +172,24 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete([FromBody] DeleteEstadoHabitacionDto dto)
+        public async Task<IActionResult> Delete(int id)
         {
-            _logger.LogInformation("Eliminando estado de habitación ID: {Id}", dto.IdEstadoHabitacion);
-            
+            _logger.LogInformation("Eliminando estado de habitación ID: {Id}", id);
+    
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("Modelo inválido para eliminar estado de habitación");
                 return BadRequest(ModelState);
             }
 
+            var dto = new DeleteEstadoHabitacionDto { IdEstadoHabitacion = id };
+
             var result = await _estadoHabitacionService.Remove(dto);
-            
+    
             if (!result.IsSuccess)
                 _logger.LogWarning("Error al eliminar estado de habitación ID {Id}: {Message}", 
                     dto.IdEstadoHabitacion, result.Message);
-                
+        
             return result.IsSuccess 
                 ? Ok(result.Data) 
                 : result.Message.Contains("No se encontró") 

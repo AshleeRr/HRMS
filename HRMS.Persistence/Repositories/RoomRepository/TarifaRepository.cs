@@ -51,19 +51,15 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
         public override async Task<OperationResult> UpdateEntityAsync(Tarifas tarifas)
         {
-            var validation = ValidarTarifa(tarifas);
-            if (!validation.IsSuccess) return validation;
-
+            
             var existingTarifa = await _context.Tarifas.FindAsync(tarifas.IdTarifa);
             if (existingTarifa == null)
             {
                 return OperationResult.Failure("La tarifa no existe.");
             }
-
             UpdateTarifa(existingTarifa, tarifas);
             await _context.SaveChangesAsync();
             return OperationResult.Success(existingTarifa, "Tarifa actualizada correctamente.");
-
         }
 
         public async Task<OperationResult> GetTarifasVigentesAsync(string fechaInput)
@@ -97,11 +93,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
         public async Task<OperationResult> GetHabitacionByPrecioAsync(decimal precio)
         {
-            if (precio <= 0)
-            {
-                return OperationResult.Failure("El precio debe ser mayor a 0.");
-            }
-
+            
             var fechaActual = DateTime.Now;
             var tarifas = await _context.Tarifas
                                         .Where(t => t.PrecioPorNoche == precio && t.Estado == true &&

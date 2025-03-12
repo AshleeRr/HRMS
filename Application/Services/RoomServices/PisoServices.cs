@@ -1,11 +1,10 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.PisoDtos;
 using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
-using HRMS.Domain.Repository;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.Extensions.Logging;
-using MyValidator.Validator;
 
 namespace HRMS.Application.Services.RoomServices
 {
@@ -13,16 +12,15 @@ namespace HRMS.Application.Services.RoomServices
     {
         private readonly IPisoRepository _pisoRepository;
         private readonly ILogger<PisoServices> _logger;
-        private readonly IReservationRepository _reservaRepository;
         private readonly IHabitacionRepository _habitacionRepository;
-        private readonly Validator<CreatePisoDto> _validator;
+        private readonly IValidator<PisoDto> _validator;
 
         public PisoServices(IPisoRepository pisoRepository, ILogger<PisoServices> logger, 
-                            IReservationRepository reservaRepository, IHabitacionRepository habitacionRepository, Validator<CreatePisoDto> validator)
+                            IHabitacionRepository habitacionRepository, 
+                            IValidator<PisoDto> validator)
         {
             _pisoRepository = pisoRepository;
             _logger = logger;
-            _reservaRepository = reservaRepository;
             _habitacionRepository = habitacionRepository;
             _validator = validator;
         }
@@ -33,10 +31,14 @@ namespace HRMS.Application.Services.RoomServices
             {
                 _logger.LogInformation("Buscando todos los pisos.");
                 var pisos = await _pisoRepository.GetAllAsync();
-
-                return pisos.Any() 
-                    ? OperationResult.Success(pisos.Select(MapToDto)) 
-                    : OperationResult.Failure("No se encontraron pisos.");
+        
+                if (pisos?.Any() != true)
+                {
+                    return OperationResult.Failure("No se encontraron pisos registrados");
+                }
+        
+                var pisosDto = pisos.Select(MapToDto).ToList();
+                return OperationResult.Success(pisosDto, "Pisos obtenidos correctamente");
             });
         }
 
@@ -44,15 +46,17 @@ namespace HRMS.Application.Services.RoomServices
         {
             return await OperationResult.ExecuteOperationAsync(async () =>
             {
-
                 var validacion = ValidateId(id, "Para obtener el piso, el ID debe ser mayor que cero.");
                 if (!validacion.IsSuccess) return validacion;
+                
                 _logger.LogInformation("Buscando piso por ID: {Id}", id);
                 var piso = await _pisoRepository.GetEntityByIdAsync(id);
                 
-                return piso != null 
-                    ? OperationResult.Success(MapToDto(piso)) 
-                    : OperationResult.Failure($"No se encontró el piso con ID {id}.");
+                if (piso == null)
+                    return OperationResult.Failure($"No se encontró el piso con ID {id}.");
+                
+                var pisoDto = MapToDto(piso);
+                return OperationResult.Success(pisoDto, "Pisos obtenidos correctamente");
             });
         }
 
@@ -72,9 +76,13 @@ namespace HRMS.Application.Services.RoomServices
 
                 var result = await _pisoRepository.SaveEntityAsync(piso);
         
-                return result.IsSuccess && result.Data != null
-                    ? OperationResult.Success(MapToDto((Piso)result.Data), "Piso creado correctamente.")
-                    : OperationResult.Failure(result.Message ?? "Error al guardar el piso.");
+                if (result.IsSuccess && result.Data is Piso pisoCreado)
+                {
+                    var pisoDto = MapToDto(pisoCreado);
+                    return OperationResult.Success(pisoDto, "Piso creado correctamente.");
+                }
+                
+                return OperationResult.Failure(result.Message ?? "Error al guardar el piso.");
             });
         }
 
@@ -82,9 +90,8 @@ namespace HRMS.Application.Services.RoomServices
         {
             return await OperationResult.ExecuteOperationAsync(async () =>
             {
-               
-                if (dto.IdPiso <= 0)
-                    return OperationResult.Failure("El ID del piso debe ser mayor que 0.");
+                var validacion = ValidateId(dto.IdPiso, "Para actualizar el piso, el ID debe ser mayor que cero.");
+                if(!validacion.IsSuccess) return validacion;
                 
                 var valitation = _validator.Validate(dto);
                 if (!valitation.IsSuccess) return valitation;
@@ -101,9 +108,13 @@ namespace HRMS.Application.Services.RoomServices
                 piso.Descripcion = dto.Descripcion;
                 var result = await _pisoRepository.UpdateEntityAsync(piso);
 
-                return result.IsSuccess && result.Data != null
-                    ? OperationResult.Success(MapToDto((Piso)result.Data), "Piso actualizado correctamente.")
-                    : OperationResult.Failure(result.Message ?? "Error al actualizar el piso.");
+                if (result.IsSuccess && result.Data is Piso pisoActualizado)
+                {
+                    var pisoDto = MapToDto(pisoActualizado);
+                    return OperationResult.Success(pisoDto, "Piso actualizado correctamente.");
+                }
+                
+                return OperationResult.Failure(result.Message ?? "Error al actualizar el piso.");
             });
         }
 
@@ -111,35 +122,29 @@ namespace HRMS.Application.Services.RoomServices
         {
             return await OperationResult.ExecuteOperationAsync(async () =>
             {
-
                 var validacion = ValidateId(dto.IdPiso, "Para eliminar el piso, el ID debe ser mayor que cero.");
                 if (!validacion.IsSuccess) return validacion;
-                
+        
                 _logger.LogInformation("Eliminando piso con ID: {Id}", dto.IdPiso);
                 var piso = await _pisoRepository.GetEntityByIdAsync(dto.IdPiso);
                 if (piso == null) return OperationResult.Failure($"No se encontró el piso con ID {dto.IdPiso}.");
 
-                if (await TieneReservasActivas(dto.IdPiso))
-                {
-                    return OperationResult.Failure(
-                        "No se puede eliminar el piso porque tiene reservas activas asociadas.");
-                }
-
-                if (await TieneHabitacionesAsociadas(dto.IdPiso))
-                {
-                    return OperationResult.Failure(
+                var tieneHabitaciones = await TieneHabitacionesAsociadas(dto.IdPiso);
+                if (tieneHabitaciones) return OperationResult.Failure(
                         "No se puede eliminar el piso porque tiene habitaciones asociadas. Debe eliminar o reubicar las habitaciones primero.");
-                }
 
                 piso.Estado = false;
                 var result = await _pisoRepository.UpdateEntityAsync(piso);
 
-                return result.IsSuccess && result.Data != null
-                    ? OperationResult.Success(MapToDto((Piso)result.Data), "Piso eliminado correctamente.")
-                    : OperationResult.Failure("Error al eliminar el piso.");
+                if (result.IsSuccess && result.Data is Piso pisoEliminado)
+                {
+                    var pisoDto = MapToDto(pisoEliminado);
+                    return OperationResult.Success(pisoDto, "Piso eliminado correctamente.");
+                }
+                
+                return OperationResult.Failure("Error al eliminar el piso.");
             });
         }
-
 
         public async Task<OperationResult> GetPisoByDescripcion(string descripcion)
         {
@@ -158,15 +163,16 @@ namespace HRMS.Application.Services.RoomServices
                         var pisosList = pisos.ToList();
                         if (pisosList.Any())
                         {
-                            return OperationResult.Success(pisosList.Select(MapToDto));
+                            var pisosDto = pisosList.Select(MapToDto).ToList();
+                            return OperationResult.Success(pisosDto, "Piso obtenido correctamente");
                         }
                     }
                     else if (result.Data is Piso piso)
                     {
-                        return OperationResult.Success(MapToDto(piso));
+                        var pisoDto = MapToDto(piso);
+                        return OperationResult.Success(pisoDto, "Piso obtenido correctamente");
                     }
                 }
-
                 return OperationResult.Failure($"No se encontraron pisos con la descripción '{descripcion}'.");
             });
         }
@@ -175,44 +181,21 @@ namespace HRMS.Application.Services.RoomServices
         {
             return id <= 0 ? OperationResult.Failure(message) : OperationResult.Success();
         }
-
-        private async Task<bool> TieneReservasActivas(int idPiso)
-        {
-            var habitacionesResult = await _habitacionRepository.GetByPisoAsync(idPiso);
-
-            if (!habitacionesResult.IsSuccess || habitacionesResult.Data == null) return false;
-
-            var habitaciones = habitacionesResult.Data as IEnumerable<Habitacion>;
-            if (habitaciones == null || !habitaciones.Any()) return false;
-
-            var fechaActual = DateTime.Now;
-            foreach (var habitacion in habitaciones)
+        
+        private static PisoDto MapToDto(Piso piso)
+            => new PisoDto()
             {
-                var reservasResult = await _reservaRepository.GetAllAsync(
-                    r => r.IdHabitacion == habitacion.IdHabitacion && r.FechaSalida >= fechaActual && r.Estado == true);
-
-                if (reservasResult.IsSuccess && reservasResult.Data is IEnumerable<object> reservas && reservas.Any())
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
+                IdPiso = piso.IdPiso, 
+                Descripcion = piso.Descripcion
+            };
+            
         private async Task<bool> TieneHabitacionesAsociadas(int idPiso)
         {
             var habitacionesResult = await _habitacionRepository.GetByPisoAsync(idPiso);
 
-            if (!habitacionesResult.IsSuccess || habitacionesResult.Data == null) return false;
-
-            var habitaciones = habitacionesResult.Data as IEnumerable<Habitacion>;
-    
-            return habitaciones != null && habitaciones.Any(h => h.Estado == true);
+            return habitacionesResult.IsSuccess 
+                   && habitacionesResult.Data is IEnumerable<Habitacion> habitaciones 
+                   && habitaciones.Any(h => h.Estado == true);
         }
-        
-        private static PisoDto MapToDto(Piso piso) => new()
-        {
-            Descripcion = piso.Descripcion,
-        };
     }
 }
