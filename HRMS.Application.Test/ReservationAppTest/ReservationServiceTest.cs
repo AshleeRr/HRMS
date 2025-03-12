@@ -97,6 +97,7 @@ namespace HRMS.Application.Test.ReservationAppTest
                 PrecioRestante = 1,
                 CostoPenalidad = 0,
                 TotalPagado = 99,
+                Adelanto = 10,
                 Observacion = "Observacion",
                 EstadoReserva = EstadoReserva.Pendiente,
                 FechaCreacion = DateTime.Now
@@ -110,7 +111,7 @@ namespace HRMS.Application.Test.ReservationAppTest
                 FechaEntrada = DateTime.Now.AddDays(32),
                 FechaSalida = DateTime.Now.AddDays(43),
                 PrecioInicial = 1000,
-                PrecioRestante = 1,
+                PrecioRestante = 10,
                 CostoPenalidad = 0,
                 TotalPagado = 100,
                 Observacion = "Observacion",
@@ -548,6 +549,75 @@ namespace HRMS.Application.Test.ReservationAppTest
             //Assert.Contains("srfrq", result.Message);
             Assert.IsType<OperationResult>(result);
             //Assert.Contains("El adelanto debe ser al menos el 30% del total de la reserva", result.Message);
+            Assert.True(result.IsSuccess);
+
+            //
+        }
+
+        [Fact]
+        public async void Update_WheReservationDosentExist_returnsFalse()
+        {
+            //Arrange
+            ReservationUpdateDTO dto = new ReservationUpdateDTO
+            {
+                     ID =100,
+                     In = DateTime.Now,
+                     Out = DateTime.Now,
+                     Observations = "",
+                     AbonoPenalidad = 0
+            };
+            //Act
+            var result = await _reservationService.Update(dto);
+            //Assert
+            //Assert.Contains("srfrq", result.Message);
+            Assert.IsType<OperationResult>(result);
+            Assert.Contains("No se ha encontrado la reserva a actualizar", result.Message);
+            Assert.False(result.IsSuccess);
+
+            //
+        }
+
+        [Fact]
+        public async void Update_WheReservationIsNotPendiente_returnsFalse()
+        {
+            //Arrange
+            ReservationUpdateDTO dto = new ReservationUpdateDTO
+            {
+                ID = _reservCanceled.IdRecepcion,
+                In = DateTime.Now,
+                Out = DateTime.Now,
+                Observations = "",
+                AbonoPenalidad = 0
+            };
+            //Act
+            var result = await _reservationService.Update(dto);
+            //Assert
+            //Assert.Contains("srfrq", result.Message);
+            Assert.IsType<OperationResult>(result);
+            Assert.Contains("No se puede modificar cuyo estado no sea pendiente", result.Message);
+            Assert.False(result.IsSuccess);
+
+            //
+        }
+
+        [Fact]
+        public async void Update_WheReservationIsValidToUpdate_returnsTrue()
+        {
+            //Arrange
+            ReservationUpdateDTO dto = new ReservationUpdateDTO
+            {
+                ID = reservToUpdate.IdRecepcion,
+                In = DateTime.Now.AddDays(50),
+                Out = DateTime.Now.AddDays(60),
+                Observations = "",
+                AbonoPenalidad = 0
+            };
+            //Act
+            var result = await _reservationService.Update(dto);
+            //Assert
+            //Assert.Contains("srfrq", result.Message);
+            Assert.IsType<OperationResult>(result);
+            //Assert.Contains("No se puede modificar cuyo estado no sea pendiente", result.Message);
             Assert.True(result.IsSuccess);
 
             //

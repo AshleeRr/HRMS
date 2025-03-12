@@ -326,19 +326,13 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                 if (reservation == null)
                 {
                     result.IsSuccess = false;
-                    result.Message = "No se ha encontrado la reserva";
+                    result.Message = "No se ha encontrado la reserva a actualizar";
                     return result;
                 }
-                else if (reservation.EstadoReserva == EstadoReserva.Cancelada)
+                else if (reservation.EstadoReserva != EstadoReserva.Pendiente)
                 {
                     result.IsSuccess = false;
-                    result.Message = "No se puede modificar una reserva cancelada";
-                    return result;
-                }
-                else if(reservation.EstadoReserva == EstadoReserva.Confirmada)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se puede modificar una reserva confirmada";
+                    result.Message = "No se puede modificar cuyo estado no sea pendiente";
                     return result;
                 }
                 else
