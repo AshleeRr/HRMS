@@ -1,7 +1,6 @@
 ﻿using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 using HRMS.Application.Interfaces.IUsersServices;
-using HRMS.Domain.Base.Validator;
 using HRMS.Application.DTOs.UserRoleDTOs;
 
 namespace HRMS.APIs.Controllers.UsersControllers
@@ -119,7 +118,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
         {
             ValidateId(id);
             ValidateNull(descripcion, "descripcion");
-            var rolNewDesc = await _userRoleService.UpdateNameAsync(id, descripcion);
+            var rolNewDesc = await _userRoleService.UpdateDescriptionAsync(id, descripcion);
             if (!rolNewDesc.IsSuccess)
             {
                 return BadRequest("Error actualizando la descripcion del rol");

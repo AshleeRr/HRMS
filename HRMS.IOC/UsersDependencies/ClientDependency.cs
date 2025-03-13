@@ -1,4 +1,6 @@
-﻿using HRMS.Domain.Base.Validator;
+﻿using HRMS.Application.Interfaces.IUsersServices;
+using HRMS.Application.Services.UsersServices;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.UsersValidations;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
@@ -14,6 +16,7 @@ namespace HRMS.IOC.UsersDependencies
         {
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IValidator<Client>, ClientValidator>();
+            services.AddScoped<IClientService, ClientService>();
             services.AddScoped<ILoggingServices, LoggingServices>();
             return services;
         }

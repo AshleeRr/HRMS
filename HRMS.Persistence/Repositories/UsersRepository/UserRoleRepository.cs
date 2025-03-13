@@ -68,9 +68,11 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 }
                 entity.FechaCreacion = DateTime.Now;
                 result.IsSuccess = true;
+                
                 await _context.UserRoles.AddAsync(entity);
                 await _context.SaveChangesAsync();
                 result.Message = "Rol de usuario guardado correctamente.";
+                result.Data = entity;
             }
             catch (Exception ex)
             {
