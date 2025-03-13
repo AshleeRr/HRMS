@@ -1,6 +1,7 @@
 ﻿using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
+using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -14,13 +15,16 @@ namespace HRMS.Persistence.Repositories.UsersRepository
     public class ClientRepository : BaseRepository<Client, int>, IClientRepository
     {
         private readonly IConfiguration _configuration;
+        private readonly ILoggingServices _loggerServices;
         private readonly ILogger<ClientRepository> _logger;
         private readonly IValidator<Client> _validator;
         public ClientRepository(HRMSContext context, ILogger<ClientRepository> logger,
+                                                     ILoggingServices loggingServices,
                                                      IConfiguration configuration, IValidator<Client> validator) : base(context)
         {
             _logger = logger;
             _configuration = configuration;
+            _loggerServices = loggingServices;
             _validator = validator;
         }
        
@@ -65,16 +69,10 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             return clientes;
         }
-
-        public override async Task<bool> ExistsAsync(Expression<Func<Client, bool>> filter)
+        public async Task<Client> GetClientByUserIdAsync(int idUsuario)
         {
-            if (filter == null)
-            {
-                return false;
-            }
-            return await base.ExistsAsync(filter);
+            return await _context.Clients.FirstOrDefaultAsync(c => c.IdUsuario == idUsuario);
         }
-        
         public override async Task<OperationResult> GetAllAsync(Expression<Func<Client, bool>> filter)
         {
             OperationResult result = new OperationResult();
@@ -90,9 +88,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             catch (Exception ex)
             {
-                result.Message = _configuration["ErrorUserRepository: GetAllAsync"];
-                result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
+                result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
         }
@@ -110,35 +106,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             return entity;
         }
-        /*
-        public override async Task<OperationResult> SaveEntityAsync(Client entity)
-        {
-            OperationResult resultSave = new OperationResult();
-            try
-            {
-                var validClient = _validator.Validate(entity);
-                if (!validClient.IsSuccess)
-                {
-                    return validClient;
-                }
-                entity.FechaCreacion = DateTime.Now;
-                resultSave.IsSuccess = true;
-                await _context.Clients.AddAsync(entity);
-                await _context.SaveChangesAsync();
-
-                resultSave.Message = "Cliente guardado existosamente";
-                return resultSave;
-                
-            }
-            catch (Exception ex)
-            {
-                resultSave.Message = _configuration["ErrorClientRepository: SaveEntityAsync"];
-                resultSave.IsSuccess = false;
-                _logger.LogError(resultSave.Message, ex.ToString());
-            }
-            return resultSave;
-        }*/
-        private OperationResult _validClientForUpdateMethod(Client client)
+        private OperationResult _validClient(Client client)
         {
             return _validator.Validate(client);
         }
@@ -148,12 +116,12 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             OperationResult result = new OperationResult();
             try
             {
-                var validClient = _validClientForUpdateMethod(entity);
+                var validClient = _validClient(entity);
                 if (!validClient.IsSuccess)
                 {
                     return validClient;
                 }
-                var cliente = await _context.Clients.FindAsync(entity.IdCliente);
+                var cliente = await _context.Clients.FindAsync(entity.IdUsuario);
                 if (cliente == null)
                 {
                     result.IsSuccess = false;
@@ -164,6 +132,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 cliente.Documento = entity.Documento;
                 cliente.Correo = entity.Correo;
                 cliente.NombreCompleto = entity.NombreCompleto;
+                cliente.Clave = entity.Clave;
 
                 _context.Clients.Update(cliente);
                 await _context.SaveChangesAsync();
@@ -172,9 +141,31 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             catch (Exception ex)
             {
-                result.Message = _configuration["ErrorClientRepository: UpdateEntityAsync"];
-                result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
+                result = await _loggerServices.LogError(ex.Message, this);
+            }
+            return result;
+        }
+        public override async Task<OperationResult> SaveEntityAsync(Client entity)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                var validClient = _validClient(entity);
+                if (!validClient.IsSuccess)
+                {
+                    return validClient;
+                }
+                entity.Estado = true;
+                entity.FechaCreacion = DateTime.Now;
+                result.IsSuccess = true;
+                await _context.Clients.AddAsync(entity);
+                await _context.SaveChangesAsync();
+                result.Message = "Cliente guardado correctamente";
+                result.Data = entity;
+            }
+            catch (Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
         }

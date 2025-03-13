@@ -1,7 +1,7 @@
 ﻿using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
-using HRMS.Models.Models.UsersModels;
+using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -15,14 +15,17 @@ namespace HRMS.Persistence.Repositories.UsersRepository
     public class UserRepository : BaseRepository<User, int>, IUserRepository
     {
         private readonly IConfiguration _configuration;
+        private readonly ILoggingServices _loggerServices;
         private readonly ILogger<UserRepository> _logger;
         private readonly IValidator<User> _validator;
 
         public UserRepository(HRMSContext context, ILogger<UserRepository> logger,
-                                                     IConfiguration configuration, IValidator<User> validator) : base(context)
+                                                   ILoggingServices loggingServices,
+                                                   IConfiguration configuration, IValidator<User> validator) : base(context)
         {
             _logger = logger;
             _configuration = configuration;
+            _loggerServices = loggingServices;
             _validator = validator;
         }
 
@@ -36,7 +39,6 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             return usuarios;
         }
-        // nuevo, aregar a api
         public async Task<User> GetUserByEmailAsync(string correo)
         {
             ArgumentException.ThrowIfNullOrEmpty(correo, nameof(correo));
@@ -46,54 +48,6 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 _logger.LogWarning("No se encontró un usuario con ese correo");
             }
             return usuario;
-        }
-        public async Task<OperationResult> GetUsersByUserRoleIdAsync(int id)
-        {
-            OperationResult result = new OperationResult();
-            try
-            {
-                if(id <= 0)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "El id del rol de usuario debe ser mayor que 0";
-                    return result;
-                }
-                var query = await (from users in _context.Users
-                                   join userRol in _context.UserRoles on users.IdRolUsuario equals userRol.IdRolUsuario
-                                   where users.IdRolUsuario == id
-                                   select new UserModel()
-                                   {
-                                       IdUsuario = users.IdUsuario,
-                                       NombreCompleto = users.NombreCompleto,
-                                       IdUserRol = userRol.IdRolUsuario,
-                                       Correo = users.Correo,
-                                       UserRol = userRol.Descripcion,
-                                       Email = users.Correo
-                                   }).ToListAsync();
-                result.Data = query;
-                result.IsSuccess = true;
-                if (!query.Any())
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se encontraron usuarios con este rol";
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-                result.Message = _configuration["ErrorUserRepository: GetUserByUserRolId"];
-                result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
-            }
-            return result;
-        }
-        public override async Task<bool> ExistsAsync(Expression<Func<User, bool>> filter)
-        {
-            if (filter == null)
-            {
-                return false;
-            }
-            return await base.ExistsAsync(filter);
         }
         public override async Task<OperationResult> GetAllAsync(Expression<Func<User, bool>> filter)
         {
@@ -110,9 +64,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             catch (Exception ex)
             {
-                result.Message = _configuration["ErrorUserRepository: GetAllAsync"];
-                result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
+                result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
         }
@@ -127,31 +79,28 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         }
         public override async Task<OperationResult> SaveEntityAsync(User entity)
         {
-            OperationResult resultSave = new OperationResult();
+            OperationResult result = new OperationResult();
             try
             {
-                var validUser = _validator.Validate(entity);
+                var validUser = _validUser(entity);
                 if(!validUser.IsSuccess)
                 {
                     return validUser;
                 }
                 entity.FechaCreacion = DateTime.Now;
-                resultSave.IsSuccess = true;
+                result.IsSuccess = true;
                 await _context.Users.AddAsync(entity);
                 await _context.SaveChangesAsync();
-
-                resultSave.Message = "Usuario guardado correctamente";
-                return resultSave;
+                result.Message = "Usuario guardado correctamente";
+                result.Data = entity;
             }
             catch (Exception ex)
             {
-                resultSave.IsSuccess = false;
-                resultSave.Message = "Ocurrió un error al guardar el usuario";
-                _logger.LogError(ex, resultSave.Message);
+                result = await _loggerServices.LogError(ex.Message, this);
             }
-            return resultSave;
+            return result;
         }
-        private OperationResult _validUserForUpdateMethod(User user)
+        private OperationResult _validUser(User user)
         {
             return _validator.Validate(user);
         }
@@ -160,7 +109,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             OperationResult result = new OperationResult();
             try
             {
-                var validUser = _validator.Validate(entity);
+                var validUser = _validUser(entity);
                 if (!validUser.IsSuccess)
                 {
                     return validUser;
@@ -172,24 +121,51 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                     result.Message = "Este usuario no existe";
                     return result;
                 }
-                var usuario = await _context.Users.FindAsync(entity.IdUsuario);
-                usuario.Clave = entity.Clave;
-                usuario.NombreCompleto = entity.NombreCompleto;
-                usuario.Correo = entity.Correo;
+                userExistente.Clave = entity.Clave;
+                userExistente.NombreCompleto = entity.NombreCompleto;
+                userExistente.Correo = entity.Correo;
 
-                _context.Users.Update(usuario);
+                _context.Users.Update(userExistente);
                 await _context.SaveChangesAsync();
                 result.IsSuccess = true;    
                 result.Message = "Usuario actualizado correctamente";
             }
             catch (Exception ex)
             {
-                result.IsSuccess = false;
-                result.Message = "Ocurrió un error al actualizar el usuario";
-                _logger.LogError(ex, result.Message);
-                _logger.LogError(result.Message, ex.ToString());
+                result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
         }
+
+        public async Task<User> GetUserByDocumentAsync(string documento)
+        {
+
+            if (string.IsNullOrWhiteSpace(documento))
+            {
+                throw new ArgumentNullException(nameof(documento), "El documento no puede estar vacío");
+            }
+            var usuario = await _context.Users.FirstOrDefaultAsync(u => u.Documento == documento);
+
+            if (usuario == null)
+            {
+                _logger.LogWarning("No se encontró un cliente con ese correo");
+            }
+            return usuario;
+        }
+
+        public async Task<List<User>> GetUsersByTypeDocumentAsync(string tipoDocumento)
+        {
+            if (string.IsNullOrWhiteSpace(tipoDocumento))
+            {
+                throw new ArgumentNullException(nameof(tipoDocumento), "El tipo de documento no puede estar vacío");
+            }
+            var usuarios = await _context.Users.Where(u => u.TipoDocumento == tipoDocumento).ToListAsync();
+            if (!usuarios.Any())
+            {
+                _logger.LogWarning("No se encontraron clientes con ese tipo de documento");
+            }
+            return usuarios;
+        }
+        
     }
 }

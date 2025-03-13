@@ -1,166 +1,203 @@
 ﻿using HRMS.Application.DTOs.UserRoleDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Domain.Base;
+using HRMS.Domain.Entities.Users;
+using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace HRMS.Application.Services.UsersServices
 {
     public class UserRoleService : IUserRoleService
     {
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<UserRoleService> _logger;
+        private readonly ILoggingServices _loggerServices;
         private readonly IUserRoleRepository _userRoleRepository;
         public UserRoleService(IUserRoleRepository userRoleRepository,
-                                ILogger<UserRoleService> logger, IConfiguration configuration) 
+                                ILoggingServices loggerServices) 
         {
             _userRoleRepository = userRoleRepository;
-            _logger = logger;
-            _configuration = configuration;
+            _loggerServices = loggerServices;
         }
 
-        public Task<OperationResult> AsignDefaultRoleAsync(int idUsuario)
+        public async Task<OperationResult> GetAll()
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<OperationResult> AsignRolUserAsync(int idUsuario, int idRolUsuario)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<OperationResult> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<OperationResult> GetById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<OperationResult> Remove(RemoveUserRoleDTO dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<OperationResult> Save(SaveUserRoleDTO dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<OperationResult> Update(UpdateUserRoleDTO dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<OperationResult> UpdateDescriptionAsync(int idRolUsuario, string nuevaDescripcion)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
-
-        /*
-        public async Task<OperationResult> AsignDefaultRoleAsync(int idUsuario)
-        { // asigna un rol por defecto
             OperationResult result = new OperationResult();
             try
             {
-               const int rolPredeterminado = 1; // el rol predeterminado debe ser cliente
-               var usuario = await _context.Users.FindAsync(idUsuario);
-                if(usuario == null)
+                var userRoles = await _userRoleRepository.GetAllAsync();
+                if (!userRoles.Any())
                 {
                     result.IsSuccess = false;
-                    result.Message = "No se encontró un usuario con ese id";
-                    return result;
+                    result.Message = "No hay roles de usuario registrados";
                 }
-                usuario.IdRolUsuario = rolPredeterminado;
-                await _context.SaveChangesAsync();
                 result.IsSuccess = true;
-                result.Message = "Rol predeterminado asignado";
-
+                result.Data = userRoles;
             }
             catch (Exception ex)
             {
-                result.Message = _configuration["ErrorUserRolRepository: AsignDefaultRoleAsync"];
-                result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
+                result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
-        }*/
-        /*
+        }
+
+        public async Task<OperationResult> GetById(int id)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                ValidateId(id);
+                var userRole = await _userRoleRepository.GetEntityByIdAsync(id);
+                ValidateUserRole(userRole);
+                result.IsSuccess = true;
+                result.Data = userRole;
+            }
+            catch (Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
+            }
+            return result;
+        }
+
+        public async Task<OperationResult> Remove(RemoveUserRoleDTO dto)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                ValidateUserRoletDto(dto);
+                var rolInUse = await _userRoleRepository.GetUsersByUserRoleIdAsync(dto.IdUserRole);
+                if (rolInUse != null) 
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Este rol está siendo utilizado por usuarios. No se puede eliminar";
+                }
+                var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
+                dto.Deleted = true;
+                userRole.Estado = false;
+                result = await _userRoleRepository.UpdateEntityAsync(userRole);
+                result.IsSuccess = true;
+                result.Message = "Rol de usuario eliminado correctamente";
+                result.Data = dto;
+            }
+            catch (Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
+            }
+            return result;
+        }
+        public async Task<OperationResult> Save(SaveUserRoleDTO dto)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                ValidateUserRoletDto(dto); 
+                var userRole = new UserRole()
+                {
+                    Descripcion = dto.Descripcion,
+                    RolNombre = dto.Nombre,
+                };
+                result = await _userRoleRepository.SaveEntityAsync(userRole);
+                if (result.IsSuccess)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Rol de usuario guardado correctamente";
+                    result.Data = dto;
+                }
+            }
+            catch (Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
+            }
+            return result;
+        }
+        public async Task<OperationResult> Update(UpdateUserRoleDTO dto)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                ValidateUserRoletDto(dto);
+                var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
+                ValidateUserRole(userRole);
+                userRole.Descripcion = dto.Descripcion;
+                userRole.RolNombre = dto.Nombre;
+                dto.ChangeTime = DateTime.Now;
+                await _userRoleRepository.UpdateEntityAsync(userRole);
+                result.Message = "Rol de usuario actualizado";
+                result.IsSuccess = true;
+                result.Data = dto;
+            }
+            catch (Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
+            }
+            return result;
+        }
         public async Task<OperationResult> UpdateDescriptionAsync(int idRolUsuario, string nuevaDescripcion)
         {
             OperationResult result = new OperationResult();
             try
             {
-
-                if (!Validation.ValidateId(idRolUsuario, result))
-                    return result;
-
-                if(!Validation.ValidateDescription(nuevaDescripcion, result))
-                    return result;
-                var rolUsuario = await _context.UserRoles.FindAsync(idRolUsuario);
-                if (rolUsuario == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se encontró un rol de usuario con ese id";
-                    return result;
-                }
-                rolUsuario.Descripcion = nuevaDescripcion;
-                await _context.SaveChangesAsync();
+                ValidateId(idRolUsuario);
+                var userRole = await _userRoleRepository.GetEntityByIdAsync(idRolUsuario);
+                ValidateNulleable(nuevaDescripcion, "nueva descripcion");
+                userRole.Descripcion = nuevaDescripcion;
+                result = await _userRoleRepository.UpdateEntityAsync(userRole);
                 result.IsSuccess = true;
                 result.Message = "Se actualizó la descripción del rol de usuario";
             }
             catch (Exception ex)
             {
-                result.Message = _configuration["ErrorUserRolRepository: UpdateDescriptionAsync"];
-                result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
+                result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
-        }*/
-
-        /*
-        public async Task<OperationResult> AsignRolUserAsync(int idUsuario, int idRolUsuario)
-        { // asigna un rol a un usuario
+        }
+        public async Task<OperationResult> UpdateNameAsync(int idRolUsuario, string nuevoNombre)
+        {
             OperationResult result = new OperationResult();
             try
             {
-                if (!Validation.ValidateId(idUsuario, result))
-                    return result;
-                if (!Validation.ValidateId(idRolUsuario, result))
-                    return result;
-                var usuario = await _context.Users.FindAsync(idUsuario);
-                if (usuario == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se encontró un usuario con ese id";
-                    return result;
-                }
-                var userRol = await _context.UserRoles.FindAsync(idRolUsuario);
-                if (userRol == null)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se encontró un rol de usuario con ese id";
-                    return result;
-                }
-                usuario.IdRolUsuario = idRolUsuario;
-                _context.Users.Update(usuario);
-                await _context.SaveChangesAsync();
+                ValidateId(idRolUsuario);
+                var userRole = await _userRoleRepository.GetEntityByIdAsync(idRolUsuario);
+                ValidateNulleable(nuevoNombre, "nuevo nombre");
+                userRole.RolNombre = nuevoNombre;
+                result = await _userRoleRepository.UpdateEntityAsync(userRole);
                 result.IsSuccess = true;
-                result.Message = "Rol asignado correctamente";
+                result.Message = "Se actualizó el nombre del rol de usuario";
             }
             catch (Exception ex)
             {
-                result.IsSuccess = false;
-                result.Message = _configuration["ErrorUserRepository: AsignRolUserAsync"];
-                _logger.LogError(result.Message, ex.ToString());
+                result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
-        }*/
+        }
+        private object ValidateUserRoletDto(object dto)
+        {
+            if (dto == null)
+            {
+                throw new ArgumentNullException("Dto nulo");
+            }
+            return dto;
+        }
+        private UserRole ValidateUserRole(UserRole userRole)
+        {
+            if (userRole == null)
+            {
+                throw new ArgumentNullException("No existe un rol con este id");
+            }
+            return userRole;
+        }
+        private int ValidateId(int id)
+        {
+            if (id <= 0)
+            {
+                throw new ArgumentNullException("El id debe ser mayor que 0");
+            }
+            return id;
+        }
+        private void ValidateNulleable(string x, string message)
+        {
+            if (string.IsNullOrEmpty(x))
+            {
+                throw new ArgumentNullException($"El campo: {message} no puede estar vacio.");
+            }
+        }
     }
 }

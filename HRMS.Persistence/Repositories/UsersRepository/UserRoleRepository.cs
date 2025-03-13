@@ -1,6 +1,8 @@
 ﻿using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
+using HRMS.Domain.InfraestructureInterfaces.Logging;
+using HRMS.Models.Models.UsersModels;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -14,28 +16,17 @@ namespace HRMS.Persistence.Repositories.UsersRepository
     public class UserRoleRepository : BaseRepository<UserRole, int>, IUserRoleRepository
     {
         private readonly IConfiguration _configuration;
+        private readonly ILoggingServices _loggerServices;
         private readonly ILogger<UserRoleRepository> _logger;
         private readonly IValidator<UserRole> _validator;
         public UserRoleRepository(HRMSContext context, ILogger<UserRoleRepository> logger,
+                                                       ILoggingServices loggingServices,
                                                      IConfiguration configuration, IValidator<UserRole> validator) : base(context)
         {
             _logger = logger;
             _configuration = configuration;
+            _loggerServices = loggingServices;
             _validator = validator;
-        }
-
-        public async Task<UserRole> GetRoleByDescriptionAsync (string descripcion)
-        {
-            return await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.Descripcion == descripcion);
-         
-        }
-        public override async Task<bool> ExistsAsync(Expression<Func<UserRole, bool>> filter)
-        {
-            if (filter == null)
-            {
-                return false;
-            }
-            return await base.ExistsAsync(filter);
         }
         public override async Task<OperationResult> GetAllAsync(Expression<Func<UserRole, bool>> filter)
         {
@@ -52,13 +43,10 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             catch (Exception ex)
             {
-                result.Message = _configuration["ErrorUserRolRepository: GetAllAsync"];
-                result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
+                result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
         }
-
         public override async Task<UserRole> GetEntityByIdAsync(int id)
         {
             var entity = await _context.UserRoles.FindAsync(id);
@@ -70,31 +58,29 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         }
         public override async Task<OperationResult> SaveEntityAsync(UserRole entity)
         {
-            OperationResult resultSave = new OperationResult();
+            OperationResult result = new OperationResult();
             try
             {
-                var validUserRole = _validator.Validate(entity);
+                var validUserRole = _validUserRole(entity);
                 if (!validUserRole.IsSuccess)
                 {
                     return validUserRole;
                 }
                 entity.FechaCreacion = DateTime.Now;
-                resultSave.IsSuccess = true;
+                result.IsSuccess = true;
+                
                 await _context.UserRoles.AddAsync(entity);
                 await _context.SaveChangesAsync();
-
-                resultSave.Message = "Rol de usuario guardado correctamente.";
-                return resultSave;
+                result.Message = "Rol de usuario guardado correctamente.";
+                result.Data = entity;
             }
             catch (Exception ex)
             {
-                resultSave.Message = _configuration["ErrorUserRolRepository: SaveEntityAsync"];
-                resultSave.IsSuccess = false;
-                _logger.LogError(resultSave.Message, ex.ToString());
+                result = await _loggerServices.LogError(ex.Message, this);
             }
-            return resultSave;
+            return result;
         }
-        private OperationResult _validUserRoleForUpdateMethod(UserRole userRole)
+        private OperationResult _validUserRole(UserRole userRole)
         {
             return _validator.Validate(userRole);
         }
@@ -103,7 +89,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             OperationResult result = new OperationResult();
             try
             {
-                var validUserRole = _validUserRoleForUpdateMethod(entity);
+                var validUserRole = _validUserRole(entity);
                 if(!validUserRole.IsSuccess)
                 {
                     return validUserRole;
@@ -126,16 +112,75 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             catch (Exception ex)
             {
-                result.Message = _configuration["ErrorUserRolRepository: UpdateEntityAsync"];
-                result.IsSuccess = false;
-                _logger.LogError(result.Message, ex.ToString());
+                result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
         }
-
         public async Task<UserRole> GetRoleByNameAsync(string rolNombre)
         {
-            return await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.RolNombre == rolNombre);
+            if (string.IsNullOrEmpty(rolNombre))
+            {
+                throw new ArgumentNullException(nameof(rolNombre), "El nombre del rol no puede estar vacio");
+            }
+            var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.RolNombre == rolNombre);
+            if (rolUsuario == null)
+            {
+                _logger.LogWarning("No se encontró un rol con este nombre");
+            }
+            return rolUsuario;
+        }
+        public async Task<UserRole> GetRoleByDescriptionAsync(string descripcion)
+        {
+            if (string.IsNullOrEmpty(descripcion))
+            {
+                throw new ArgumentNullException(nameof(descripcion), "La descripción no puede estar vacía");
+            }
+            var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.Descripcion == descripcion);
+            if(rolUsuario == null)
+            {
+                _logger.LogWarning("No se encontró un rol con esta descripción");
+            }
+            return rolUsuario;
+        }
+        public async Task<OperationResult> GetUsersByUserRoleIdAsync(int id)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (id <= 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "El id del rol de usuario debe ser mayor que 0";
+                    return result;
+                }
+                var query = await (from userRol in _context.UserRoles
+                                   join users in _context.Users on userRol.IdRolUsuario equals users.IdRolUsuario
+                                   where userRol.IdRolUsuario == id
+                                   select new UserModel()
+                                   {
+                                       IdUsuario = users.IdUsuario,
+                                       NombreCompleto = users.NombreCompleto,
+                                       IdUserRol = userRol.IdRolUsuario,
+                                       Correo = users.Correo,
+                                       UserRol = userRol.Descripcion,
+                                       Email = users.Correo,
+                                       TipoDocumento = users.TipoDocumento,
+                                       Documento = users.Documento,
+                                   }).ToListAsync();
+                result.Data = query;
+                result.IsSuccess = true;
+                if (!query.Any())
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontraron usuarios con este rol";
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
+            }
+            return result;
         }
     }
 }

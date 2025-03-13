@@ -1,4 +1,7 @@
-﻿using HRMS.Domain.Base.Validator;
+﻿using HRMS.Application.DTOs.UserRoleDTOs;
+using HRMS.Application.Interfaces.IUsersServices;
+using HRMS.Application.Services.UsersServices;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.UsersValidations;
 using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -12,6 +15,8 @@ namespace HRMS.IOC.UsersDependencies
         {
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             services.AddScoped<IValidator<UserRole>, UserRoleValidator>();
+            services.AddScoped<IUserRoleService, UserRoleService>();
+
             return services;
         }
     }
