@@ -7,7 +7,6 @@ using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace HRMS.Persistence.Repositories.UsersRepository
@@ -16,14 +15,11 @@ namespace HRMS.Persistence.Repositories.UsersRepository
     {
         private readonly IConfiguration _configuration;
         private readonly ILoggingServices _loggerServices;
-        private readonly ILogger<UserRepository> _logger;
         private readonly IValidator<User> _validator;
 
-        public UserRepository(HRMSContext context, ILogger<UserRepository> logger,
-                                                   ILoggingServices loggingServices,
+        public UserRepository(HRMSContext context, ILoggingServices loggingServices,
                                                    IConfiguration configuration, IValidator<User> validator) : base(context)
         {
-            _logger = logger;
             _configuration = configuration;
             _loggerServices = loggingServices;
             _validator = validator;
@@ -35,7 +31,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var usuarios = await _context.Users.Where(u => u.NombreCompleto == nombreCompleto).ToListAsync();
             if (!usuarios.Any())
             {
-                _logger.LogWarning("No se encontraron usuarios activos");
+                await _loggerServices.LogWarning("No se encontraron usuarios con este nombre", this, nameof(GetUsersByNameAsync));
             }
             return usuarios;
         }
@@ -45,7 +41,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var usuario = await _context.Users.FirstOrDefaultAsync(u => u.Correo == correo);
             if (usuario == null)
             {
-                _logger.LogWarning("No se encontró un usuario con ese correo");
+                await _loggerServices.LogWarning("No se encontró un usuario con este correo", this, nameof(GetUserByEmailAsync));
             }
             return usuario;
         }
@@ -57,7 +53,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var usuarios = await _context.Users.Where(u => u.Estado == true).ToListAsync();
                 if (!usuarios.Any())
                 {
-                    _logger.LogWarning("No se encontraron usuarios activos");
+                    await _loggerServices.LogWarning("No se encontraron un usuarios activos", this, nameof(GetAllAsync));
                 }
                 result.Data = usuarios;
                 result.IsSuccess = true;
@@ -73,7 +69,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var entityById = await _context.Users.FindAsync(id);
             if (entityById == null)
             {
-                _logger.LogWarning("No se encontró un usuario con ese id");
+                await _loggerServices.LogWarning("No se encontró un usuario con este id", this, nameof(GetEntityByIdAsync));
             }
             return entityById;
         }
@@ -148,7 +144,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
 
             if (usuario == null)
             {
-                _logger.LogWarning("No se encontró un cliente con ese correo");
+                await _loggerServices.LogWarning("No se encontró un usuario con este documento", this, nameof(GetUserByDocumentAsync));
             }
             return usuario;
         }
@@ -162,7 +158,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var usuarios = await _context.Users.Where(u => u.TipoDocumento == tipoDocumento).ToListAsync();
             if (!usuarios.Any())
             {
-                _logger.LogWarning("No se encontraron clientes con ese tipo de documento");
+                await _loggerServices.LogWarning("No se encontraron usuarios con este tipo de documentio", this, nameof(GetUsersByTypeDocumentAsync));
             }
             return usuarios;
         }

@@ -7,7 +7,6 @@ using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace HRMS.Persistence.Repositories.UsersRepository
@@ -16,13 +15,10 @@ namespace HRMS.Persistence.Repositories.UsersRepository
     {
         private readonly IConfiguration _configuration;
         private readonly ILoggingServices _loggerServices;
-        private readonly ILogger<ClientRepository> _logger;
         private readonly IValidator<Client> _validator;
-        public ClientRepository(HRMSContext context, ILogger<ClientRepository> logger,
-                                                     ILoggingServices loggingServices,
+        public ClientRepository(HRMSContext context, ILoggingServices loggingServices,
                                                      IConfiguration configuration, IValidator<Client> validator) : base(context)
         {
-            _logger = logger;
             _configuration = configuration;
             _loggerServices = loggingServices;
             _validator = validator;
@@ -37,7 +33,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Correo == correo);
             if (cliente == null) 
             {
-                _logger.LogWarning("No se encontró un cliente con ese correo");
+                await _loggerServices.LogWarning("No se encontró un cliente con este correo", this, nameof(GetClientByEmailAsync));
             }
             return cliente;
         }
@@ -51,7 +47,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Documento == documento);
             if (cliente == null)
             {
-                _logger.LogWarning("No se encontró un cliente con ese correo");
+                await _loggerServices.LogWarning("No se encontró un cliente con este documento", this, nameof(GetClientByDocumentAsync));
             }
             return cliente;
         }
@@ -65,7 +61,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var clientes = await _context.Clients.Where(c => c.TipoDocumento == tipoDocumento).ToListAsync();
             if (!clientes.Any())
             {
-                _logger.LogWarning("No se encontraron clientes con ese tipo de documento");
+                await _loggerServices.LogWarning("No se encontraron clientes con ese tipo de documento", this, nameof(GetClientsByTypeDocumentAsync));
             }
             return clientes;
         }
@@ -81,7 +77,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var clientes = await _context.Clients.Where(c => c.Estado == true).ToListAsync();
                 if (!clientes.Any())
                 {
-                    _logger.LogWarning("No se encontraron clientes activos");
+                    await _loggerServices.LogWarning("No se encontraron clientes activos", this, nameof(GetAllAsync));
                 }
                 result.Data = clientes; 
                 result.IsSuccess = true;
@@ -102,7 +98,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var entity = await _context.Clients.FindAsync(id);
             if (entity == null)
             {
-                _logger.LogWarning("No se encontró un cliente con ese id");
+                await _loggerServices.LogWarning("No se encontró un cliente con ese id", this, nameof(GetEntityByIdAsync));
             }
             return entity;
         }

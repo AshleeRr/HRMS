@@ -8,7 +8,6 @@ using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace HRMS.Persistence.Repositories.UsersRepository
@@ -17,13 +16,10 @@ namespace HRMS.Persistence.Repositories.UsersRepository
     {
         private readonly IConfiguration _configuration;
         private readonly ILoggingServices _loggerServices;
-        private readonly ILogger<UserRoleRepository> _logger;
         private readonly IValidator<UserRole> _validator;
-        public UserRoleRepository(HRMSContext context, ILogger<UserRoleRepository> logger,
-                                                       ILoggingServices loggingServices,
+        public UserRoleRepository(HRMSContext context, ILoggingServices loggingServices,
                                                      IConfiguration configuration, IValidator<UserRole> validator) : base(context)
         {
-            _logger = logger;
             _configuration = configuration;
             _loggerServices = loggingServices;
             _validator = validator;
@@ -36,7 +32,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var roles = await _context.UserRoles.Where(ur => ur.Estado == true).ToListAsync();
                 if (!roles.Any())
                 {
-                    _logger.LogWarning("No se encontraron roles activos");
+                   await _loggerServices.LogWarning("No se encontraron roles activos", this, nameof(GetAllAsync));
                 }
                 result.Data = roles;
                 result.IsSuccess = true;
@@ -52,7 +48,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var entity = await _context.UserRoles.FindAsync(id);
             if (entity == null)
             {
-                _logger.LogWarning("No se encontró un cliente con ese id");
+                await _loggerServices.LogWarning("No se encontró un rol con este id", this, nameof(GetEntityByIdAsync));
             }
             return entity;
         }
@@ -125,7 +121,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.RolNombre == rolNombre);
             if (rolUsuario == null)
             {
-                _logger.LogWarning("No se encontró un rol con este nombre");
+                await _loggerServices.LogWarning("No se encontró un rol con este nombre", this, nameof(GetRoleByNameAsync));
             }
             return rolUsuario;
         }
@@ -138,7 +134,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.Descripcion == descripcion);
             if(rolUsuario == null)
             {
-                _logger.LogWarning("No se encontró un rol con esta descripción");
+                await _loggerServices.LogWarning("No se encontró un rol con esta descripción", this, nameof(GetRoleByDescriptionAsync));
             }
             return rolUsuario;
         }
