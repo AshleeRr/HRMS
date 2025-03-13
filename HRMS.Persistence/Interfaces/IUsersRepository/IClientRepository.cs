@@ -7,7 +7,7 @@ namespace HRMS.Persistence.Interfaces.IUsersRepository
     {
         Task<Client> GetClientByEmailAsync(string correo);
         Task<Client> GetClientByDocumentAsync(string documento);
-        // obtener reservas de un cliente (verhistorial)
+        Task<Client> GetClientByUserIdAsync(int idUsuario);
         Task<List<Client>> GetClientsByTypeDocumentAsync(string tipoDocumento);
     }
 }

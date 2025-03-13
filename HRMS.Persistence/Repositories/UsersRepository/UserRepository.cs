@@ -92,6 +92,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 await _context.Users.AddAsync(entity);
                 await _context.SaveChangesAsync();
                 result.Message = "Usuario guardado correctamente";
+                result.Data = entity;
             }
             catch (Exception ex)
             {
@@ -120,12 +121,11 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                     result.Message = "Este usuario no existe";
                     return result;
                 }
-                var usuario = await _context.Users.FindAsync(entity.IdUsuario);
-                usuario.Clave = entity.Clave;
-                usuario.NombreCompleto = entity.NombreCompleto;
-                usuario.Correo = entity.Correo;
+                userExistente.Clave = entity.Clave;
+                userExistente.NombreCompleto = entity.NombreCompleto;
+                userExistente.Correo = entity.Correo;
 
-                _context.Users.Update(usuario);
+                _context.Users.Update(userExistente);
                 await _context.SaveChangesAsync();
                 result.IsSuccess = true;    
                 result.Message = "Usuario actualizado correctamente";

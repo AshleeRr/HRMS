@@ -1,6 +1,7 @@
-﻿using HRMS.Application.DTOs.UserDTOs;
+﻿using HRMS.Application.DTOs.ClientDTOs;
+using HRMS.Application.DTOs.UserDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
-using HRMS.Domain.Base.Validator;
+using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,30 +15,53 @@ namespace HRMS.APIs.Controllers.UsersControllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
-        private readonly IValidator<SaveUserDTO> _validatorSave;
+        private readonly IClientService _clientService;
         private readonly ILogger<UserController> _logger;
 
         public UserController(IUserRepository userRepository, IUserService userService,
-                              IValidator<SaveUserDTO> validatorSave, ILogger<UserController> logger)
+                              IClientService clientService,   
+                              ILogger<UserController> logger)
         {
             _userRepository = userRepository;
             _userService = userService;
-            _validatorSave = validatorSave;
+            _clientService = clientService;
             _logger = logger;
         }
 
         // POST api/<UserController>
         [HttpPost("/user")]
-        public async Task<IActionResult> SaveUser([FromBody] SaveUserDTO user)
+        public async Task<IActionResult> SaveUser([FromBody] SaveUserClientDTO user)
         {
-            var validDTO = _validatorSave.Validate(user);
-            if (validDTO.IsSuccess)
+            var u = await _userService.Save(user);
+            if (!u.IsSuccess)
             {
-                var createdUser = await _userService.Save(user);
-                _logger.LogInformation("Usuario creado correctamente");
-                return Ok(createdUser);
+                return BadRequest("Error al crear un usuario");
+                
             }
-            return BadRequest("Error al crear un usuario");
+            _logger.LogInformation("Usuario creado correctamente");
+            var createdUser = (User)u.Data;
+            var userId = createdUser.IdUsuario;
+            
+            if (user.IdUserRole == 1)
+            {
+                var clientDto = new SaveClientDTO
+                {
+                    NombreCompleto = user.NombreCompleto,
+                    Correo = user.Correo,
+                    Clave = user.Clave,
+                    Documento = user.Documento,
+                    TipoDocumento = user.TipoDocumento,
+                    IdUserRole = user.IdUserRole,
+                    IdUsuario = userId 
+                };
+                var client = await _clientService.Save(clientDto);
+                if (!client.IsSuccess)
+                {
+                    return BadRequest("Error al crear un cliente");
+                }
+                return Ok(client);
+            }
+            return Ok(u);
         }
 
         // GET: api/<UserController>
@@ -55,7 +79,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
 
         // GET api/<UserController>/5
         [HttpGet("/user/{id}")]
-        public async Task<IActionResult> GetUsersById(int id)
+        public async Task<IActionResult> GetUserById(int id)
         {
             ValidateId(id);
             var usuario = await _userService.GetById(id);
@@ -98,7 +122,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             var usuario = await _userRepository.GetUserByDocumentAsync(documento);
             if (usuario == null)
             {
-                return BadRequest($"No se ha encontrado un usuario con este correo: {documento}");
+                return BadRequest($"No se ha encontrado un usuario con este documento: {documento}");
             }
             return Ok(usuario);
         }
@@ -107,27 +131,36 @@ namespace HRMS.APIs.Controllers.UsersControllers
         public async Task<IActionResult> GetUsersByTypeDocumentAsync(string tipoDocumento)
         {
             ValidateNull(tipoDocumento, "tipo documento");
-            var usuario = await _userRepository.GetUserByDocumentAsync(tipoDocumento);
+            var usuario = await _userRepository.GetUsersByTypeDocumentAsync(tipoDocumento);
             if (usuario == null)
             {
-                return BadRequest($"No se ha encontrado un usuario con este correo: {tipoDocumento}");
+                return BadRequest($"No se ha encontrado un usuario con este tipo de documento: {tipoDocumento}");
             }
             return Ok(usuario);
         }
 
         // PUT api/<UserController>/5
         [HttpPut("/user/{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDTO user)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserClientDTO user)
         {
             ValidateId(id);
             var existentUser = await _userService.GetById(id);
-            if (existentUser.IsSuccess)
+            if (!existentUser.IsSuccess)
             {
-                var updatedUser = await _userService.Update(user);
-                _logger.LogInformation("Usuario actualizado correctamente");
-                return Ok(updatedUser);
+                return BadRequest($"No se ha podido encontrar un usuario con este id:{id}");
             }
-            return BadRequest($"No se ha podido encontrar un usuario con este id:{id}");
+            if(user.IdUserRole == 1)
+            {
+                var client = await _clientService.GetById(id);
+                if (client != null)
+                {
+                    var updatedClient = await _clientService.Update(user);
+                    return Ok(updatedClient);
+                }
+            }
+            var updatedUser = await _userService.Update(user);
+            _logger.LogInformation("Usuario actualizado correctamente");
+            return Ok(updatedUser);
         }
 
         [HttpPatch("/user/{id}/nombre-completo")]
@@ -136,12 +169,26 @@ namespace HRMS.APIs.Controllers.UsersControllers
             ValidateId(id);
             ValidateNull(nuevoNombre, "nuevoNombre");
             var user = await _userService.UpdateNombreCompletoAsync(id, nuevoNombre);
-            if (user.IsSuccess)
+            if (!user.IsSuccess)
             {
-                return Ok(user);
+                return BadRequest("Error actualizando el nombre del usuario");
+                
             }
-            return BadRequest("Error actualizando el nombre del usuario");
+            var createdUser = (User)user.Data;
+            var userRole = createdUser.IdRolUsuario;
+            if(userRole == 1)
+            {
+                var c = await _clientService.GetClientByUserIdAsync(id);
+                if(c == null)
+                {
+                    return BadRequest("No se ha encontrado el cliente");
+                }
+                var client = await _clientService.UpdateNombreCompletoAsync(id, nuevoNombre);
+                return Ok(client);
+            }
+            return Ok(user);
         }
+
         [HttpPatch("/user/{id}/role")]
         public async Task<IActionResult> UpdateUserRoleToUserAsync(int id, int idUserRole)
         {
@@ -162,13 +209,33 @@ namespace HRMS.APIs.Controllers.UsersControllers
             ValidateNull(documento, "documento");
             ValidateNull(tipoDocumento, "tipo documento");
 
-            var user = await _userService.UpdateTipoDocumentoAndDocumentoAsync(id, tipoDocumento, documento);
-            if (user.IsSuccess)
+            var existingDocument = await _userRepository.GetUserByDocumentAsync(documento);
+            if (existingDocument != null || existingDocument.IdUsuario != id)
             {
-                return Ok(user);
+                return BadRequest("Este documento ya esta registrado por otro usuario");
             }
-            return BadRequest("Error actualizando el documento y el tipo del documento del usuario");
+
+            var user = await _userService.UpdateTipoDocumentoAndDocumentoAsync(id, tipoDocumento, documento);
+            if (!user.IsSuccess)
+            {
+                return BadRequest("Error actualizando el documento y el tipo del documento del usuario");
+            }
+
+            var createdUser = (User)user.Data;
+            var userRole = createdUser.IdRolUsuario;
+            if(userRole == 1)
+            {
+                var c = await _clientService.GetClientByUserIdAsync(id);
+                if (c == null)
+                {
+                    return BadRequest("No se ha encontrado el cliente");
+                }
+                var client = await _clientService.UpdateTipoDocumentoAndDocumentoAsync(id, tipoDocumento, documento);
+                return Ok(client);
+            }
+            return Ok(user);
         }
+
         [HttpPatch("/users/{id}/password")]
         public async Task<IActionResult> UpdatePasswordAsync(int id, string nuevaClave)
         {
@@ -178,18 +245,68 @@ namespace HRMS.APIs.Controllers.UsersControllers
             var user = await _userService.UpdatePasswordAsync(id, nuevaClave);
             if (user.IsSuccess)
             {
-                return Ok(user);
+                return BadRequest("Error actualizando la clave del usuario");
             }
-            return BadRequest("Error actualizando la clave del usuario");
+            var createdUser = (User)user.Data;
+            var userRole = createdUser.IdRolUsuario;
+            if(userRole == 1)
+            {
+                var c = await _clientService.GetClientByUserIdAsync(id);
+                if (c == null)
+                {
+                    return BadRequest("No se ha encontrado el cliente");
+                }
+                var client = await _clientService.UpdatePasswordAsync(id, nuevaClave);
+                return Ok(client);
+            }
+            return Ok(user);
         }
+
+        [HttpPatch("/users/{id}/email")]
+        public async Task<IActionResult> UpdateEmailAsync(int id, string email)
+        {
+            ValidateId(id);
+            ValidateNull(email, "email");
+
+            var existingDocument = await _userRepository.GetUserByEmailAsync(email);
+            if (existingDocument != null || existingDocument.IdUsuario != id)
+            {
+                return BadRequest("Este correo ya esta registrado por otro usuario");
+            }
+            var user = await _userService.UpdateCorreoAsync(id, email);
+            if (!user.IsSuccess)
+            {
+                return BadRequest("Error actualizando el documento y el tipo del documento del usuario");
+            }
+            var createdUser = (User)user.Data;
+            var userRole = createdUser.IdRolUsuario;
+            if(userRole == 1)
+            {
+                var c = await _clientService.GetById(id);
+                if (!c.IsSuccess)
+                {
+                    return BadRequest("No se ha encontrado el cliente");
+                }
+                var client = await _clientService.UpdateCorreoAsync(id, email);
+                return Ok(client);
+            }
+            return Ok(user);
+        }
+
         // DELETE api/<UserController>/5
         [HttpDelete("/user/{id}")]
-        public async Task<IActionResult> Delete([FromBody] RemoveUserDTO user)
+        public async Task<IActionResult> Delete([FromBody] RemoveUserClientDTO user)
         {
             var userDeleted = await _userService.Remove(user);
             if (!userDeleted.IsSuccess)
             {
                 return BadRequest("Error al eliminar el usuario");
+            }
+            var c = await _clientService.GetClientByUserIdAsync(user.Id);
+            if (c != null)
+            {
+                var client = await _clientService.Remove(user);
+                return Ok(client);
             }
             _logger.LogInformation("Usuario eliminado correctamente");
             return Ok(userDeleted);

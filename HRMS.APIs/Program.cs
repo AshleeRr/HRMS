@@ -2,7 +2,6 @@ using HRMS.IOC.UsersDependencies;
 using HRMS.IOC.ReservationDepedencies;
 using HRMS.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using HRMS.Persistence.Context;
 
 namespace HRMS.APIs
 {
@@ -19,8 +18,6 @@ namespace HRMS.APIs
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DBHotel"));
             });
             builder.Services.AddReceptionDependencies();
-
-            // añadir las dependencias
             builder.Services.AddClientDependencies();
             builder.Services.AddUserDependencies();
             builder.Services.AddUserRoleDependencies();

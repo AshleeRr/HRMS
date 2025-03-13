@@ -75,6 +75,7 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
                 result.IsSuccess = true;
                 result.Message = "Rol de usuario eliminado correctamente";
+                result.Data = dto;
             }
             catch (Exception ex)
             {
@@ -91,10 +92,15 @@ namespace HRMS.Application.Services.UsersServices
                 var userRole = new UserRole()
                 {
                     Descripcion = dto.Descripcion,
+                    RolNombre = dto.Nombre,
                 };
                 result = await _userRoleRepository.SaveEntityAsync(userRole);
-                result.IsSuccess = true;
-                result.Message = "Rol de usuario guardado correctamente";
+                if (result.IsSuccess)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Rol de usuario guardado correctamente";
+                    result.Data = dto;
+                }
             }
             catch (Exception ex)
             {
@@ -108,9 +114,15 @@ namespace HRMS.Application.Services.UsersServices
             try
             {
                 ValidateUserRoletDto(dto);
-                ValidateId(dto.IdUserRole);
                 var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
                 ValidateUserRole(userRole);
+                userRole.Descripcion = dto.Descripcion;
+                userRole.RolNombre = dto.Nombre;
+                dto.ChangeTime = DateTime.Now;
+                await _userRoleRepository.UpdateEntityAsync(userRole);
+                result.Message = "Rol de usuario actualizado";
+                result.IsSuccess = true;
+                result.Data = dto;
             }
             catch (Exception ex)
             {
@@ -125,12 +137,7 @@ namespace HRMS.Application.Services.UsersServices
             {
                 ValidateId(idRolUsuario);
                 var userRole = await _userRoleRepository.GetEntityByIdAsync(idRolUsuario);
-                if(string.IsNullOrEmpty(nuevaDescripcion))
-                {
-                    result.IsSuccess = false;
-                    result.Message = "La nueva descripción no puede estar vacía";
-                    return result;
-                }
+                ValidateNulleable(nuevaDescripcion, "nueva descripcion");
                 userRole.Descripcion = nuevaDescripcion;
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
                 result.IsSuccess = true;
@@ -149,12 +156,7 @@ namespace HRMS.Application.Services.UsersServices
             {
                 ValidateId(idRolUsuario);
                 var userRole = await _userRoleRepository.GetEntityByIdAsync(idRolUsuario);
-                if (string.IsNullOrEmpty(nuevoNombre))
-                {
-                    result.IsSuccess = false;
-                    result.Message = "El nuevo nombre no puede estar vacío";
-                    return result;
-                }
+                ValidateNulleable(nuevoNombre, "nuevo nombre");
                 userRole.RolNombre = nuevoNombre;
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
                 result.IsSuccess = true;
@@ -166,25 +168,35 @@ namespace HRMS.Application.Services.UsersServices
             }
             return result;
         }
-        private void ValidateUserRoletDto(object dto)
+        private object ValidateUserRoletDto(object dto)
         {
             if (dto == null)
             {
                 throw new ArgumentNullException("Dto nulo");
             }
+            return dto;
         }
-        private void ValidateUserRole(UserRole userRole)
+        private UserRole ValidateUserRole(UserRole userRole)
         {
             if (userRole == null)
             {
-                throw new ArgumentNullException("No existe un rol no con este id");
+                throw new ArgumentNullException("No existe un rol con este id");
             }
+            return userRole;
         }
-        private void ValidateId(int id)
+        private int ValidateId(int id)
         {
             if (id <= 0)
             {
                 throw new ArgumentNullException("El id debe ser mayor que 0");
+            }
+            return id;
+        }
+        private void ValidateNulleable(string x, string message)
+        {
+            if (string.IsNullOrEmpty(x))
+            {
+                throw new ArgumentNullException($"El campo: {message} no puede estar vacio.");
             }
         }
     }
