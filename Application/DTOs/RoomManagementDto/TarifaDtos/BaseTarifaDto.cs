@@ -1,12 +1,16 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.TarifaDtos;
+﻿using HRMS.Application.DTOs.BaseDTO;
 
-public class BaseTarifaDto : DTOBase
+namespace HRMS.Application.DTOs.RoomManagementDto.TarifaDtos
 {
-    public DateTime FechaInicio { get; set; }
-    public DateTime FechaFin { get; set; }
-    public decimal PrecioPorNoche { get; set; }
-    public decimal Descuento { get; set; }
-    public string Descripcion { get; set; }
+    public class BaseTarifaDto : DTOBase
+    {
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFin { get; set; }
+        public decimal PrecioPorNoche { get; set; }
+        public decimal Descuento { get; set; }
+        public string Descripcion { get; set; }
     
-    public int IdCategoria { get; set; }
+        public int IdCategoria { get; set; }
+    }  
 }
+

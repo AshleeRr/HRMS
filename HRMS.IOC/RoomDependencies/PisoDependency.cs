@@ -1,5 +1,4 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.PisoDtos;
-using HRMS.Application.DTOs.RoomManagementDto.Validations;
 using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Application.Services.RoomServices;
 using HRMS.Domain.Base.Validator;

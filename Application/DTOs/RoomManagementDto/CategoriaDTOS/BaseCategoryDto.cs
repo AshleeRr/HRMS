@@ -1,8 +1,12 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
+﻿using HRMS.Application.DTOs.BaseDTO;
 
-public abstract class BaseCategoryDto : DTOBase
+namespace HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS
 {
-    public string Descripcion { get; set; }
-    public short IdServicio { get; set; }
-    public int Capacidad { get; set; }
+    public abstract class BaseCategoryDto : DTOBase
+    {
+        public string Descripcion { get; set; }
+        public short IdServicio { get; set; }
+        public int Capacidad { get; set; }
+    }
 }
+

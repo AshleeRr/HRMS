@@ -1,7 +1,7 @@
-using HRMS.IOC.AuditDependencies;
 using HRMS.IOC.UsersDependencies;
 using HRMS.IOC.ReservationDepedencies;
 using HRMS.IOC.RoomDependencies;
+using HRMS.IOC.ServicesDependency;
 using HRMS.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +25,6 @@ namespace HRMS.APIs
             builder.Services.AddClientDependencies();
             builder.Services.AddUserDependencies();
             builder.Services.AddUserRoleDependencies();
-            builder.Services.AddAuditDependencies();
 
             //Dependencias de Habitaciones
             builder.Services.AddPisoDependency();
@@ -33,6 +32,7 @@ namespace HRMS.APIs
             builder.Services.AddEstadoHabitacionDependency();
             builder.Services.AddRoomDependency();
             builder.Services.AddTarifaDependecy();
+            builder.Services.AddServicioDependencies();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

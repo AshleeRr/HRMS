@@ -1,6 +1,7 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.TarifaDtos;
-
-public class UpdateTarifaDto : CreateTarifaDto
+﻿namespace HRMS.Application.DTOs.RoomManagementDto.TarifaDtos
 {
-   public int IdTarifa { get; set; }
+    public class UpdateTarifaDto : CreateTarifaDto
+    {
+        public int IdTarifa { get; set; }
+    }
 }

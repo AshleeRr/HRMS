@@ -1,4 +1,6 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos;
+﻿using HRMS.Application.DTOs.BaseDTO;
+
+namespace HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos;
 
 public class DeleteHabitacionDto : DTOBase
 {

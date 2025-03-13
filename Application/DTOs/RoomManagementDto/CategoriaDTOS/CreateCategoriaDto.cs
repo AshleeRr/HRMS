@@ -1,6 +1,9 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
-
-public class CreateCategoriaDto : BaseCategoryDto
+﻿namespace HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS
 {
+    public class CreateCategoriaDto : BaseCategoryDto
+    {
 
+    }
 }
+    
+

@@ -1,5 +1,7 @@
 ﻿
 
+using HRMS.Application.DTOs.BaseDTO;
+
 namespace HRMS.Application.DTOs.Reservation_2023_0731
 {
     public class ReservationAddDTO : DTOBase

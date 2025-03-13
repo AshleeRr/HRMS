@@ -1,6 +1,7 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos;
-
-public class UpdateHabitacionDto : CreateHabitacionDTo
+﻿namespace HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos
 {
-    public int IdHabitacion { get; set; }
+    public class UpdateHabitacionDto : CreateHabitacionDTo
+    {
+        public int IdHabitacion { get; set; }
+    }
 }

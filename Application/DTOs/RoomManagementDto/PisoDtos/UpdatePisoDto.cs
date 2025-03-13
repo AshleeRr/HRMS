@@ -1,6 +1,7 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.PisoDtos;
-
-public class UpdatePisoDto : CreatePisoDto
+﻿namespace HRMS.Application.DTOs.RoomManagementDto.PisoDtos
 {
-    public int IdPiso { get; set; }
+    public class UpdatePisoDto : CreatePisoDto
+    {
+        public int IdPiso { get; set; }
+    }
 }

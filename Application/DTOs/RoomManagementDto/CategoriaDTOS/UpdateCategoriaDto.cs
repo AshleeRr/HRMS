@@ -1,6 +1,7 @@
-﻿namespace HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
-
-public class UpdateCategoriaDto : CreateCategoriaDto
+﻿namespace HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS
 {
-    public int IdCategoria { get; set; }
+    public class UpdateCategoriaDto : CreateCategoriaDto
+    {
+        public int IdCategoria { get; set; }
+    }
 }
