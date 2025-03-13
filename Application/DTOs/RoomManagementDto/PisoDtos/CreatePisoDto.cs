@@ -1,6 +1,6 @@
 ﻿namespace HRMS.Application.DTOs.RoomManagementDto.PisoDtos;
 
-public class CreatePisoDto : PisoDto
+public class CreatePisoDto : BasePisoDto
 {
     
 }

@@ -469,7 +469,7 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             // Arrange
             var dto = new UpdateCategoriaDto
             {
-                IdCategoria = 999,
+                IdCategoria = 999, 
                 Descripcion = "Categoría Actualizada",
                 Capacidad = 3,
                 IdServicio = 1
@@ -482,7 +482,11 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
 
             _mockCategoryRepository.Setup(repo => repo.GetEntityByIdAsync(dto.IdCategoria))
                 .ReturnsAsync((Categoria)null);
-
+        
+            var servicio = new Servicios { IdServicio = 1, Estado = true };
+            _mockServicioRepository.Setup(repo => repo.GetEntityByIdAsync(dto.IdServicio))
+                .ReturnsAsync(servicio);
+    
             // Act
             var result = await _categoriaServices.Update(dto);
 
@@ -490,10 +494,14 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             Assert.False(result.IsSuccess);
             Assert.Equal($"No se encontró la categoría con ID {dto.IdCategoria}.", result.Message);
         }
-
+        
         [Fact]
         public async Task Update_ServicioNotExists_ReturnsFailure()
         {
+            var servicio = new Servicios()
+            {
+                IdServicio = 1
+            };
             // Arrange
             var dto = new UpdateCategoriaDto
             {

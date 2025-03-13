@@ -11,24 +11,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/CategoryServiceTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/EstadoHabitacionServiceTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/PisoServiceTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/TarifaServiceTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/ValidatorTests/CategoryServiceValidatorTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/ValidatorTests/EstadoHabitacionValidatorTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/ValidatorTests/HabitacionValidatorTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/ValidatorTests/PisoValidatorTest.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/ValidatorTests/TarifaTestValidator.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/BaseCategoryDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/BaseEstadoHabitacionDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/BaseHabitacionDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/BasePisoDto.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/BaseTarifaDto.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/CategoriaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/CategoriaDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/CreateCategoriaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/CreateCategoriaDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/CreateEstadoHabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/CreateEstadoHabitacionDto.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/EstadoHabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/EstadoHabitacionDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/CreateHabitacionDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/CreateHabitacionDTO.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/HabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/HabitacionDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/CreatePisoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/CreatePisoDto.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/PisoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/PisoDto.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/CreateTarifaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/CreateTarifaDto.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/TarifaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/TarifaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/CategoryServiceValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/CategoryServiceValidator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/EstadoHabitacionServiceValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/EstadoHabitacionServiceValidator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/HabitacionServiceValidation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/HabitacionServiceValidation.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/PisoServiceValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/PisoServiceValidator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/TarifaServiceValidation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/Validations/TarifaServiceValidation.cs" afterDir="false" />
@@ -38,19 +36,18 @@
       <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/PisoServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/PisoServices.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/TarifaServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/TarifaServices.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/PisoController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/PisoController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/TarifaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/TarifaController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/HRMS.Application.Test.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/HRMS.Application.Test.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Categoria.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Categoria.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/EstadoHabitacion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/EstadoHabitacion.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Habitacion.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Habitacion.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Piso.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Piso.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/CategoryServiceTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/CategoryServiceTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/EstadoHabitacionServiceTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/EstadoHabitacionServiceTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/PisoServiceTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/PisoServiceTest.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/EstadoHabitacionRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/EstadoHabitacionRepositoryTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/HabitacionRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/HabitacionRepositoryTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/PisoRepositoryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/PisoRepositoryTests.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/PisoRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/PisoRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -82,11 +79,13 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/HRMS.APIs/Controllers/AuditController/AuditoriaController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Controllers/ReservationController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRMS.IOC/AuditDependencies/AuditoriaDependency.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a42ba4db448ed38dcb9fb39194c637a317a8281856b88e139e8a905ee6d12b/Guid.Windows.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/aef21ab35a6576cdcb99a56e6a8c84076d069f09ad1be52cfedaf49ee667855/Int32.cs" root0="FORCE_HIGHLIGHTING" />
@@ -256,7 +255,8 @@
       <workItem from="1741671108447" duration="8879000" />
       <workItem from="1741721552208" duration="7439000" />
       <workItem from="1741730111888" duration="11212000" />
-      <workItem from="1741762448734" duration="5394000" />
+      <workItem from="1741762448734" duration="5849000" />
+      <workItem from="1741807799120" duration="24072000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
@@ -354,7 +354,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741411529564</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Se ha agregado los test de la capa de Servicios, agregado los MapToDTo en la capa de Servicio, se ha quitado validaciones innecesarias en la capa de persistencia , se edito los controladores de la Api, las entidades de dominio se han hecho publicas y no &quot;Sealed&quot;, se ha agreado el Id a los Dto">
+      <option name="closed" value="true" />
+      <created>1741768144213</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1741768144213</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -398,7 +406,8 @@
     <MESSAGE value="Apis integradas" />
     <MESSAGE value="Pruebas" />
     <MESSAGE value="Validaciones a la capa de servicios hecha" />
-    <option name="LAST_COMMIT_MESSAGE" value="Validaciones a la capa de servicios hecha" />
+    <MESSAGE value="Se ha agregado los test de la capa de Servicios, agregado los MapToDTo en la capa de Servicio, se ha quitado validaciones innecesarias en la capa de persistencia , se edito los controladores de la Api, las entidades de dominio se han hecho publicas y no &quot;Sealed&quot;, se ha agreado el Id a los Dto" />
+    <option name="LAST_COMMIT_MESSAGE" value="Se ha agregado los test de la capa de Servicios, agregado los MapToDTo en la capa de Servicio, se ha quitado validaciones innecesarias en la capa de persistencia , se edito los controladores de la Api, las entidades de dominio se han hecho publicas y no &quot;Sealed&quot;, se ha agreado el Id a los Dto" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

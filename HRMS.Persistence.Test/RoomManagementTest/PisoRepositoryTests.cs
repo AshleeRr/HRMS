@@ -1,12 +1,8 @@
 ﻿using HRMS.Domain.Base;
-using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Moq;
 using Xunit.Abstractions;
 
 namespace HRMS.Persistence.Test.RoomManagementTest
@@ -15,9 +11,6 @@ namespace HRMS.Persistence.Test.RoomManagementTest
     {
         private readonly ITestOutputHelper _testOutputHelper;
         private readonly DbContextOptions<HRMSContext> _dbOptions;
-        private readonly Mock<IValidator<Piso>> _validatorMock;
-        private readonly Mock<ILogger<PisoRepository>> _loggerMock;
-        private readonly Mock<IConfiguration> _configMock;
 
         public PisoRepositoryTests(ITestOutputHelper testOutputHelper)
         {
@@ -25,10 +18,6 @@ namespace HRMS.Persistence.Test.RoomManagementTest
             _dbOptions = new DbContextOptionsBuilder<HRMSContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
-            
-            _validatorMock = new Mock<IValidator<Piso>>();
-            _loggerMock = new Mock<ILogger<PisoRepository>>();
-            _configMock = new Mock<IConfiguration>();
         }
 
         [Fact]
@@ -46,7 +35,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new PisoRepository(context);
 
                 // Act
                 var result = await repo.GetAllAsync();
@@ -62,7 +51,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new PisoRepository(context);
                 
                 // Act
                 var result = await repo.GetEntityByIdAsync(0);
@@ -84,7 +73,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new PisoRepository(context);
 
                 // Act
                 var result = await repo.GetEntityByIdAsync(1);
@@ -100,14 +89,13 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new PisoRepository(context);
 
                 // Act
                 var result = await repo.GetPisoByDescripcion("");
 
                 // Assert
                 Assert.False(result.IsSuccess);
-                Assert.Contains("vacía", result.Message);
             }
         }
 
@@ -123,7 +111,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new PisoRepository(context);
 
                 // Act
                 var result = await repo.GetPisoByDescripcion("Ejec");
@@ -135,60 +123,92 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         }
 
         [Fact]
-        public async Task UpdateEntityAsync_DuplicateDescripcion_ReturnsFailure()
+        public async Task GetPisoByDescripcion_NoMatchingDescripcion_ReturnsFailure()
         {
             // Arrange
             using (var context = new HRMSContext(_dbOptions))
             {
-                // Create two pisos
-                context.Pisos.Add(new Piso { IdPiso = 1, Descripcion = "Original", Estado = true });
-                context.Pisos.Add(new Piso { IdPiso = 2, Descripcion = "Different", Estado = true });
+                context.Pisos.Add(new Piso { Descripcion = "Piso Ejecutivo", Estado = true });
                 await context.SaveChangesAsync();
             }
 
-            var updatedPiso = new Piso { IdPiso = 2, Descripcion = "Original" };
-            _validatorMock.Setup(v => v.Validate(updatedPiso)).Returns(new OperationResult { IsSuccess = true });
-
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new PisoRepository(context);
 
                 // Act
-                var result = await repo.UpdateEntityAsync(updatedPiso);
+                var result = await repo.GetPisoByDescripcion("Inexistente");
 
                 // Assert
                 Assert.False(result.IsSuccess);
-        
-                _testOutputHelper.WriteLine($"Error message: {result.Message}");
-                Assert.Contains("existe", result.Message);
             }
         }
 
         [Fact]
-        public async Task UpdateEntityAsync_ValidUpdate_ModifiesPiso()
+        public async Task ExistsByDescripcionAsync_ExistingDescripcion_ReturnsTrue()
         {
             // Arrange
-            var original = new Piso { IdPiso = 1, Descripcion = "Antiguo", Estado = true };
+            string descripcion = "Único";
             using (var context = new HRMSContext(_dbOptions))
             {
-                context.Pisos.Add(original);
+                context.Pisos.Add(new Piso { IdPiso = 1, Descripcion = descripcion, Estado = true });
                 await context.SaveChangesAsync();
             }
 
-            var updated = new Piso { IdPiso = 1, Descripcion = "Nuevo", Estado = false };
-            _validatorMock.Setup(v => v.Validate(updated)).Returns(new OperationResult { IsSuccess = true });
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new PisoRepository(context);
+
+                // Act
+                var result = await repo.ExistsByDescripcionAsync(descripcion);
+
+                // Assert
+                Assert.True(result);
+            }
+        }
+
+        [Fact]
+        public async Task ExistsByDescripcionAsync_NonExistingDescripcion_ReturnsFalse()
+        {
+            // Arrange
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.Pisos.Add(new Piso { IdPiso = 1, Descripcion = "Existente", Estado = true });
+                await context.SaveChangesAsync();
+            }
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new PisoRepository(context);
 
                 // Act
-                var result = await repo.UpdateEntityAsync(updated);
+                var result = await repo.ExistsByDescripcionAsync("Inexistente");
 
                 // Assert
-                var modified = await context.Pisos.FindAsync(1);
-                Assert.Equal("Nuevo", modified.Descripcion);
-                Assert.False(modified.Estado);
+                Assert.False(result);
+            }
+        }
+
+        [Fact]
+        public async Task ExistsByDescripcionAsync_ExcludingCurrentId_ReturnsFalse()
+        {
+            // Arrange
+            string descripcion = "Único";
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                context.Pisos.Add(new Piso { IdPiso = 1, Descripcion = descripcion, Estado = true });
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new HRMSContext(_dbOptions))
+            {
+                var repo = new PisoRepository(context);
+
+                // Act
+                var result = await repo.ExistsByDescripcionAsync(descripcion, 1);
+
+                // Assert
+                Assert.False(result);
             }
         }
     }

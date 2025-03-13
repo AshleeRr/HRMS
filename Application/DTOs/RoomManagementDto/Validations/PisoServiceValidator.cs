@@ -1,7 +1,7 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.PisoDtos;
 using MyValidator.Validator;
 
-public class PisoServiceValidator : Validator<PisoDto>
+public class PisoServiceValidator : Validator<CreatePisoDto>
 {
     public PisoServiceValidator()
     {

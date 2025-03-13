@@ -80,12 +80,7 @@ namespace HRMS.Application.Services.RoomServices
             
                 _logger.LogInformation("Creando una nueva categoría.");
 
-                var category = new Categoria
-                {
-                    Descripcion = dto.Descripcion,
-                    Capacidad = dto.Capacidad,
-                    IdServicio = dto.IdServicio,
-                };
+                var category = MapToEntity(dto);
 
                 await _categoryRepository.SaveEntityAsync(category);
                 var categoryDto = MapToDto(category);
@@ -99,13 +94,14 @@ namespace HRMS.Application.Services.RoomServices
             {
                 var validateId = ValidateId(dto.IdCategoria, "El ID de la categoría debe ser mayor que 0.");
                 if (!validateId.IsSuccess) return validateId;
-                
+        
                 var validation = _validator.Validate(dto);
                 if (!validation.IsSuccess)
                     return OperationResult.Failure(validation.Message);
 
-                var category = await _categoryRepository.GetEntityByIdAsync(dto.IdCategoria);
-                if (category == null)
+                var categoria = await _categoryRepository.GetEntityByIdAsync(dto.IdCategoria);
+        
+                if (categoria == null)
                     return OperationResult.Failure($"No se encontró la categoría con ID {dto.IdCategoria}.");
 
                 var servicioValidation = await ValidateServicioExistsAndActiveAsync(dto.IdServicio);
@@ -116,16 +112,14 @@ namespace HRMS.Application.Services.RoomServices
                         c.Descripcion == dto.Descripcion &&
                         c.IdCategoria != dto.IdCategoria &&
                         c.Estado == true))
-                    
+            
                     return OperationResult.Failure(
                         $"Ya existe otra categoría con la descripción '{dto.Descripcion}'.");
 
-                category.Descripcion = dto.Descripcion;
-                category.Capacidad = dto.Capacidad;
-                category.IdServicio = dto.IdServicio;
+                UpdateEntityFromDto(categoria, dto);
 
-                await _categoryRepository.UpdateEntityAsync(category);
-                var categoryDto = MapToDto(category);
+                await _categoryRepository.UpdateEntityAsync(categoria);
+                var categoryDto = MapToDto(categoria);
                 return OperationResult.Success(categoryDto, "Categoría actualizada correctamente.");
             });
         }
@@ -134,11 +128,10 @@ namespace HRMS.Application.Services.RoomServices
         {
             return await OperationResult.ExecuteOperationAsync(async () =>
             {
+                _logger.LogInformation("Eliminando categoría con ID: {Id}", dto.IdCategoria);
                 var validateId = ValidateId(dto.IdCategoria, "El ID de la categoría debe ser mayor que 0.");
                 if (!validateId.IsSuccess) return validateId;
                 
-                _logger.LogInformation("Eliminando categoría con ID: {Id}", dto.IdCategoria);
-
                 var category = await _categoryRepository.GetEntityByIdAsync(dto.IdCategoria);
                 if (category == null)
                     return OperationResult.Failure($"No se encontró la categoría con ID {dto.IdCategoria}.");
@@ -273,6 +266,21 @@ namespace HRMS.Application.Services.RoomServices
                 Capacidad = categoria.Capacidad,
                 IdServicio = categoria.IdServicio
             };
+
+        private static Categoria MapToEntity(CreateCategoriaDto dto)
+            => new Categoria()
+            {
+                Descripcion = dto.Descripcion,
+                Capacidad = dto.Capacidad,
+                IdServicio = dto.IdServicio,
+            };
+
+        private static void UpdateEntityFromDto(Categoria entity, UpdateCategoriaDto dto)
+        {
+            entity.Descripcion = dto.Descripcion;
+            entity.Capacidad = dto.Capacidad;
+            entity.IdServicio = dto.IdServicio;
+        }
         
         private OperationResult ValidateId(int value, string message)
         {

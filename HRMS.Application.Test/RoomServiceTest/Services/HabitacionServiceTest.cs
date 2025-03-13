@@ -19,6 +19,9 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
         private readonly Mock<IValidator<CreateHabitacionDTo>> _mockValidator;
         private readonly HabitacionServices _service;
         private readonly Mock<IReservationRepository> _mockReservationRepository;
+        private readonly Mock<IPisoRepository> _pisoRepository;
+        private readonly Mock<IEstadoHabitacionRepository> _estadoHabitacioRepository;
+        private readonly Mock<ICategoryRepository> _categoryRepository;
 
         public HabitacionServicesTests()
         {
@@ -26,11 +29,17 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             _mockLogger = new Mock<ILogger<HabitacionServices>>();
             _mockValidator = new Mock<IValidator<CreateHabitacionDTo>>();
             _mockReservationRepository = new Mock<IReservationRepository>();
+            _pisoRepository = new Mock<IPisoRepository>();
+            _estadoHabitacioRepository = new Mock<IEstadoHabitacionRepository>();
+            _categoryRepository = new Mock<ICategoryRepository>();
             _service = new HabitacionServices(
                 _mockRepository.Object,
                 _mockLogger.Object,
                 _mockValidator.Object,
-                _mockReservationRepository.Object
+                _mockReservationRepository.Object,
+                _pisoRepository.Object,
+                _estadoHabitacioRepository.Object,
+                _categoryRepository.Object
             );
         }
 
@@ -149,10 +158,8 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             Assert.True(result.IsSuccess);
             Assert.Equal("Habitación obtenida correctamente", result.Message);
     
-            // Verificar que el resultado es un HabitacionDto
             var habitacionDto = Assert.IsType<HabitacionDto>(result.Data);
     
-            // Verificar que las propiedades del DTO coinciden con la entidad original
             Assert.Equal(habitacion.Numero, habitacionDto.Numero);
             Assert.Equal(habitacion.Detalle, habitacionDto.Detalle);
             Assert.Equal(habitacion.Precio, habitacionDto.Precio);
@@ -220,13 +227,19 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
                 IdPiso = 1, 
                 IdCategoria = 1 
             };
-            
+    
             _mockValidator.Setup(v => v.Validate(dto))
                 .Returns(OperationResult.Success());
-            
+    
             _mockRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Habitacion, bool>>>()))
                 .ReturnsAsync(false);
-            
+            _pisoRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Piso, bool>>>()))
+                .ReturnsAsync(true);
+            _categoryRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Categoria, bool>>>()))
+                .ReturnsAsync(true);
+            _estadoHabitacioRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<EstadoHabitacion, bool>>>()))
+                .ReturnsAsync(true);
+    
             _mockRepository.Setup(r => r.SaveEntityAsync(It.IsAny<Habitacion>()))
                 .ReturnsAsync(OperationResult.Success(new Habitacion { IdHabitacion = 1, Numero = dto.Numero }));
 
@@ -283,19 +296,34 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             Assert.Equal($"Ya existe una habitación con el número {dto.Numero}", result.Message);
             _mockRepository.Verify(r => r.SaveEntityAsync(It.IsAny<Habitacion>()), Times.Never);
         }
-
         [Fact]
         public async Task Save_WhenRepositoryThrowsException_ReturnsFailure()
         {
             // Arrange
-            var dto = new CreateHabitacionDTo { Numero = "101" };
-            
+            var dto = new CreateHabitacionDTo 
+            { 
+                Numero = "101",
+                Detalle = "Habitación Standard",
+                Precio = 100.0m,
+                IdPiso = 1,
+                IdCategoria = 1,
+                IdEstadoHabitacion = 1
+            };
+
             _mockValidator.Setup(v => v.Validate(dto))
                 .Returns(OperationResult.Success());
-            
+
             _mockRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Habitacion, bool>>>()))
                 .ReturnsAsync(false);
-            
+        
+            // Setup foreign key validation mocks
+            _pisoRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Piso, bool>>>()))
+                .ReturnsAsync(true);
+            _categoryRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Categoria, bool>>>()))
+                .ReturnsAsync(true);
+            _estadoHabitacioRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<EstadoHabitacion, bool>>>()))
+                .ReturnsAsync(true);
+
             _mockRepository.Setup(r => r.SaveEntityAsync(It.IsAny<Habitacion>()))
                 .ThrowsAsync(new Exception("Database error"));
 
@@ -306,7 +334,7 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             Assert.False(result.IsSuccess);
             Assert.Contains("Error al guardar la habitación: Database error", result.Message);
         }
-
+        
         #endregion
 
         #region Update Tests
@@ -325,7 +353,7 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
                 IdPiso = 2, 
                 IdCategoria = 2 
             };
-            
+    
             var existingHabitacion = new Habitacion 
             { 
                 IdHabitacion = 1, 
@@ -337,16 +365,23 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
                 IdCategoria = 1,
                 Estado = true
             };
-            
+    
             _mockValidator.Setup(v => v.Validate(dto))
                 .Returns(OperationResult.Success());
-            
+    
             _mockRepository.Setup(r => r.GetEntityByIdAsync(dto.IdHabitacion))
                 .ReturnsAsync(existingHabitacion);
-            
+    
             _mockRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Habitacion, bool>>>()))
                 .ReturnsAsync(false);
-            
+    
+            _pisoRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Piso, bool>>>()))
+                .ReturnsAsync(true);
+            _categoryRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Categoria, bool>>>()))
+                .ReturnsAsync(true);
+            _estadoHabitacioRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<EstadoHabitacion, bool>>>()))
+                .ReturnsAsync(true);
+    
             _mockRepository.Setup(r => r.UpdateEntityAsync(It.IsAny<Habitacion>()))
                 .ReturnsAsync(OperationResult.Success(existingHabitacion));
 
@@ -358,7 +393,7 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             _mockRepository.Verify(r => r.UpdateEntityAsync(It.Is<Habitacion>(h => 
                 h.IdHabitacion == dto.IdHabitacion)), Times.Once);
         }
-
+        
         [Fact]
         public async Task Update_WithInvalidId_ReturnsFailure()
         {
@@ -454,24 +489,36 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             var dto = new UpdateHabitacionDto 
             { 
                 IdHabitacion = 1,
-                Numero = "101"
+                Numero = "101",
+                IdPiso = 1,             
+                IdCategoria = 1,
+                IdEstadoHabitacion = 1
             };
-            
+    
             var existingHabitacion = new Habitacion 
             { 
                 IdHabitacion = 1, 
-                Numero = "101"
+                Numero = "101",
+                IdPiso = 1,            
+                IdCategoria = 1,
+                IdEstadoHabitacion = 1
             };
-            
+    
             _mockValidator.Setup(v => v.Validate(dto))
                 .Returns(OperationResult.Success());
-            
+    
             _mockRepository.Setup(r => r.GetEntityByIdAsync(dto.IdHabitacion))
                 .ReturnsAsync(existingHabitacion);
-            
+    
             _mockRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Habitacion, bool>>>()))
                 .ReturnsAsync(false);
-            
+    
+            _pisoRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Piso, bool>>>()))
+                .ReturnsAsync(true);
+            _categoryRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<Categoria, bool>>>()))
+                .ReturnsAsync(true);
+            _estadoHabitacioRepository.Setup(r => r.ExistsAsync(It.IsAny<Expression<Func<EstadoHabitacion, bool>>>()))
+                .ReturnsAsync(true);
             _mockRepository.Setup(r => r.UpdateEntityAsync(It.IsAny<Habitacion>()))
                 .ThrowsAsync(new Exception("Database error"));
 

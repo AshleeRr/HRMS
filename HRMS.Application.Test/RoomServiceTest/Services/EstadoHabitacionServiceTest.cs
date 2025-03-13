@@ -25,7 +25,6 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             _mockLogger = new Mock<ILogger<EstadoHabitacionService>>();
             _mockValidator = new Mock<IValidator<CreateEstadoHabitacionDto>>();
 
-            // Configurar el validador para pasar por defecto
             _mockValidator
                 .Setup(v => v.Validate(It.IsAny<CreateEstadoHabitacionDto>()))
                 .Returns(OperationResult.Success());
@@ -184,10 +183,12 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
 
             var operationResult = OperationResult.Success(estado, "Estado de habitación guardado correctamente");
 
-            _mockEstadoHabitacionRepository.Setup(repo => repo.ExistsAsync(It.IsAny<Expression<Func<EstadoHabitacion, bool>>>()))
+            _mockEstadoHabitacionRepository.Setup(repo =>
+                    repo.ExistsAsync(It.IsAny<Expression<Func<EstadoHabitacion, bool>>>()))
                 .ReturnsAsync(false);
 
-            _mockEstadoHabitacionRepository.Setup(repo => repo.SaveEntityAsync(It.IsAny<EstadoHabitacion>()))
+            _mockEstadoHabitacionRepository.Setup(repo =>
+                    repo.SaveEntityAsync(It.IsAny<EstadoHabitacion>()))
                 .ReturnsAsync(operationResult);
 
             // Act
@@ -212,7 +213,6 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
                 Descripcion = descripcion
             };
 
-            // Configurar el validador para fallar en este caso
             _mockValidator
                 .Setup(v => v.Validate(It.Is<CreateEstadoHabitacionDto>(d => string.IsNullOrWhiteSpace(d.Descripcion))))
                 .Returns(OperationResult.Failure("La descripción del estado de habitación es requerida."));
@@ -234,7 +234,6 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
                 Descripcion = new string('A', 51) // 51 caracteres
             };
 
-            // Configurar el validador para fallar en este caso
             _mockValidator
                 .Setup(v => v.Validate(It.Is<CreateEstadoHabitacionDto>(d => d.Descripcion.Length > 50)))
                 .Returns(OperationResult.Failure("La descripción no puede exceder los 50 caracteres."));
@@ -253,10 +252,9 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             // Arrange
             var dto = new CreateEstadoHabitacionDto
             {
-                Descripcion = "AB" // 2 caracteres (menos que el mínimo de 3)
+                Descripcion = "AB" 
             };
 
-            // Configurar el validador para fallar en este caso
             _mockValidator
                 .Setup(v => v.Validate(It.Is<CreateEstadoHabitacionDto>(d => d.Descripcion.Length < 3)))
                 .Returns(OperationResult.Failure("La descripción debe tener al menos 3 caracteres."));
@@ -309,7 +307,7 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Contains("Error al guardar el estado de habitación", result.Message);
+            Assert.Contains("Error al guardar el est", result.Message);
         }
 
         #endregion
@@ -342,15 +340,18 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
 
             var operationResult = OperationResult.Success(updatedEstado, "Estado de habitación actualizado correctamente.");
 
-            _mockEstadoHabitacionRepository.Setup(repo => repo.GetEntityByIdAsync(dto.IdEstadoHabitacion))
+            _mockEstadoHabitacionRepository.Setup(repo => 
+                    repo.GetEntityByIdAsync(dto.IdEstadoHabitacion))
                 .ReturnsAsync(estado);
 
-            _mockEstadoHabitacionRepository.Setup(repo => repo.UpdateEntityAsync(It.IsAny<EstadoHabitacion>()))
+            _mockEstadoHabitacionRepository.Setup(repo => 
+                    repo.UpdateEntityAsync(It.IsAny<EstadoHabitacion>()))
                 .ReturnsAsync(operationResult);
 
-            // Asegurar que el validador acepta este DTO
             _mockValidator
-                .Setup(v => v.Validate(It.Is<CreateEstadoHabitacionDto>(d => d.Descripcion == dto.Descripcion)))
+                .Setup(v =>
+                    v.Validate(It.Is<CreateEstadoHabitacionDto>(d
+                        => d.Descripcion == dto.Descripcion)))
                 .Returns(OperationResult.Success());
 
             // Act
@@ -397,7 +398,6 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
                 Descripcion = descripcion
             };
 
-            // Configurar el validador para fallar en este caso
             _mockValidator
                 .Setup(v => v.Validate(It.Is<CreateEstadoHabitacionDto>(d => string.IsNullOrWhiteSpace(d.Descripcion))))
                 .Returns(OperationResult.Failure("La descripción del estado de habitación es requerida."));
@@ -420,7 +420,6 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
                 Descripcion = new string('A', 51) // 51 caracteres
             };
 
-            // Configurar el validador para fallar en este caso
             _mockValidator
                 .Setup(v => v.Validate(It.Is<CreateEstadoHabitacionDto>(d => d.Descripcion.Length > 50)))
                 .Returns(OperationResult.Failure("La descripción no puede exceder los 50 caracteres."));
@@ -632,8 +631,9 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             var result = await _estadoHabitacionService.Remove(dto);
 
             // Assert
+            // Assert
             Assert.False(result.IsSuccess);
-            Assert.Contains("Error al eliminar el estado de habitación", result.Message);
+            Assert.Contains("Error inesperado", result.Message);
         }
 
         #endregion

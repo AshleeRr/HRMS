@@ -1,7 +1,6 @@
 ﻿namespace HRMS.Application.DTOs.RoomManagementDto.EstadoHabitacionDtos;
 
-public class EstadoHabitacionDto : DTOBase
+public class EstadoHabitacionDto : BaseEstadoHabitacionDto
 {
     public int IdEstadoHabitacion { get; set; }
-    public string Descripcion { get; set; }
 }

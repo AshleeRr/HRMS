@@ -1,10 +1,7 @@
-﻿using HRMS.Domain.Base;
-using HRMS.Domain.Base.Validator;
-using HRMS.Domain.Entities.RoomManagement;
+﻿using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -13,9 +10,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
     public class EstadoHabitacionRepositoryTests
     {
         private readonly DbContextOptions<HRMSContext> _dbOptions;
-        private readonly Mock<IValidator<EstadoHabitacion>> _validatorMock;
         private readonly Mock<ILogger<EstadoHabitacionRepository>> _loggerMock;
-        private readonly Mock<IConfiguration> _configMock;
 
         public EstadoHabitacionRepositoryTests()
         {
@@ -23,9 +18,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             
-            _validatorMock = new Mock<IValidator<EstadoHabitacion>>();
             _loggerMock = new Mock<ILogger<EstadoHabitacionRepository>>();
-            _configMock = new Mock<IConfiguration>();
         }
 
         [Fact]
@@ -43,7 +36,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
 
                 // Act
                 var result = await repo.GetAllAsync();
@@ -59,7 +52,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
                 
                 // Act
                 var result = await repo.GetEntityByIdAsync(0);
@@ -81,7 +74,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
 
                 // Act
                 var result = await repo.GetEntityByIdAsync(1);
@@ -93,50 +86,22 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         }
 
         [Fact]
-        public async Task SaveEntityAsync_ValidationFails_ReturnsFailure()
+        public async Task SaveEntityAsync_ValidEntity_SavesSuccessfully()
         {
             // Arrange
-            var estado = new EstadoHabitacion();
-            _validatorMock.Setup(v => v.Validate(estado))
-                .Returns(OperationResult.Failure("Error de validación"));
+            var estado = new EstadoHabitacion { Descripcion = "Disponible" };
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
 
                 // Act
                 var result = await repo.SaveEntityAsync(estado);
 
                 // Assert
-                Assert.False(result.IsSuccess);
-                Assert.Contains("validación", result.Message);
-            }
-        }
-
-        [Fact]
-        public async Task SaveEntityAsync_DuplicateDescripcion_ReturnsFailure()
-        {
-            // Arrange
-            var existingEstado = new EstadoHabitacion { Descripcion = "Ocupado", Estado = true };
-            using (var context = new HRMSContext(_dbOptions))
-            {
-                context.EstadoHabitaciones.Add(existingEstado);
-                await context.SaveChangesAsync();
-            }
-
-            var newEstado = new EstadoHabitacion { Descripcion = "Ocupado" };
-            _validatorMock.Setup(v => v.Validate(newEstado)).Returns(OperationResult.Success());
-
-            using (var context = new HRMSContext(_dbOptions))
-            {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
-
-                // Act
-                var result = await repo.SaveEntityAsync(newEstado);
-
-                // Assert
-                Assert.False(result.IsSuccess);
-                Assert.Contains("ya existe", result.Message);
+                Assert.True(result.IsSuccess);
+                var savedEstado = await context.EstadoHabitaciones.FirstOrDefaultAsync(e => e.Descripcion == "Disponible");
+                Assert.NotNull(savedEstado);
             }
         }
 
@@ -145,11 +110,10 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             // Arrange
             var estado = new EstadoHabitacion { IdEstadoHabitacion = 99 };
-            _validatorMock.Setup(v => v.Validate(estado)).Returns(OperationResult.Success());
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
 
                 // Act
                 var result = await repo.UpdateEntityAsync(estado);
@@ -172,34 +136,34 @@ namespace HRMS.Persistence.Test.RoomManagementTest
             }
 
             var updated = new EstadoHabitacion { IdEstadoHabitacion = 1, Descripcion = "Nuevo" };
-            _validatorMock.Setup(v => v.Validate(updated)).Returns(OperationResult.Success());
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
 
                 // Act
                 var result = await repo.UpdateEntityAsync(updated);
 
                 // Assert
+                Assert.True(result.IsSuccess);
                 var modified = await context.EstadoHabitaciones.FindAsync(1);
                 Assert.Equal("Nuevo", modified.Descripcion);
             }
         }
         
         [Fact]
-        public async Task GetEstadoByDescripcionAsync_EmptyDescripcion_ReturnsFailure()
+        public async Task GetEstadoByDescripcionAsync_NoMatches_ReturnsEmptyList()
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
 
                 // Act
-                var result = await repo.GetEstadoByDescripcionAsync("");
+                var result = await repo.GetEstadoByDescripcionAsync("NoExiste");
 
                 // Assert
-                Assert.False(result.IsSuccess);
-                Assert.Contains("vacía", result.Message);
+                Assert.True(result.IsSuccess); // Ahora siempre devuelve success, posiblemente con lista vacía
+                Assert.Empty((List<EstadoHabitacion>)result.Data);
             }
         }
 
@@ -218,7 +182,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
 
                 // Act
                 var result = await repo.GetEstadoByDescripcionAsync("teni");

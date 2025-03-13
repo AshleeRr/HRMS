@@ -1,7 +1,6 @@
 ﻿namespace HRMS.Application.DTOs.RoomManagementDto.PisoDtos;
 
-public class PisoDto : DTOBase
+public class PisoDto : BasePisoDto
 {
     public int IdPiso { get; set; }
-    public string Descripcion { get; set; }
 }

@@ -15,15 +15,22 @@ namespace HRMS.Application.Services.RoomServices
         private readonly IHabitacionRepository _habitacionRepository;
         private readonly IValidator<CreateHabitacionDTo> _habitacionValidator;
         private readonly IReservationRepository _reservaRepository;
+        private readonly IPisoRepository _pisoRepository;
+        private readonly IEstadoHabitacionRepository _estadoHabitacionRepository;
+        private readonly ICategoryRepository _categoryRepository;
+
 
         public HabitacionServices(IHabitacionRepository habitacionRepository,
             ILogger<HabitacionServices> logger,IValidator<CreateHabitacionDTo> habitacionValidator, 
-            IReservationRepository reservaRepository)
+            IReservationRepository reservaRepository, IPisoRepository pisoRepository, IEstadoHabitacionRepository estadoHabitacionRepository, ICategoryRepository categoryRepository)
         {
             _habitacionRepository = habitacionRepository;
             _logger = logger;
             _habitacionValidator = habitacionValidator;
             _reservaRepository = reservaRepository;
+            _pisoRepository = pisoRepository;
+            _estadoHabitacionRepository = estadoHabitacionRepository;
+            _categoryRepository = categoryRepository;
         }
         
         public async Task<OperationResult> GetAll()
@@ -73,35 +80,32 @@ namespace HRMS.Application.Services.RoomServices
 
         public async Task<OperationResult> Save(CreateHabitacionDTo dto)
         {
-            var validation = _habitacionValidator.Validate(dto);
-            if (!validation.IsSuccess) return validation;
-            
             try
             {
                 _logger.LogInformation($"Creando habitación con número: {dto.Numero}");
 
                 if (await _habitacionRepository.ExistsAsync(e => e.Numero == dto.Numero))
                     return OperationResult.Failure($"Ya existe una habitación con el número {dto.Numero}");
-
-                var habitacion = new Habitacion
-                {
-                    Numero = dto.Numero,
-                    Detalle = dto.Detalle,
-                    Precio = dto.Precio,
-                    IdEstadoHabitacion = dto.IdEstadoHabitacion,
-                    IdPiso = dto.IdPiso,
-                    IdCategoria = dto.IdCategoria,
-                    Estado = true
-                };
+        
+                var validationDto = _habitacionValidator.Validate(dto);
+                if (!validationDto.IsSuccess) return validationDto;
+                
+                var foreignKeyValidation = await ValidateForeignKeys(dto.IdPiso,
+                    dto.IdCategoria, dto.IdEstadoHabitacion);
+                if (!foreignKeyValidation.IsSuccess)
+                    return foreignKeyValidation;
+        
+                var habitacion = MapToEntity(dto);
+                habitacion.Estado = true;
 
                 var result = await _habitacionRepository.SaveEntityAsync(habitacion);
-                
+        
                 if (result.IsSuccess && result.Data is Habitacion habitacionCreada)
                 {
                     var habitacionDto = MapToDto(habitacionCreada);
                     return OperationResult.Success(habitacionDto, result.Message);
                 }
-                
+        
                 return result;
             }
             catch (Exception ex)
@@ -132,8 +136,12 @@ namespace HRMS.Application.Services.RoomServices
                     if (await _habitacionRepository.ExistsAsync(h => h.Numero == dto.Numero && h.IdHabitacion != dto.IdHabitacion))
                         return OperationResult.Failure($"Ya existe otra habitación con el número {dto.Numero}");
                 }
+                
+                var foreignKeyValidation = await ValidateForeignKeys(dto.IdPiso, dto.IdCategoria, dto.IdEstadoHabitacion);
+                if (!foreignKeyValidation.IsSuccess)
+                    return foreignKeyValidation;
 
-                UpdateHabitacionFields(habitacion, dto);
+                UpdateEntityFromDto(habitacion, dto);
         
                 var result = await _habitacionRepository.UpdateEntityAsync(habitacion);
                 
@@ -340,15 +348,53 @@ namespace HRMS.Application.Services.RoomServices
                 IdPiso = habitacion.IdPiso,
                 IdEstadoHabitacion = habitacion.IdEstadoHabitacion
             };
-            
-        private void UpdateHabitacionFields(Habitacion habitacion, UpdateHabitacionDto dto)
+        
+        private static Habitacion MapToEntity(CreateHabitacionDTo dto)
+            => new Habitacion()
+            {
+                Numero = dto.Numero,
+                Detalle = dto.Detalle,
+                Precio = dto.Precio,
+                IdCategoria = dto.IdCategoria,
+                IdPiso = dto.IdPiso,
+                IdEstadoHabitacion = dto.IdEstadoHabitacion
+            };
+
+        private static void UpdateEntityFromDto(Habitacion entity, UpdateHabitacionDto dto)
         {
-            if (dto.Numero != null) habitacion.Numero = dto.Numero;
-            if (dto.Detalle != null) habitacion.Detalle = dto.Detalle;
-            if (dto.Precio.HasValue) habitacion.Precio = dto.Precio.Value;
-            if (dto.IdEstadoHabitacion.HasValue) habitacion.IdEstadoHabitacion = dto.IdEstadoHabitacion.Value;
-            if (dto.IdPiso.HasValue) habitacion.IdPiso = dto.IdPiso.Value;
-            if (dto.IdCategoria.HasValue) habitacion.IdCategoria = dto.IdCategoria.Value;
+            if (dto.Numero != null) entity.Numero = dto.Numero;
+            if (dto.Detalle != null) entity.Detalle = dto.Detalle;
+            if (dto.Precio.HasValue) entity.Precio = dto.Precio.Value;
+            if (dto.IdCategoria.HasValue) entity.IdCategoria = dto.IdCategoria.Value;
+            if (dto.IdPiso.HasValue) entity.IdPiso = dto.IdPiso.Value;
+            if (dto.IdEstadoHabitacion.HasValue) entity.IdEstadoHabitacion = dto.IdEstadoHabitacion.Value;
+        }
+            
+        private async Task<OperationResult> ValidateForeignKeys(int? idPiso, int? idCategoria, int? idEstadoHabitacion)
+        {
+            if (!idPiso.HasValue)
+                return OperationResult.Failure("El ID del piso no puede ser nulo.");
+    
+            if (!idCategoria.HasValue)
+                return OperationResult.Failure("El ID de la categoría no puede ser nulo.");
+    
+            if (!idEstadoHabitacion.HasValue)
+                return OperationResult.Failure("El ID del estado de habitación no puede ser nulo.");
+
+            bool pisoExists = await _pisoRepository.ExistsAsync(p => p.IdPiso == idPiso.Value && p.Estado == true);
+            if (!pisoExists)
+                return OperationResult.Failure($"El piso con ID {idPiso} no existe o está inactivo.");
+    
+            bool categoriaExists = await _categoryRepository.ExistsAsync(c => c.IdCategoria == idCategoria.Value && c.Estado == true);
+            if (!categoriaExists)
+                return OperationResult.Failure($"La categoría con ID {idCategoria} no existe o está inactiva.");
+    
+            bool estadoExists = await _estadoHabitacionRepository.ExistsAsync(e => 
+                e.IdEstadoHabitacion == idEstadoHabitacion.Value && e.Estado == true);
+            if (!estadoExists)
+                return OperationResult.Failure($"El estado de habitación con ID {idEstadoHabitacion} no existe o está inactivo.");
+
+            return OperationResult.Success();
         }
     }
 }

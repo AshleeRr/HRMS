@@ -6,6 +6,7 @@ using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.Extensions.Logging;
 
+
 namespace HRMS.Application.Services.RoomServices
 {
     public class PisoServices : IPisoService
@@ -13,11 +14,11 @@ namespace HRMS.Application.Services.RoomServices
         private readonly IPisoRepository _pisoRepository;
         private readonly ILogger<PisoServices> _logger;
         private readonly IHabitacionRepository _habitacionRepository;
-        private readonly IValidator<PisoDto> _validator;
+        private readonly IValidator<CreatePisoDto> _validator;
 
         public PisoServices(IPisoRepository pisoRepository, ILogger<PisoServices> logger, 
                             IHabitacionRepository habitacionRepository, 
-                            IValidator<PisoDto> validator)
+                            IValidator<CreatePisoDto> validator)
         {
             _pisoRepository = pisoRepository;
             _logger = logger;
@@ -56,33 +57,32 @@ namespace HRMS.Application.Services.RoomServices
                     return OperationResult.Failure($"No se encontró el piso con ID {id}.");
                 
                 var pisoDto = MapToDto(piso);
-                return OperationResult.Success(pisoDto, "Pisos obtenidos correctamente");
+                return OperationResult.Success(pisoDto, "Piso obtenido correctamente");
             });
         }
-
-
+        
         public async Task<OperationResult> Save(CreatePisoDto dto)
         {
             return await OperationResult.ExecuteOperationAsync(async () =>
             {
                 var validation = _validator.Validate(dto);
-                if(!validation.IsSuccess) return validation;
+                if (!validation.IsSuccess) return validation;
                 
-                if (await _pisoRepository.ExistsAsync(p => p.Descripcion == dto.Descripcion))
-                    return OperationResult.Failure($"Ya existe un piso con la descripción '{dto.Descripcion}'.");
+                var uniqueValidation = await ValidateUniqueDescripcion(dto);
+                if (!uniqueValidation.IsSuccess) return uniqueValidation;
+                _logger.LogInformation("Guardando el piso {Descripcion}", dto.Descripcion);
 
-                _logger.LogInformation("Creando un nuevo piso.");
-                var piso = new Piso { Descripcion = dto.Descripcion, Estado = true };
-
-                var result = await _pisoRepository.SaveEntityAsync(piso);
-        
-                if (result.IsSuccess && result.Data is Piso pisoCreado)
+                var estado = MapToEntity(dto);
+                
+                var result = await _pisoRepository.SaveEntityAsync(estado);
+                
+                if (result.IsSuccess && result.Data is Piso piso)
                 {
-                    var pisoDto = MapToDto(pisoCreado);
-                    return OperationResult.Success(pisoDto, "Piso creado correctamente.");
+                    var estadoDto = MapToDto(piso);
+                    return OperationResult.Success(estadoDto, 
+                        "Piso guardado correctamente .");
                 }
-                
-                return OperationResult.Failure(result.Message ?? "Error al guardar el piso.");
+                return result;
             });
         }
 
@@ -93,19 +93,19 @@ namespace HRMS.Application.Services.RoomServices
                 var validacion = ValidateId(dto.IdPiso, "Para actualizar el piso, el ID debe ser mayor que cero.");
                 if(!validacion.IsSuccess) return validacion;
                 
-                var valitation = _validator.Validate(dto);
-                if (!valitation.IsSuccess) return valitation;
+                var validation = _validator.Validate(dto);
+                if (!validation.IsSuccess) return validation;
                 
+                var uniqueValidation = await ValidateUniqueDescripcion(dto);
+                if (!uniqueValidation.IsSuccess) return uniqueValidation;
+
                 _logger.LogInformation("Actualizando piso con ID: {Id}", dto.IdPiso);
         
                 var piso = await _pisoRepository.GetEntityByIdAsync(dto.IdPiso);
                 if (piso == null) 
                     return OperationResult.Failure($"No se encontró el piso con ID {dto.IdPiso}.");
-
-                if (await _pisoRepository.ExistsAsync(p => p.Descripcion == dto.Descripcion && p.IdPiso != dto.IdPiso))
-                    return OperationResult.Failure($"Ya existe un piso con la descripción '{dto.Descripcion}'.");
-
-                piso.Descripcion = dto.Descripcion;
+                
+                UpdateEntityFromDto(piso, dto);
                 var result = await _pisoRepository.UpdateEntityAsync(piso);
 
                 if (result.IsSuccess && result.Data is Piso pisoActualizado)
@@ -156,24 +156,25 @@ namespace HRMS.Application.Services.RoomServices
                 _logger.LogInformation("Buscando piso por descripción: {Descripcion}", descripcion);
                 var result = await _pisoRepository.GetPisoByDescripcion(descripcion);
 
-                if (result.IsSuccess && result.Data != null)
+                if (!result.IsSuccess || result.Data == null)
+                    return OperationResult.Failure($"No se encontraron pisos con la descripción '{descripcion}'.");
+
+                if (result.Data is IEnumerable<Piso> pisos)
                 {
-                    if (result.Data is IEnumerable<Piso> pisos)
-                    {
-                        var pisosList = pisos.ToList();
-                        if (pisosList.Any())
-                        {
-                            var pisosDto = pisosList.Select(MapToDto).ToList();
-                            return OperationResult.Success(pisosDto, "Piso obtenido correctamente");
-                        }
-                    }
-                    else if (result.Data is Piso piso)
-                    {
-                        var pisoDto = MapToDto(piso);
-                        return OperationResult.Success(pisoDto, "Piso obtenido correctamente");
-                    }
+                    var pisosList = pisos.ToList();
+                    if (!pisosList.Any())
+                        return OperationResult.Failure($"No se encontraron pisos con la descripción '{descripcion}'.");
+                        
+                    var pisosDto = pisosList.Select(MapToDto).ToList();
+                    return OperationResult.Success(pisosDto, "Pisos obtenidos correctamente");
                 }
-                return OperationResult.Failure($"No se encontraron pisos con la descripción '{descripcion}'.");
+                else if (result.Data is Piso piso)
+                {
+                    var pisoDto = MapToDto(piso);
+                    return OperationResult.Success(pisoDto, "Piso obtenido correctamente");
+                }
+                
+                return OperationResult.Failure($"Formato de respuesta inesperado al buscar pisos con la descripción '{descripcion}'.");
             });
         }
         
@@ -188,6 +189,25 @@ namespace HRMS.Application.Services.RoomServices
                 IdPiso = piso.IdPiso, 
                 Descripcion = piso.Descripcion
             };
+        
+        private static Piso MapToEntity(CreatePisoDto dto)
+            => new Piso 
+            { 
+                Descripcion = dto.Descripcion, 
+                Estado = true 
+            };
+            
+        private static void UpdateEntityFromDto(Piso entity, UpdatePisoDto dto)
+        {
+            entity.Descripcion = dto.Descripcion;
+        }
+        private async Task<OperationResult> ValidateUniqueDescripcion(CreatePisoDto dto)
+        {
+            if (await _pisoRepository.ExistsAsync(e =>
+                    e.Descripcion == dto.Descripcion && e.Estado == true))
+                return OperationResult.Failure($"Ya existe un piso con la descripción '{dto.Descripcion}'.");
+            return OperationResult.Success();
+        }
             
         private async Task<bool> TieneHabitacionesAsociadas(int idPiso)
         {

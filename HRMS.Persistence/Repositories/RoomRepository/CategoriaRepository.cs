@@ -23,35 +23,29 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
         public override async Task<List<Categoria>> GetAllAsync() =>
             await _context.Categorias.Where(c => c.Estado == true).ToListAsync();
-
+        
+        public override async Task<Categoria> GetEntityByIdAsync(int id)
+        {
+            return (id == 0 ? null : await _context.Categorias
+                .FirstOrDefaultAsync(c => c.IdCategoria == id && c.Estado == true))!;
+        }
+        
         public override async Task<OperationResult> SaveEntityAsync(Categoria categoria) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
-                var validation = _validator.Validate(categoria);
-                if (!validation.IsSuccess) return validation;
-                
                 await _context.Categorias.AddAsync(categoria);
                 await _context.SaveChangesAsync();
-
                 return OperationResult.Success(categoria, "Categoría guardada correctamente.");
             });
         
         public override async Task<OperationResult> UpdateEntityAsync(Categoria categoria) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
-                var validation = _validator.Validate(categoria);
-                if (!validation.IsSuccess) return validation;
-
                 var existingCategoria = await _context.Categorias.FindAsync(categoria.IdCategoria);
                 if (existingCategoria == null) return OperationResult.Failure("La categoría no existe.");
-
-                if (await ExistsAsync(c => c.Descripcion == categoria.Descripcion && c.IdCategoria != categoria.IdCategoria))
-                    return OperationResult.Failure($"Ya existe otra categoría con la descripción '{categoria.Descripcion}'.");
-
                 UpdateCategoria(existingCategoria, categoria);
                 await _context.SaveChangesAsync();
-
-                return OperationResult.Success(existingCategoria, "Categoría actualizada correctamente.");
+                return OperationResult.Success(existingCategoria);
             });
         
         public async Task<OperationResult> GetCategoriaByServiciosAsync(string nombre) =>
@@ -64,22 +58,19 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                         (c, s) => new { Categoria = c, Servicio = s })
                     .Where(cs => cs.Categoria.Estado == true && cs.Servicio.Estado == true)
                     .ToListAsync();
-
+ 
                 var categorias = categoriasYServicios
-                    .Where(cs => EF.Functions.Like(cs.Servicio.Nombre, $"%{nombre}%"))
+                    .Where(cs => cs.Servicio.Nombre.Contains(nombre, StringComparison.OrdinalIgnoreCase))
                     .Select(cs => cs.Categoria)
                     .ToList();
-    
+ 
                 return OperationResult.Success(categorias, 
                     categorias.Any() ? null : $"No se encontraron categorías para el servicio '{nombre}'.");
-            });
-        
+            });        
         public async Task<OperationResult> GetCategoriaByDescripcionAsync(string descripcion) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
-                if (string.IsNullOrWhiteSpace(descripcion)) 
-                    return OperationResult.Failure("La descripción de la categoria no puede estar vacía.");
-
+                
                 var categorias = await _context.Categorias
                     .Where(c => c.Descripcion != null && 
                                 EF.Functions.Like(c.Descripcion, $"%{descripcion}%") && 
@@ -111,6 +102,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
 
                 return OperationResult.Success(habitaciones, "Habitaciones obtenidas correctamente.");
             });
+        
         
         private static void UpdateCategoria(Categoria existing, Categoria updated)
         {

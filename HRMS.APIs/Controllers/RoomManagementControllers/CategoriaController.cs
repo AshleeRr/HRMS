@@ -168,7 +168,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
                 return BadRequest(new { message = "La descripción no puede estar vacía." });
             }
 
-            var result = await _categoryService.GetCategoriaByServicio(descripcion);
+            var result = await _categoryService.GetCategoriaByDescripcion(descripcion);
 
             if (!result.IsSuccess)
                 _logger.LogWarning("No se encontraron categorias con la descripcion '{nombreServicio}': {Message}",

@@ -176,7 +176,7 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal("Piso creado correctamente.", result.Message);
+            Assert.Equal("Piso guardado correctamente .", result.Message);
             Assert.NotNull(result.Data);
             var resultDto = Assert.IsType<PisoDto>(result.Data);
             Assert.Equal(dto.Descripcion, resultDto.Descripcion);

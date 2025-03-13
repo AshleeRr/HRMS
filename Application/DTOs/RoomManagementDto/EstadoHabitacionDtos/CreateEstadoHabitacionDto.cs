@@ -1,6 +1,6 @@
 ﻿namespace HRMS.Application.DTOs.RoomManagementDto.EstadoHabitacionDtos;
 
-public class CreateEstadoHabitacionDto : EstadoHabitacionDto
+public class CreateEstadoHabitacionDto : BaseEstadoHabitacionDto
 {
     
 }
