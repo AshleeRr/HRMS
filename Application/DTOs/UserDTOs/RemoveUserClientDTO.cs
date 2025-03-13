@@ -2,8 +2,8 @@
 
 namespace HRMS.Application.DTOs.UserDTOs
 {
-    public class RemoveUserClientDTO : DTOBase
+    public class RemoveUserClientDTO : SoftDeleteBaseDTO
     {
-        public int Id { get; set; }
+        public int Id { get; set; } 
     }
 }
