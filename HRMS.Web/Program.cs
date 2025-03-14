@@ -2,6 +2,7 @@ using HRMS.IOC.ReservationDepedencies;
 using HRMS.IOC.RoomDependencies;
 using HRMS.IOC.ServicesDependency;
 using HRMS.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRMS.Web
 {
@@ -11,8 +12,11 @@ namespace HRMS.Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddDbContext<HRMSContext>();
+
+            builder.Services.AddDbContext<HRMSContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DBHotel")));
             // Add services to the container.
+
             builder.Services.AddControllersWithViews();
             builder.Services.AddPisoDependency();
             builder.Services.AddCategoryDependency();

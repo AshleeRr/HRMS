@@ -1,32 +1,43 @@
-﻿using HRMS.Application.Interfaces.RoomManagementService;
+﻿using HRMS.Application.DTOs.RoomManagementDto.PisoDtos;
+using HRMS.Application.Interfaces.RoomManagementService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRMS.Web.Controllers
 {
-    public class RoomController : Controller
+    public class PisoController : Controller
     {
-        private readonly IHabitacionService habitacionService;
-        // GET: RoomController
-        public async Task <IActionResult> Index()
+        private readonly IPisoService pisoService;
+
+        public PisoController(IPisoService pisoService)
         {
-            var habitaciones = habitacionService.GetAll();
-            return View();
+            this.pisoService = pisoService;
         }
 
-        // GET: RoomController/Details/5
+        public async Task <IActionResult> Index()
+        {
+            var result = await pisoService.GetAll();
+            if (result.IsSuccess)
+            {
+                List<PisoDto> pisoList = (List<PisoDto>)result.Data;
+                return View(pisoList);
+            }
+            return View("Index");
+        }
+
+        // GET: PisoController/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
 
-        // GET: RoomController/Create
+        // GET: PisoController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: RoomController/Create
+        // POST: PisoController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
@@ -41,13 +52,13 @@ namespace HRMS.Web.Controllers
             }
         }
 
-        // GET: RoomController/Edit/5
+        // GET: PisoController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: RoomController/Edit/5
+        // POST: PisoController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -62,13 +73,13 @@ namespace HRMS.Web.Controllers
             }
         }
 
-        // GET: RoomController/Delete/5
+        // GET: PisoController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: RoomController/Delete/5
+        // POST: PisoController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)

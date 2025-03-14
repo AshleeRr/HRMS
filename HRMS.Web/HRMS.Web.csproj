@@ -19,4 +19,18 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\RoomViews\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Tarifa\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\RoomViews\Tarifa\Index.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="Views\Room\Create.cshtml" />
+    <AdditionalFiles Include="Views\Room\Index.cshtml" />
+  </ItemGroup>
+
 </Project>

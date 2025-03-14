@@ -17,48 +17,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/RoomController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/BaseDTO/DTOBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/BaseDTO/DTOBase.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservClientInfoDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservClientInfoDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationAddDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationAddDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationConfirmDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationConfirmDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationRemoveDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationRemoveDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationUpdateDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/Reservation_2023-0731/ReservationUpdateDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/BaseCategoryDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/BaseCategoryDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/CategoriaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/CategoriaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/CreateCategoriaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/CreateCategoriaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/DeleteCategoriaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/DeleteCategoriaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/UpdateCategoriaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/UpdateCategoriaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/BaseEstadoHabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/BaseEstadoHabitacionDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/CreateEstadoHabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/CreateEstadoHabitacionDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/DeleteEstadoHabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/DeleteEstadoHabitacionDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/EstadoHabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/EstadoHabitacionDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/UpdateEstadoHabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/UpdateEstadoHabitacionDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/BaseHabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/BaseHabitacionDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/CreateHabitacionDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/CreateHabitacionDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/DeleteHabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/DeleteHabitacionDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/HabitacionDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/HabitacionDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/UpdateHabitacionDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/UpdateHabitacionDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/BasePisoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/BasePisoDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/CreatePisoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/CreatePisoDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/DeletePisoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/DeletePisoDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/PisoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/PisoDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/UpdatePisoDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/PisoDtos/UpdatePisoDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/BaseTarifaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/BaseTarifaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/CreateTarifaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/CreateTarifaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/DeleteTarifaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/DeleteTarifaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/TarifaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/TarifaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/UpdateTarifaDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/TarifaDtos/UpdateTarifaDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserDTOs/RemoveUserClientDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/UserDTOs/RemoveUserClientDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserDTOs/UserDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/UserDTOs/UserDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserRoleDTOs/RemoveUserRoleDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/UserRoleDTOs/RemoveUserRoleDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserRoleDTOs/UserRoleDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/UserRoleDTOs/UserRoleDTO.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomController.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Web/HRMS.Web.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/HRMS.Web.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Web/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Home/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Home/Index.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Home/RoomView.cshtml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Shared/_Layout.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/appsettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,6 +64,7 @@
     <setting file="file://$PROJECT_DIR$/WebApplication1/Models/ErrorViewModel.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/WebApplication1/Program.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5acc345db3c207bc9d886a36ff14867ef8d65557432172c2a42f19aeac04d1b/Nullable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7d81b2d4f22bee75e5438c707251ae43cb0974c207db91ffc159118c84b4eb9/ServiceProvider.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a42ba4db448ed38dcb9fb39194c637a317a8281856b88e139e8a905ee6d12b/Guid.Windows.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/aef21ab35a6576cdcb99a56e6a8c84076d069f09ad1be52cfedaf49ee667855/Int32.cs" root0="FORCE_HIGHLIGHTING" />
@@ -113,26 +81,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.HRMS.APIs: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Launch Settings Profile.HRMS.Web: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Launch Settings Profile.WebApplication1: http.executor&quot;: &quot;Run&quot;,
-    &quot;17f863f2-0756-4004-8cec-c4fe455a4b00.executor&quot;: &quot;Debug&quot;,
-    &quot;1bbbd99b-50bb-45a2-b1bb-ea182635a59a.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;HTTP Request.HRMS.APIs | #1.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;HabitFloors-20240045&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.HRMS.APIs: http.executor": "Run",
+    ".NET Launch Settings Profile.HRMS.Web: http.executor": "Run",
+    ".NET Launch Settings Profile.WebApplication1: http.executor": "Run",
+    "17f863f2-0756-4004-8cec-c4fe455a4b00.executor": "Debug",
+    "1bbbd99b-50bb-45a2-b1bb-ea182635a59a.executor": "Debug",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "HTTP Request.HRMS.APIs | #1.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "HabitFloors-20240045",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.Web: http">
     <configuration name="Unnamed" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false" temporary="true">
       <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.Persistence.Test/HRMS.Persistence.Test.csproj" />
@@ -360,7 +328,8 @@
       <workItem from="1741762448734" duration="5849000" />
       <workItem from="1741807799120" duration="27930000" />
       <workItem from="1741849543337" duration="558000" />
-      <workItem from="1741850804932" duration="5028000" />
+      <workItem from="1741850804932" duration="13500000" />
+      <workItem from="1741930897695" duration="6726000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
