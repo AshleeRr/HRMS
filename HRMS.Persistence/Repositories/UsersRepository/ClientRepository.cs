@@ -26,10 +26,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
        
         public async Task<Client> GetClientByEmailAsync(string correo) 
         {
-            if (string.IsNullOrWhiteSpace(correo))
-            {
-                throw new ArgumentNullException(nameof(correo), "El correo no puede estar vacío");
-            }
+            ValidateNulleable(correo, "correo");
             var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Correo == correo);
             if (cliente == null) 
             {
@@ -39,11 +36,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         }
         public async Task<Client> GetClientByDocumentAsync(string documento)
         {
-
-            if (string.IsNullOrWhiteSpace(documento))
-            {
-                throw new ArgumentNullException(nameof(documento), "El documento no puede estar vacío");
-            }
+            ValidateNulleable(documento, "documento");
             var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Documento == documento);
             if (cliente == null)
             {
@@ -53,11 +46,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         }
         public async Task<List<Client>> GetClientsByTypeDocumentAsync(string tipoDocumento)
         {
-
-            if (string.IsNullOrWhiteSpace(tipoDocumento))
-            {
-                throw new ArgumentNullException(nameof(tipoDocumento), "El tipo de documento no puede estar vacío");
-            }
+            ValidateNulleable(tipoDocumento, "tipo documento");
             var clientes = await _context.Clients.Where(c => c.TipoDocumento == tipoDocumento).ToListAsync();
             if (!clientes.Any())
             {
@@ -67,6 +56,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         }
         public async Task<Client> GetClientByUserIdAsync(int idUsuario)
         {
+            ValidateId(idUsuario);
             return await _context.Clients.FirstOrDefaultAsync(c => c.IdUsuario == idUsuario);
         }
         public override async Task<OperationResult> GetAllAsync(Expression<Func<Client, bool>> filter)
@@ -91,10 +81,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         
         public override async Task<Client> GetEntityByIdAsync(int id)
         {
-            if(id < 1)
-            {
-                throw new ArgumentNullException(nameof(id), "El id debe ser mayor que 0");
-            }
+            ValidateId(id);
             var entity = await _context.Clients.FindAsync(id);
             if (entity == null)
             {
@@ -164,6 +151,21 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
+        }
+        private int ValidateId(int id)
+        {
+            if (id <= 0)
+            {
+                throw new ArgumentNullException("El id debe ser mayor que 0");
+            }
+            return id;
+        }
+        private void ValidateNulleable(string x, string message)
+        {
+            if (string.IsNullOrEmpty(x))
+            {
+                throw new ArgumentNullException($"El campo: {message} no puede estar vacio.");
+            }
         }
     }
 }
