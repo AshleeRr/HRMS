@@ -41,11 +41,16 @@ namespace HRMS.Web.Controllers
         // POST: CategoriaController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task <IActionResult> Create(CreateCategoriaDto dto)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var result = await categoryService.Save(dto);
+                if (result.IsSuccess)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                return View("Index");
             }
             catch
             {
@@ -54,44 +59,97 @@ namespace HRMS.Web.Controllers
         }
 
         // GET: CategoriaController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task <IActionResult> Edit(int id)
         {
-            return View();
+            try
+            {
+                var result = await categoryService.GetById(id);
+                if (!result.IsSuccess)
+                {
+                    TempData["ErrorMessage"] = result.Message ?? "El categoria no fue encontrado.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var categoria = result.Data as CategoriaDto;
+                if (categoria == null)
+                {
+                    TempData["ErrorMessage"] = "Error al obtener las categorias.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var updateDto = new UpdateCategoriaDto()
+                {
+                    IdCategoria = categoria.IdCategoria,
+                    Descripcion = categoria.Descripcion,
+                    IdServicio = categoria.IdServicio,
+                    Capacidad = categoria.Capacidad
+                };
+
+                return View(updateDto);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error al cargar los datos: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }        
         }
 
         // POST: CategoriaController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task <IActionResult> Edit(UpdateCategoriaDto dto)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (!ModelState.IsValid)
+                {
+                    return View(dto);
+                }
+
+                var result = await categoryService.Update(dto);
+                if (result.IsSuccess)
+                {
+                    TempData["SuccessMessage"] = "Categoria actualizado correctamente.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ModelState.AddModelError("", result.Message ?? "No se pudo actualizar la categoria.");
+                return View(dto);
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
+                return View(dto);
             }
         }
 
         // GET: CategoriaController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+
 
         // POST: CategoriaController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task <IActionResult> Delete(int id)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var delete = new DeleteCategoriaDto() { IdCategoria = id };
+                var result = await categoryService.Remove(delete);
+
+                if (result != null && result.IsSuccess)
+                {
+                    TempData["SuccessMessage"] = "Categoria eliminado correctamente.";
+                    return Json(new { success = true, message = "Categoria eliminado correctamente." });
+                }
+                else
+                {
+                    string errorMessage = result?.Message ?? "No se pudo eliminar la categoria.";
+                    return Json(new { success = false, message = errorMessage });
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return Json(new { success = false, message = "Error al eliminar: " + ex.Message });
             }
         }
     }

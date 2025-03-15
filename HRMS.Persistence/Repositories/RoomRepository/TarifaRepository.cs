@@ -49,13 +49,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             {
                 _logger.LogInformation("Guardando nueva tarifa");
                 
-                var validation = _validator.Validate(tarifas);
-                if (!validation.IsSuccess)
-                {
-                    _logger.LogWarning("Validación de tarifa fallida: {Message}", validation.Message);
-                    return validation;
-                }
-                
                 await _context.Tarifas.AddAsync(tarifas);
                 await _context.SaveChangesAsync();
                 
@@ -69,13 +62,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             return await OperationResult.ExecuteOperationAsync(async () =>
             {
                 _logger.LogInformation("Actualizando tarifa con ID: {Id}", tarifas.IdTarifa);
-                
-                var validation = _validator.Validate(tarifas);
-                if (!validation.IsSuccess)
-                {
-                    _logger.LogWarning("Validación de tarifa fallida: {Message}", validation.Message);
-                    return validation;
-                }
                 
                 var existingTarifa = await _context.Tarifas.FindAsync(tarifas.IdTarifa);
                 if (existingTarifa == null)

@@ -151,21 +151,57 @@
                     return false;
                 }
                 
+                // Show loading indicator on button
+                const submitButton = $(this).find('button[type="submit"]');
+                submitButton.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i> Procesando...');
+                
                 $.ajax({
                     url: $(this).attr('action'),
                     type: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {
+                        // Reset button state
+                        submitButton.prop('disabled', false).html('<i class="bi bi-trash-fill"></i> Eliminar');
+                        
                         if (response.success) {
+                            // IMPORTANT: Close the modal and remove backdrop
                             $('#deleteModal').modal('hide');
+                            $('.modal-backdrop').remove();
+                            $('body').removeClass('modal-open');
+                            $('body').css('overflow', '');
+                            $('body').css('padding-right', '');
                             
-                            location.reload();
+                            // Add success alert to the page
+                            const alertHtml = `
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-check-circle-fill me-2"></i> ${response.message || 'Habitación eliminada correctamente.'}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            `;
+                            $('.container').first().prepend(alertHtml);
+                            
+                            // Remove the deleted row with a fade effect
+                            $(`button[data-id="${roomId}"]`).closest('tr').fadeOut(500, function() {
+                                $(this).remove();
+                            });
+                            
+                            // If the table is now empty, add a "no records" row
+                            if ($('table tbody tr:visible').length === 0) {
+                                $('table tbody').append(`
+                                    <tr>
+                                        <td colspan="7" class="text-center">No hay habitaciones registradas</td>
+                                    </tr>
+                                `);
+                            }
                         } else {
                             $('#modalErrorContainer').removeClass('d-none');
                             $('#modalErrorMessage').text(response.message || 'No se pudo eliminar la habitación.');
                         }
                     },
                     error: function(xhr) {
+                        // Reset button state
+                        submitButton.prop('disabled', false).html('<i class="bi bi-trash-fill"></i> Eliminar');
+                        
                         $('#modalErrorContainer').removeClass('d-none');
                         
                         if (xhr.responseJSON && xhr.responseJSON.message) {

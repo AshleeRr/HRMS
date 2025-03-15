@@ -1,28 +1,30 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.TarifaDtos;
 using HRMS.Application.Interfaces.RoomManagementService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HRMS.Web.Controllers
+namespace HRMS.Web.Controllers.RoomControllers
 {
     public class TarifaController : Controller
     {
         private readonly ITarifaService tarifaService;
-        
+
         public TarifaController(ITarifaService tarifaService)
         {
             this.tarifaService = tarifaService;
         }
+
         // GET: Tarifa
-        public async Task <IActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             var result = await tarifaService.GetAll();
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Data != null)
             {
                 List<TarifaDto> tarifaList = (List<TarifaDto>)result.Data;
                 return View(tarifaList);
             }
-            return View();
+
+            TempData["ErrorMessage"] = result.Message ?? "No se pudieron cargar las tarifas.";
+            return View(new List<TarifaDto>());
         }
 
         // GET: Tarifa/Details/5
@@ -40,58 +42,99 @@ namespace HRMS.Web.Controllers
         // POST: Tarifa/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(CreateTarifaDto dto)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (!ModelState.IsValid)
+                {
+                    return View(dto);
+                }
+
+                var result = await tarifaService.Save(dto);
+                if (result.IsSuccess)
+                {
+                    TempData["SuccessMessage"] = "Tarifa creada correctamente.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ModelState.AddModelError("", result.Message ?? "No se pudo crear la tarifa.");
+                return View(dto);
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                ModelState.AddModelError("", "Error al crear: " + ex.Message);
+                return View(dto);
             }
         }
 
         // GET: Tarifa/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            return View();
+            try
+            {
+                var result = await tarifaService.GetById(id);
+                if (!result.IsSuccess)
+                {
+                    TempData["ErrorMessage"] = result.Message ?? "La tarifa no fue encontrada.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var tarifa = result.Data as TarifaDto;
+                if (tarifa == null)
+                {
+                    TempData["ErrorMessage"] = "Error al obtener las tarifas.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var updateDto = new UpdateTarifaDto()
+                {
+                    IdTarifa = tarifa.IdTarifa,
+                    Descripcion = tarifa.Descripcion,
+                    PrecioPorNoche = tarifa.PrecioPorNoche,
+                    Descuento = tarifa.Descuento,
+                    FechaInicio = tarifa.FechaInicio,
+                    FechaFin = tarifa.FechaFin,
+                    IdCategoria = tarifa.IdCategoria
+                };
+
+                return View(updateDto);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error al cargar los datos: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // POST: Tarifa/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(UpdateTarifaDto dto)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                if (!ModelState.IsValid)
+                {
+                    return View(dto);
+                }
 
-        // GET: Tarifa/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+                var result = await tarifaService.Update(dto);
+                if (result.IsSuccess)
+                {
+                    TempData["SuccessMessage"] = "Tarifa actualizada correctamente.";
+                    return RedirectToAction(nameof(Index));
+                }
 
-        // POST: Tarifa/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", result.Message ?? "No se pudo actualizar la tarifa.");
+                return View(dto);
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                ModelState.AddModelError("", "Error al actualizar: " + ex.Message);
+                return View(dto);
             }
         }
     }
 }
+

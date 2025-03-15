@@ -17,15 +17,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/RoomController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/HRMS.Web.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/HRMS.Web.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Home/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Home/Index.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Home/RoomView.cshtml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/CategoriaController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/EstadoHabitacionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/PisoController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/PisoController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/RoomController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/RoomController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/TarifaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/TarifaController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Categoria/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Categoria/Index.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/EstadoHabitacion/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/EstadoHabitacion/Index.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Piso/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Piso/Index.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Room/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Room/Index.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Shared/_Layout.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/appsettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Tarifa/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Tarifa/Index.cshtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +67,7 @@
     <setting file="file://$PROJECT_DIR$/WebApplication1/Controllers/HomeController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/WebApplication1/Models/ErrorViewModel.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/WebApplication1/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0fbc4d3b821e47d7a79878451a0956b944928/d0/f35b51ac/ValidationSummary.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5acc345db3c207bc9d886a36ff14867ef8d65557432172c2a42f19aeac04d1b/Nullable.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7d81b2d4f22bee75e5438c707251ae43cb0974c207db91ffc159118c84b4eb9/ServiceProvider.cs" root0="FORCE_HIGHLIGHTING" />
@@ -81,26 +86,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Launch Settings Profile.HRMS.APIs: http.executor": "Run",
-    ".NET Launch Settings Profile.HRMS.Web: http.executor": "Run",
-    ".NET Launch Settings Profile.WebApplication1: http.executor": "Run",
-    "17f863f2-0756-4004-8cec-c4fe455a4b00.executor": "Debug",
-    "1bbbd99b-50bb-45a2-b1bb-ea182635a59a.executor": "Debug",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "HTTP Request.HRMS.APIs | #1.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "HabitFloors-20240045",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Launch Settings Profile.HRMS.APIs: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.HRMS.Web: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.WebApplication1: http.executor&quot;: &quot;Run&quot;,
+    &quot;17f863f2-0756-4004-8cec-c4fe455a4b00.executor&quot;: &quot;Debug&quot;,
+    &quot;1bbbd99b-50bb-45a2-b1bb-ea182635a59a.executor&quot;: &quot;Debug&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;HTTP Request.HRMS.APIs | #1.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;HabitFloors-20240045&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.Web: http">
     <configuration name="Unnamed" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false" temporary="true">
       <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.Persistence.Test/HRMS.Persistence.Test.csproj" />
@@ -329,7 +334,8 @@
       <workItem from="1741807799120" duration="27930000" />
       <workItem from="1741849543337" duration="558000" />
       <workItem from="1741850804932" duration="13500000" />
-      <workItem from="1741930897695" duration="6726000" />
+      <workItem from="1741930897695" duration="8318000" />
+      <workItem from="1741981403503" duration="13051000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
