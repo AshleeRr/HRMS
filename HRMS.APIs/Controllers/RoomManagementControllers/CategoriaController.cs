@@ -238,6 +238,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
             return result.IsSuccess
                 ? Ok(result.Data)
                 : NotFound(new { message = result.Message });
+            
         }
 
     }
