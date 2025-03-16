@@ -27,17 +27,17 @@ namespace HRMS.Persistence.Repositories.UsersRepository
 
         public async Task<List<User>> GetUsersByNameAsync(string nombreCompleto)
         {
-            ArgumentException.ThrowIfNullOrEmpty(nombreCompleto, nameof(nombreCompleto));
+            ValidateNulleable(nombreCompleto, "nombre completo");
             var usuarios = await _context.Users.Where(u => u.NombreCompleto == nombreCompleto).ToListAsync();
             if (!usuarios.Any())
             {
-                await _loggerServices.LogWarning("No se encontraron usuarios con este nombre", this, nameof(GetUsersByNameAsync));
+                await _loggerServices.LogError("No se encontraron usuarios con este nombre", this, nameof(GetUsersByNameAsync));
             }
             return usuarios;
         }
         public async Task<User> GetUserByEmailAsync(string correo)
         {
-            ArgumentException.ThrowIfNullOrEmpty(correo, nameof(correo));
+            ValidateNulleable(correo, "correo");
             var usuario = await _context.Users.FirstOrDefaultAsync(u => u.Correo == correo);
             if (usuario == null)
             {
@@ -66,6 +66,10 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         }
         public override async Task<User> GetEntityByIdAsync(int id)
         {
+            if (id <= 0)
+            {
+                throw new ArgumentNullException("El id debe ser mayor que 0");
+            }
             var entityById = await _context.Users.FindAsync(id);
             if (entityById == null)
             {
@@ -135,11 +139,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
 
         public async Task<User> GetUserByDocumentAsync(string documento)
         {
-
-            if (string.IsNullOrWhiteSpace(documento))
-            {
-                throw new ArgumentNullException(nameof(documento), "El documento no puede estar vacío");
-            }
+            ValidateNulleable(documento, "documento");
             var usuario = await _context.Users.FirstOrDefaultAsync(u => u.Documento == documento);
 
             if (usuario == null)
@@ -151,10 +151,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
 
         public async Task<List<User>> GetUsersByTypeDocumentAsync(string tipoDocumento)
         {
-            if (string.IsNullOrWhiteSpace(tipoDocumento))
-            {
-                throw new ArgumentNullException(nameof(tipoDocumento), "El tipo de documento no puede estar vacío");
-            }
+            ValidateNulleable(tipoDocumento, "tipodocumento");
             var usuarios = await _context.Users.Where(u => u.TipoDocumento == tipoDocumento).ToListAsync();
             if (!usuarios.Any())
             {
@@ -162,6 +159,13 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             return usuarios;
         }
-        
+        private void ValidateNulleable(string x, string message)
+        {
+            if (string.IsNullOrEmpty(x))
+            {
+                _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
+            }
+        }
+
     }
 }

@@ -45,6 +45,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         }
         public override async Task<UserRole> GetEntityByIdAsync(int id)
         {
+            ValidateId(id);
             var entity = await _context.UserRoles.FindAsync(id);
             if (entity == null)
             {
@@ -60,7 +61,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var validUserRole = _validUserRole(entity);
                 if (!validUserRole.IsSuccess)
                 {
-                    return validUserRole;
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos del rol para guardar";
+                    return result;
                 }
                 entity.FechaCreacion = DateTime.Now;
                 result.IsSuccess = true;
@@ -88,7 +91,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var validUserRole = _validUserRole(entity);
                 if(!validUserRole.IsSuccess)
                 {
-                    return validUserRole;
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos del rol para actualizar";
+                    return result;
                 }
                 var rolUsuario = await _context.UserRoles.FindAsync(entity.IdRolUsuario);
                 if (rolUsuario == null)
@@ -114,23 +119,17 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         }
         public async Task<UserRole> GetRoleByNameAsync(string rolNombre)
         {
-            if (string.IsNullOrEmpty(rolNombre))
-            {
-                throw new ArgumentNullException(nameof(rolNombre), "El nombre del rol no puede estar vacio");
-            }
+            ValidateNulleable(rolNombre, "rol nombre");
             var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.RolNombre == rolNombre);
             if (rolUsuario == null)
             {
-                await _loggerServices.LogWarning("No se encontró un rol con este nombre", this, nameof(GetRoleByNameAsync));
+                await _loggerServices.LogError("No se encontró un rol con este nombre", this, nameof(GetRoleByNameAsync));
             }
             return rolUsuario;
         }
         public async Task<UserRole> GetRoleByDescriptionAsync(string descripcion)
         {
-            if (string.IsNullOrEmpty(descripcion))
-            {
-                throw new ArgumentNullException(nameof(descripcion), "La descripción no puede estar vacía");
-            }
+            ValidateNulleable(descripcion, "descripcion");
             var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.Descripcion == descripcion);
             if(rolUsuario == null)
             {
@@ -143,12 +142,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             OperationResult result = new OperationResult();
             try
             {
-                if (id <= 0)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "El id del rol de usuario debe ser mayor que 0";
-                    return result;
-                }
+                ValidateId(id);
                 var query = await (from userRol in _context.UserRoles
                                    join users in _context.Users on userRol.IdRolUsuario equals users.IdRolUsuario
                                    where userRol.IdRolUsuario == id
@@ -177,6 +171,20 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
+        }
+        private void ValidateId(int id)
+        {
+            if (id <= 0)
+            {
+                _loggerServices.LogError($"{id}", "El id debe ser mayor que 0");
+            }
+        }
+        private void ValidateNulleable(string x, string message)
+        {
+            if (string.IsNullOrEmpty(x))
+            {
+                _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
+            }
         }
     }
 }
