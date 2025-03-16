@@ -102,7 +102,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var validClient = _validClient(entity);
                 if (!validClient.IsSuccess)
                 {
-                    return validClient;
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos del cliente para actualizar";
+                    return result; ;
                 }
                 var cliente = await _context.Clients.FindAsync(entity.IdUsuario);
                 if (cliente == null)
@@ -136,7 +138,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var validClient = _validClient(entity);
                 if (!validClient.IsSuccess)
                 {
-                    return validClient;
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos del cliente para guardar";
+                    return result;
                 }
                 entity.Estado = true;
                 entity.FechaCreacion = DateTime.Now;
@@ -164,7 +168,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         {
             if (string.IsNullOrEmpty(x))
             {
-                throw new ArgumentNullException($"El campo: {message} no puede estar vacio.");
+                _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
             }
         }
     }

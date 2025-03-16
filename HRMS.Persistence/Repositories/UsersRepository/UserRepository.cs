@@ -31,7 +31,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var usuarios = await _context.Users.Where(u => u.NombreCompleto == nombreCompleto).ToListAsync();
             if (!usuarios.Any())
             {
-                await _loggerServices.LogWarning("No se encontraron usuarios con este nombre", this, nameof(GetUsersByNameAsync));
+                await _loggerServices.LogError("No se encontraron usuarios con este nombre", this, nameof(GetUsersByNameAsync));
             }
             return usuarios;
         }
@@ -163,7 +163,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         {
             if (string.IsNullOrEmpty(x))
             {
-                throw new ArgumentNullException($"El campo: {message} no puede estar vacio.");
+                _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
             }
         }
 

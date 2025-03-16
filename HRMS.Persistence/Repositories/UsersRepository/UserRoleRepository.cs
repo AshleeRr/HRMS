@@ -61,7 +61,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var validUserRole = _validUserRole(entity);
                 if (!validUserRole.IsSuccess)
                 {
-                    return validUserRole;
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos del rol para guardar";
+                    return result;
                 }
                 entity.FechaCreacion = DateTime.Now;
                 result.IsSuccess = true;
@@ -89,7 +91,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var validUserRole = _validUserRole(entity);
                 if(!validUserRole.IsSuccess)
                 {
-                    return validUserRole;
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos del rol para actualizar";
+                    return result;
                 }
                 var rolUsuario = await _context.UserRoles.FindAsync(entity.IdRolUsuario);
                 if (rolUsuario == null)
@@ -119,7 +123,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.RolNombre == rolNombre);
             if (rolUsuario == null)
             {
-                await _loggerServices.LogWarning("No se encontró un rol con este nombre", this, nameof(GetRoleByNameAsync));
+                await _loggerServices.LogError("No se encontró un rol con este nombre", this, nameof(GetRoleByNameAsync));
             }
             return rolUsuario;
         }
@@ -168,19 +172,18 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             }
             return result;
         }
-        private int ValidateId(int id)
+        private void ValidateId(int id)
         {
             if (id <= 0)
             {
-                throw new ArgumentNullException("El id debe ser mayor que 0");
+                _loggerServices.LogError($"{id}", "El id debe ser mayor que 0");
             }
-            return id;
         }
         private void ValidateNulleable(string x, string message)
         {
             if (string.IsNullOrEmpty(x))
             {
-                throw new ArgumentNullException($"El campo: {message} no puede estar vacio.");
+                _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
             }
         }
     }
