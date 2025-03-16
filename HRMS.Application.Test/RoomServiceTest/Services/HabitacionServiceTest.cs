@@ -1088,17 +1088,21 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
         public async Task GetInfoHabitacionesAsync_WithValidResult_ReturnsSuccess()
         {
             // Arrange
-            var infoHabitaciones = new List<object> 
+            var infoHabitaciones = new List<HabitacionInfoDto> 
             {
-                new 
+                new HabitacionInfoDto 
                 { 
                     IdHabitacion = 1, 
                     Numero = "101",
                     PrecioPorNoche = 100.0M,
-                    DescripcionCategoria = "Simple"
+                    DescripcionCategoria = "Simple",
+                    DescripcionPiso = "",
+                    Detalle = "",
+                    NombreServicio = "Sin servicio",
+                    DescripcionServicio = "Sin descripción"
                 }
             };
-            
+    
             _mockRepository.Setup(r => r.GetInfoHabitacionesAsync())
                 .ReturnsAsync(OperationResult.Success(infoHabitaciones));
 
@@ -1108,8 +1112,23 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
             // Assert
             Assert.True(result.IsSuccess);
             Assert.Equal("Información de las habitaciones obtenida correctamente", result.Message);
-            Assert.Same(infoHabitaciones, result.Data);
+    
+            var resultList = Assert.IsType<List<HabitacionInfoDto>>(result.Data);
+            Assert.Equal(infoHabitaciones.Count, resultList.Count);
+    
+            for (int i = 0; i < infoHabitaciones.Count; i++)
+            {
+                Assert.Equal(infoHabitaciones[i].IdHabitacion, resultList[i].IdHabitacion);
+                Assert.Equal(infoHabitaciones[i].Numero, resultList[i].Numero);
+                Assert.Equal(infoHabitaciones[i].PrecioPorNoche, resultList[i].PrecioPorNoche);
+                Assert.Equal(infoHabitaciones[i].DescripcionCategoria, resultList[i].DescripcionCategoria);
+                Assert.Equal(infoHabitaciones[i].DescripcionPiso, resultList[i].DescripcionPiso);
+                Assert.Equal(infoHabitaciones[i].Detalle, resultList[i].Detalle);
+                Assert.Equal(infoHabitaciones[i].NombreServicio, resultList[i].NombreServicio);
+                Assert.Equal(infoHabitaciones[i].DescripcionServicio, resultList[i].DescripcionServicio);
+            }
         }
+
 
         [Fact]
         public async Task GetInfoHabitacionesAsync_WithNoInfoFound_ReturnsSuccess()

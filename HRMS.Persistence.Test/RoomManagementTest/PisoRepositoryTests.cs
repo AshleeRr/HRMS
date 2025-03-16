@@ -1,8 +1,11 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit.Abstractions;
 
 namespace HRMS.Persistence.Test.RoomManagementTest
@@ -11,6 +14,8 @@ namespace HRMS.Persistence.Test.RoomManagementTest
     {
         private readonly ITestOutputHelper _testOutputHelper;
         private readonly DbContextOptions<HRMSContext> _dbOptions;
+        private readonly Mock<ILogger<PisoRepository>> _loggerMock;
+        private readonly Mock<IValidator<Piso>> _validatorMock;
 
         public PisoRepositoryTests(ITestOutputHelper testOutputHelper)
         {
@@ -18,6 +23,9 @@ namespace HRMS.Persistence.Test.RoomManagementTest
             _dbOptions = new DbContextOptionsBuilder<HRMSContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
+            
+            _loggerMock  = new Mock<ILogger<PisoRepository>>();
+            _validatorMock = new Mock<IValidator<Piso>>();
         }
 
         [Fact]
@@ -35,7 +43,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context);
+                var repo = new PisoRepository(context ,  _loggerMock.Object , _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetAllAsync();
@@ -51,7 +59,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context);
+                var repo = new PisoRepository(context ,  _loggerMock.Object , _validatorMock.Object);
                 
                 // Act
                 var result = await repo.GetEntityByIdAsync(0);
@@ -73,7 +81,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context);
+                var repo = new PisoRepository(context ,  _loggerMock.Object , _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetEntityByIdAsync(1);
@@ -89,7 +97,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context);
+                var repo = new PisoRepository(context ,  _loggerMock.Object , _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetPisoByDescripcion("");
@@ -111,7 +119,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context);
+                var repo = new PisoRepository(context ,  _loggerMock.Object , _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetPisoByDescripcion("Ejec");
@@ -134,7 +142,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context);
+                var repo = new PisoRepository(context ,  _loggerMock.Object , _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetPisoByDescripcion("Inexistente");
@@ -157,7 +165,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context);
+                var repo = new PisoRepository(context ,  _loggerMock.Object , _validatorMock.Object);
 
                 // Act
                 var result = await repo.ExistsByDescripcionAsync(descripcion);
@@ -179,7 +187,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context);
+                var repo = new PisoRepository(context ,  _loggerMock.Object , _validatorMock.Object);
 
                 // Act
                 var result = await repo.ExistsByDescripcionAsync("Inexistente");
@@ -202,7 +210,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new PisoRepository(context);
+                var repo = new PisoRepository(context ,  _loggerMock.Object , _validatorMock.Object);
 
                 // Act
                 var result = await repo.ExistsByDescripcionAsync(descripcion, 1);

@@ -22,7 +22,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// Obtiene todas las tarifas activas
         /// </summary>
         /// <returns>Lista de tarifas</returns>
-        [HttpGet]
+        [HttpGet("GetAllTarifas")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
@@ -41,7 +41,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="id">ID de la tarifa</param>
         /// <returns>Tarifa encontrada</returns>
-        [HttpGet("{id}")]
+        [HttpGet("GetTarifaById{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
@@ -60,7 +60,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="fecha">Fecha en formato válido (dd/MM/yyyy, yyyy-MM-dd, MM/dd/yyyy, dd-MM-yyyy)</param>
         /// <returns>Lista de tarifas vigentes</returns>
-        [HttpGet("vigentes/{fecha}")]
+        [HttpGet("GetTarifaByFecha{fecha}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
@@ -83,7 +83,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="precio">Precio de la tarifa</param>
         /// <returns>Lista de habitaciones con el precio especificado</returns>
-        [HttpGet("habitaciones-por-precio/{precio:decimal}")]
+        [HttpGet("GetTarifaByPrecio/{precio:decimal}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
@@ -106,7 +106,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="dto">Datos de la tarifa a crear</param>
         /// <returns>Tarifa creada</returns>
-        [HttpPost]
+        [HttpPost("CreateTarifa")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
@@ -130,7 +130,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="dto">Datos de la tarifa a actualizar</param>
         /// <returns>Tarifa actualizada</returns>
-        [HttpPut]
+        [HttpPut("UpdateTarifaBy{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -157,7 +157,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="dto">Datos de la tarifa a eliminar</param>
         /// <returns>Resultado de la operación</returns>
-        [HttpDelete]
+        [HttpDelete("DeleteTarifaBy{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

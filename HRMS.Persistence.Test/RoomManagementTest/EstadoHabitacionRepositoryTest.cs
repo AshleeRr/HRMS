@@ -1,4 +1,5 @@
-﻿using HRMS.Domain.Entities.RoomManagement;
+﻿using HRMS.Domain.Base.Validator;
+using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
     {
         private readonly DbContextOptions<HRMSContext> _dbOptions;
         private readonly Mock<ILogger<EstadoHabitacionRepository>> _loggerMock;
+        private readonly Mock<IValidator<EstadoHabitacion>> _validatorMock;
 
         public EstadoHabitacionRepositoryTests()
         {
@@ -19,6 +21,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
                 .Options;
             
             _loggerMock = new Mock<ILogger<EstadoHabitacionRepository>>();
+            _validatorMock = new Mock<IValidator<EstadoHabitacion>>();
         }
 
         [Fact]
@@ -36,7 +39,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object , _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetAllAsync();
@@ -52,7 +55,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object ,_validatorMock.Object );
                 
                 // Act
                 var result = await repo.GetEntityByIdAsync(0);
@@ -74,7 +77,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetEntityByIdAsync(1);
@@ -89,11 +92,11 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         public async Task SaveEntityAsync_ValidEntity_SavesSuccessfully()
         {
             // Arrange
-            var estado = new EstadoHabitacion { Descripcion = "Disponible" };
+            var estado = new EstadoHabitacion { Descripcion = "Disponib" };
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.SaveEntityAsync(estado);
@@ -113,7 +116,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.UpdateEntityAsync(estado);
@@ -139,7 +142,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.UpdateEntityAsync(updated);
@@ -156,7 +159,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetEstadoByDescripcionAsync("NoExiste");
@@ -182,7 +185,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object);
+                var repo = new EstadoHabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetEstadoByDescripcionAsync("teni");

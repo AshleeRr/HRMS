@@ -18,6 +18,10 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
             _logger = logger;
         }
 
+        /// <summary>
+        ///  Obtiene todas las categorias activas
+        /// </summary>
+        /// <returns>Lista de categorias</returns>
         [HttpGet("GetAllCategorias")]
         public async Task<IActionResult> GetAll()
         {
@@ -32,6 +36,11 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
                 : NotFound(new { message = result.Message });
         }
 
+        /// <summary>
+        /// Obtiene una categoria mediante el parametro del Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returnsCategoria></returns>
         [HttpGet("GetCategoriaById{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -54,6 +63,11 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
 
         }
 
+        /// <summary>
+        /// Create una nueva categoria
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Piso creado</returns>
         [HttpPost("CreateCategoria")]
         public async Task<IActionResult> Create([FromBody] CreateCategoriaDto dto)
         {
@@ -75,6 +89,13 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
                 : BadRequest(new { message = result.Message });
         }
 
+        /// <summary>
+        /// Actualiza una categoria mediante el Id,
+        /// y su dto 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dto"></param>
+        /// <returns>Categoria</returns>
         [HttpPut("UpdateCategoriaById{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -105,6 +126,11 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
                     : BadRequest(result);
         }
 
+        /// <summary>
+        /// Elimina una categoria mediante su Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Categoria eliminada</returns>
         [HttpDelete("DeleteCategoriaById{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
@@ -135,6 +161,11 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
                     : BadRequest(new { message = result.Message });
         }
 
+        /// <summary>
+        /// Busca las categorias que tengan un nombre de servicio asociado
+        /// </summary>
+        /// <param name="nombreServicio"></param>
+        /// <returns>Categoria list</returns>
         [HttpGet("GetCategoriaByNombreServicio/{nombreServicio}")]
         public async Task<IActionResult> GetByServicio(string nombreServicio)
         {
@@ -157,6 +188,11 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
                 : NotFound(new { message = result.Message });
         }
 
+        /// <summary>
+        /// Busca una categoria mediante sus descripcion
+        /// </summary>
+        /// <param name="descripcion"></param>
+        /// <returns>Categoria por descripcion</returns>
         [HttpGet("GetCategoriaByDescripcion/{descripcion}")]
         public async Task<IActionResult> GetServiciosByDescripcion(string descripcion)
         {
@@ -179,6 +215,11 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
                 : NotFound(new { message = result.Message });
         }
 
+        /// <summary>
+        /// Busca categorias con x capacidad y las habitaciones relacionadas con ellas
+        /// </summary>
+        /// <param name="capacidad"></param>
+        /// <returns>Habitaciones </returns>
         [HttpGet("GetHabitacionByCapacidad/{capacidad}")]
         public async Task<IActionResult> GetHabitacionesByCapacidad(int capacidad)
         {

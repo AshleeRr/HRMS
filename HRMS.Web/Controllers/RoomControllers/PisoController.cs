@@ -2,7 +2,7 @@
 using HRMS.Application.Interfaces.RoomManagementService;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HRMS.Web.Controllers
+namespace HRMS.Web.Controllers.RoomControllers
 {
     public class PisoController : Controller
     {

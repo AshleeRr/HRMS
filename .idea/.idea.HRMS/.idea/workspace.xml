@@ -17,17 +17,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/InfoHabitacionDTO.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/PisoController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/PisoController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/TarifaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/TarifaController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/ServiceValidations/TarifasValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/ServiceValidations/TarifasValidator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/CategoriaRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/CategoriaRepositoryTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/EstadoHabitacionRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/EstadoHabitacionRepositoryTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/HabitacionRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/HabitacionRepositoryTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/PisoRepositoryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/PisoRepositoryTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/PisoRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/PisoRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/CategoriaController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/EstadoHabitacionController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/PisoController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/PisoController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/RoomController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/RoomController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/TarifaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/TarifaController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Categoria/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Categoria/Index.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/EstadoHabitacion/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/EstadoHabitacion/Index.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Piso/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Piso/Index.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Room/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Room/Index.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Shared/_Layout.cshtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Tarifa/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Tarifa/Index.cshtml" afterDir="false" />
     </list>
@@ -107,6 +120,21 @@
   }
 }</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.Web: http">
+    <configuration name="Unnamed (1)" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false" temporary="true">
+      <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.Application.Test/HRMS.Application.Test.csproj" />
+      <option name="PROJECT_TFM" value="" />
+      <option name="LAUNCH_PROFILE_NAME" value="" />
+      <option name="TRACK_ARGUMENTS" value="1" />
+      <option name="ARGUMENTS" value="" />
+      <option name="TRACK_WORKING_DIRECTORY" value="1" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="TRACK_ENVS" value="1" />
+      <option name="USE_PODMAN_RUNTIME" value="0" />
+      <option name="TRACK_URL" value="1" />
+      <method v="2">
+        <option name="Build" />
+      </method>
+    </configuration>
     <configuration name="Unnamed" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false" temporary="true">
       <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.Persistence.Test/HRMS.Persistence.Test.csproj" />
       <option name="PROJECT_TFM" value="" />
@@ -277,6 +305,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Aspire Host.Unnamed (1)" />
         <item itemvalue="Aspire Host.Unnamed" />
         <item itemvalue="HTTP Request.HRMS.APIs | #1" />
         <item itemvalue="HTTP Request.HRMS.APIs | #1" />
@@ -335,7 +364,8 @@
       <workItem from="1741849543337" duration="558000" />
       <workItem from="1741850804932" duration="13500000" />
       <workItem from="1741930897695" duration="8318000" />
-      <workItem from="1741981403503" duration="13051000" />
+      <workItem from="1741981403503" duration="14033000" />
+      <workItem from="1742067051260" duration="16617000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />

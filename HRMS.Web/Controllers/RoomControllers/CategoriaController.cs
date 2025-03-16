@@ -1,9 +1,8 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.CategoriaDTOS;
 using HRMS.Application.Interfaces.RoomManagementService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HRMS.Web.Controllers
+namespace HRMS.Web.Controllers.RoomControllers
 {
     public class CategoriaController : Controller
     {

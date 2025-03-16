@@ -1,4 +1,5 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Domain.Entities.Servicio;
 using HRMS.Persistence.Context;
@@ -15,15 +16,16 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         private readonly ITestOutputHelper _testOutputHelper;
         private readonly DbContextOptions<HRMSContext> _dbOptions;
         private readonly Mock<ILogger<HabitacionRepository>> _loggerMock;
+        private readonly Mock<IValidator<Habitacion>> _validatorMock;
 
-        public HabitacionRepositoryTests(ITestOutputHelper testOutputHelper)
+        public HabitacionRepositoryTests()
         {
-            _testOutputHelper = testOutputHelper;
             _dbOptions = new DbContextOptionsBuilder<HRMSContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
 
             _loggerMock = new Mock<ILogger<HabitacionRepository>>();
+            _validatorMock = new Mock<IValidator<Habitacion>>();
         }
 
         [Fact]
@@ -41,7 +43,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object , _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetAllAsync();
@@ -57,14 +59,14 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetByPisoAsync(0);
 
                 // Assert
                 Assert.False(result.IsSuccess);
-                Assert.Contains("mayor que cero", result.Message);
+                Assert.Contains("El ID de piso no puede ser menor o igual a cero", result.Message);
             }
         }
 
@@ -80,7 +82,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetByPisoAsync(5);
@@ -96,7 +98,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetByCategoriaAsync("");
@@ -121,7 +123,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetByCategoriaAsync("Prem");
@@ -137,7 +139,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetInfoHabitacionesAsync();
@@ -190,7 +192,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetInfoHabitacionesAsync();
@@ -236,7 +238,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.SaveEntityAsync(habitacion);
@@ -256,7 +258,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.UpdateEntityAsync(habitacion);
@@ -291,7 +293,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.UpdateEntityAsync(updated);
@@ -319,7 +321,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetByNumeroAsync("A-101");
@@ -337,7 +339,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new HabitacionRepository(context, _loggerMock.Object);
+                var repo = new HabitacionRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetByNumeroAsync("");

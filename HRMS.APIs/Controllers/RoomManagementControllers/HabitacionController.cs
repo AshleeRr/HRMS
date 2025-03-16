@@ -35,7 +35,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="id">ID de la habitación</param>
         /// <returns>Datos de la habitación</returns>
-        [HttpGet("GetBy{id}")]
+        [HttpGet("GetByHabitacion{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             _logger.LogInformation($"Obteniendo habitación con ID: {id}");

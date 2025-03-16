@@ -6,6 +6,7 @@ using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HRMS.Persistence.Repositories.RoomRepository
 {
@@ -13,19 +14,28 @@ namespace HRMS.Persistence.Repositories.RoomRepository
     {
         private readonly IConfiguration _configuration;
         private readonly IValidator<Categoria> _validator;
+        private readonly ILogger<CategoriaRepository> _logger;
 
-        public CategoriaRepository(HRMSContext context, IConfiguration configuration, IValidator<Categoria> validator) 
+        public CategoriaRepository(HRMSContext context, IConfiguration configuration, IValidator<Categoria> validator, ILogger<CategoriaRepository> logger) 
             : base(context)
         {
             _configuration = configuration;
             _validator = validator;
+            _logger = logger;
         }
 
-        public override async Task<List<Categoria>> GetAllAsync() =>
-            await _context.Categorias.Where(c => c.Estado == true).ToListAsync();
+        public override async Task<List<Categoria>> GetAllAsync()
+        {
+            _logger.LogInformation("Obteniendo todas las categorías activas");
+            return await _context.Categorias
+                .Where(c => c.Estado == true)
+                .ToListAsync();
+        }
         
         public override async Task<Categoria> GetEntityByIdAsync(int id)
         {
+            _logger.LogInformation($"Obteniendo categoría por id {id}");
+            
             return (id == 0 ? null : await _context.Categorias
                 .FirstOrDefaultAsync(c => c.IdCategoria == id && c.Estado == true))!;
         }
@@ -33,6 +43,15 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         public override async Task<OperationResult> SaveEntityAsync(Categoria categoria) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
+                _logger.LogInformation("Guardando nueva categoría");
+                
+                var validationResult = _validator.Validate(categoria);
+                if (!validationResult.IsSuccess)
+                {
+                    _logger.LogWarning("Error de validación al crear categorias: {Error}", validationResult.Message);
+                    return OperationResult.Failure(validationResult.Message);
+                }
+                
                 await _context.Categorias.AddAsync(categoria);
                 await _context.SaveChangesAsync();
                 return OperationResult.Success(categoria, "Categoría guardada correctamente.");
@@ -41,6 +60,16 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         public override async Task<OperationResult> UpdateEntityAsync(Categoria categoria) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
+                _logger.LogInformation($"Actualizando categoría con id {categoria.IdCategoria}");
+                
+            
+                var validationResult = _validator.Validate(categoria);
+                if (!validationResult.IsSuccess)
+                {
+                    _logger.LogWarning("Error de validación al actualizar categorias: {Error}", validationResult.Message);
+                    return OperationResult.Failure(validationResult.Message);
+                }
+                
                 var existingCategoria = await _context.Categorias.FindAsync(categoria.IdCategoria);
                 if (existingCategoria == null) return OperationResult.Failure("La categoría no existe.");
                 UpdateCategoria(existingCategoria, categoria);
@@ -51,6 +80,11 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         public async Task<OperationResult> GetCategoriaByServiciosAsync(string nombre) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
+                var validation = await validateString(nombre, "El nombre del servicio no puede ser nulo o vacío.");
+                if (!validation.IsSuccess)
+                    return validation;
+                _logger.LogInformation($"Obteniendo categorías por servicio '{nombre}'");
+                
                 var categoriasYServicios = await _context.Categorias
                     .Join(_context.Servicios,
                         c => c.IdServicio,
@@ -70,6 +104,11 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         public async Task<OperationResult> GetCategoriaByDescripcionAsync(string descripcion) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
+                var validation = await validateString(descripcion, "La descripción no puede ser nula o vacía.");
+                if (!validation.IsSuccess)
+                    return validation;
+                
+                _logger.LogInformation($"Obteniendo categorías por descripción '{descripcion}'");
                 
                 var categorias = await _context.Categorias
                     .Where(c => c.Descripcion != null && 
@@ -85,6 +124,13 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         public async Task<OperationResult> GetHabitacionByCapacidad(int capacidad) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
+                
+                var validation = await validateInt(capacidad, "La capacidad debe ser mayor a 0.");
+                if (!validation.IsSuccess)
+                    return validation;
+                
+                _logger.LogInformation("Obteniendo habitaciones con capacidad para {Capacidad} personas", capacidad);
+                
                 var categoriasIds = await _context.Categorias
                     .Where(c => c.Capacidad == capacidad && c.Estado == true)
                     .Select(c => c.IdCategoria)
@@ -103,6 +149,19 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 return OperationResult.Success(habitaciones, "Habitaciones obtenidas correctamente.");
             });
         
+        private async Task<OperationResult> validateInt(int id , string message)
+        {
+            if (id <= 0)
+                return OperationResult.Failure(message);
+            return OperationResult.Success();
+        }
+        
+        private async Task<OperationResult> validateString(string message , string error)
+        {
+            if (string.IsNullOrEmpty(message))
+                return OperationResult.Failure(error);
+            return OperationResult.Success();
+        }
         
         private static void UpdateCategoria(Categoria existing, Categoria updated)
         {

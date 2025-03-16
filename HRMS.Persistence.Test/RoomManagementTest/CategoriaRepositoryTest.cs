@@ -6,6 +6,7 @@ using HRMS.Persistence.Context;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace HRMS.Persistence.Test.RoomManagementTest
@@ -15,6 +16,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         private readonly DbContextOptions<HRMSContext> _dbOptions;
         private readonly Mock<IValidator<Categoria>> _validatorMock;
         private readonly Mock<IConfiguration> _configMock;
+        private readonly Mock<ILogger<CategoriaRepository>> _loggerMock;
 
         public CategoriaRepositoryTests()
         {
@@ -24,6 +26,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
             
             _validatorMock = new Mock<IValidator<Categoria>>();
             _configMock = new Mock<IConfiguration>();
+            _loggerMock = new Mock<ILogger<CategoriaRepository>>();
         }
         
         [Fact]
@@ -41,7 +44,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object, _loggerMock.Object);
 
                 // Act
                 var result = await repo.GetAllAsync();
@@ -62,7 +65,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object, _loggerMock.Object);
 
                 // Act
                 var result = await repo.SaveEntityAsync(categoria);
@@ -90,7 +93,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object, _loggerMock.Object);
 
                 // Act
                 var result = await repo.SaveEntityAsync(newCategoria);
@@ -111,7 +114,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object, _loggerMock.Object);
 
                 // Act
                 var result = await repo.UpdateEntityAsync(categoria);
@@ -139,7 +142,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object, _loggerMock.Object);
 
                 // Act
                 var result = await repo.UpdateEntityAsync(updatedCategoria);
@@ -163,7 +166,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object, _loggerMock.Object);
 
                 // Act
                 var result = await repo.GetCategoriaByServiciosAsync("limpieza");
@@ -179,7 +182,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object, _loggerMock.Object);
 
                 // Act
                 var result = await repo.GetHabitacionByCapacidad(0);
@@ -203,7 +206,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object);
+                var repo = new CategoriaRepository(context, _configMock.Object, _validatorMock.Object, _loggerMock.Object);
 
                 // Act
                 var result = await repo.GetHabitacionByCapacidad(2);

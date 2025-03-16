@@ -1,9 +1,8 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos;
 using HRMS.Application.Interfaces.RoomManagementService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HRMS.Web.Controllers
+namespace HRMS.Web.Controllers.RoomControllers
 {
     public class RoomController : Controller
     {
@@ -153,6 +152,40 @@ namespace HRMS.Web.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "Error al eliminar: " + ex.Message });
+            }
+        }
+        public async Task<IActionResult> InfoHabitaciones()
+        {
+            try
+            {
+                var resultado = await _habitacionService.GetInfoHabitacionesAsync();
+
+                if (!resultado.IsSuccess)
+                {
+                    TempData["ErrorMessage"] = resultado.Message ?? "Error al obtener la información de las habitaciones";
+                    return View(new List<HabitacionInfoDto>());
+                }
+
+                if (resultado.Data == null)
+                {
+                    TempData["WarningMessage"] = "No se encontró información de habitaciones";
+                    return View(new List<HabitacionInfoDto>());
+                }
+
+                var habitacionesInfo = resultado.Data as List<HabitacionInfoDto>;
+            
+                if (habitacionesInfo == null)
+                {
+                    TempData["ErrorMessage"] = "Error al procesar los datos de habitaciones";
+                    return View(new List<HabitacionInfoDto>());
+                }
+
+                return View(habitacionesInfo);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Ocurrió un error: {ex.Message}";
+                return View(new List<HabitacionInfoDto>());
             }
         }
     }

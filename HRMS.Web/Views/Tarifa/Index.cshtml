@@ -57,9 +57,9 @@
                             <a asp-action="Edit" asp-route-id="@item.IdTarifa" class="btn btn-warning btn-sm">
                                 <i class="bi bi-pencil"></i> Edit
                             </a>
-                            <button type="button" class="btn btn-danger btn-sm delete-tarifa-btn" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#deleteModal" 
+                            <button type="button" class="btn btn-danger btn-sm delete-tarifa-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
                                     data-id="@item.IdTarifa"
                                     data-desc="@item.Descripcion"
                                     data-precio="@item.PrecioPorNoche">
@@ -77,6 +77,46 @@
             }
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar tarifa -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalErrorContainer" class="alert alert-danger d-none">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span id="modalErrorMessage"></span>
+                </div>
+
+                <p>¿Está seguro que desea eliminar la siguiente tarifa?</p>
+                <div class="card p-3 mb-3">
+                    <p class="mb-1"><strong>Descripción:</strong> <span id="tarifaDescToDelete"></span></p>
+                    <p class="mb-1"><strong>Precio por noche:</strong> $<span id="tarifaPrecioDisplay"></span></p>
+                    <p class="mb-0"><strong>ID:</strong> <span id="tarifaIdDisplay"></span></p>
+                </div>
+                <p class="text-danger"><strong>Advertencia:</strong> Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <form id="deleteForm" asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="tarifaIdToDelete" name="id" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash-fill"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

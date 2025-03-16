@@ -3,6 +3,7 @@ using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
+using HRMS.Domain.Entities.Servicio;
 using HRMS.Domain.Repository;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.Extensions.Logging;
@@ -305,17 +306,19 @@ namespace HRMS.Application.Services.RoomServices
             try
             {
                 _logger.LogInformation("Obteniendo información de las habitaciones");
-                
+        
                 var resultado = await _habitacionRepository.GetInfoHabitacionesAsync();
-                
+        
                 if (!resultado.IsSuccess)
                     return resultado;
-                
-                string message = resultado.Data == null ? 
-                    "No se encontró la información de las habitaciones" : 
-                    "Información de las habitaciones obtenida correctamente";
-                
-                return OperationResult.Success(resultado.Data, message);
+                if (resultado.Data == null)
+                    return OperationResult.Success(null, "No se encontró la información de las habitaciones");
+        
+                var habitacionesInfo = resultado.Data is IEnumerable<dynamic> habitacionesDatos
+                    ? MapToHabitacionInfoDtoList(habitacionesDatos)
+                    : null;
+        
+                return OperationResult.Success(habitacionesInfo, "Información de las habitaciones obtenida correctamente");
             }
             catch (Exception ex)
             {
@@ -369,7 +372,99 @@ namespace HRMS.Application.Services.RoomServices
             if (dto.IdPiso.HasValue) entity.IdPiso = dto.IdPiso.Value;
             if (dto.IdEstadoHabitacion.HasValue) entity.IdEstadoHabitacion = dto.IdEstadoHabitacion.Value;
         }
-            
+
+        private List<HabitacionInfoDto> MapToHabitacionInfoDtoList(IEnumerable<dynamic> habitacionesDatos)
+        {
+            if (habitacionesDatos == null)
+                return new List<HabitacionInfoDto>();
+
+            var result = new List<HabitacionInfoDto>();
+
+            foreach (var item in habitacionesDatos)
+            {
+                try
+                {
+                    if (item == null)
+                        continue;
+
+                    var dto = new HabitacionInfoDto
+                    {
+                        IdHabitacion = GetPropertyValue<int>(item, "IdHabitacion"),
+                        Numero = GetPropertyValue<string>(item, "Numero") ?? string.Empty,
+                        Detalle = GetPropertyValue<string>(item, "Detalle") ?? string.Empty,
+                        PrecioPorNoche = GetPropertyValue<decimal>(item, "PrecioPorNoche"),
+                        DescripcionPiso = GetPropertyValue<string>(item, "DescripcionPiso") ?? string.Empty,
+                        DescripcionCategoria = GetPropertyValue<string>(item, "DescripcionCategoria") ?? string.Empty,
+                        NombreServicio = GetPropertyValue<string>(item, "NombreServicio") ?? "Sin servicio",
+                        DescripcionServicio = GetPropertyValue<string>(item, "DescripcionServicio") ?? "Sin descripción"
+                    };
+
+                    result.Add(dto);
+                }
+                catch (Exception)
+                {
+                    _logger.LogWarning("Error al mapear la información de la habitación");
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Obtiene el valor de una propiedad de un objeto de forma segura, independientemente de su tipo.
+        /// Funciona tanto con objetos dinámicos (ExpandoObject) como con objetos tipados.
+        /// </summary>
+        /// <typeparam name="T">El tipo de valor que se espera obtener</typeparam>
+        /// <param name="obj">El objeto del cual se extraerá la propiedad</param>
+        /// <param name="propertyName">El nombre de la propiedad a obtener</param>
+        /// <returns>El valor de la propiedad convertido al tipo T, o el valor por defecto si no se encuentra</returns>
+        private T GetPropertyValue<T>(object obj, string propertyName)
+        {
+            try
+            {
+                // CASO 1: Si el objeto es un diccionario (como ExpandoObject o tipos dinámicos)
+                if (obj is IDictionary<string, object> dict && dict.TryGetValue(propertyName, out var val))
+                {
+                    // Si el valor obtenido es nulo, devolver el valor por defecto para el tipo T
+                    if (val == null)
+                        return default;
+
+                    // Si el valor ya es del tipo T, devolverlo directamente
+                    // Si no, intentar convertirlo al tipo T
+                    return val is T typedVal ? typedVal : (T)Convert.ChangeType(val, typeof(T));
+                }
+
+                // CASO 2: Para objetos normales o anónimos, usar reflexión
+                // Buscar la propiedad por nombre (ignorando mayúsculas/minúsculas)
+                var prop = obj.GetType().GetProperty(propertyName,
+                    System.Reflection.BindingFlags.Public |
+                    System.Reflection.BindingFlags.Instance |
+                    System.Reflection.BindingFlags.IgnoreCase);
+
+                // Si la propiedad no existe, devolver el valor por defecto
+                if (prop == null)
+                    return default;
+
+                // Obtener el valor de la propiedad
+                var value = prop.GetValue(obj);
+
+                // Si el valor es nulo, devolver el valor por defecto
+                if (value == null)
+                    return default;
+
+                // Si el valor ya es del tipo T, devolverlo directamente
+                // Si no, intentar convertirlo al tipo T
+                return value is T typedValue ? typedValue : (T)Convert.ChangeType(value, typeof(T));
+            }
+            catch
+            {
+                // Si ocurre cualquier excepción (propiedad no encontrada, error de conversión, etc.)
+                // devolver el valor por defecto para el tipo T
+                return default;
+            }
+
+        }
+
         private async Task<OperationResult> ValidateForeignKeys(int? idPiso, int? idCategoria, int? idEstadoHabitacion)
         {
             if (!idPiso.HasValue)

@@ -1,6 +1,5 @@
 ﻿using HRMS.Application.DTOs.RoomManagementDto.EstadoHabitacionDtos;
 using HRMS.Application.Interfaces.RoomManagementService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRMS.Web.Controllers.RoomControllers

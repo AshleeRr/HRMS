@@ -22,7 +22,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// Obtiene todos los pisos
         /// </summary>
         /// <returns>Lista de pisos</returns>
-        [HttpGet]
+        [HttpGet("GetAllPisos")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
@@ -41,7 +41,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="id">ID del piso</param>
         /// <returns>Piso encontrado</returns>
-        [HttpGet("{id}")]
+        [HttpGet("GetPisoById{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
@@ -60,7 +60,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="descripcion">Descripción del piso</param>
         /// <returns>Piso encontrado</returns>
-        [HttpGet("por-descripcion/{descripcion}")]
+        [HttpGet("GetPisoByDescripcion{descripcion}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
@@ -79,7 +79,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="dto">Datos del piso a crear</param>
         /// <returns>Piso creado</returns>
-        [HttpPost]
+        [HttpPost("CreatePiso")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
@@ -103,7 +103,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="dto">Datos del piso a actualizar</param>
         /// <returns>Piso actualizado</returns>
-        [HttpPut]
+        [HttpPatch("UpdatePiso{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -136,7 +136,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="dto">Datos del piso a eliminar</param>
         /// <returns>Resultado de la operación</returns>
-        [HttpDelete]
+        [HttpDelete("DeletePiso{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]

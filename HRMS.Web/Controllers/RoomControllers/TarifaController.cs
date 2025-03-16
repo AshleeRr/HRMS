@@ -135,6 +135,37 @@ namespace HRMS.Web.Controllers.RoomControllers
                 return View(dto);
             }
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var checkResult = await tarifaService.GetById(id);
+                if (!checkResult.IsSuccess)
+                {
+                    return Json(new { success = false, message = checkResult.Message ?? "No se encontró la tarifa." });
+                }
+        
+                var delete = new DeleteTarifaDto() { IdTarifa = id }; 
+                var result = await tarifaService.Remove(delete);
+        
+                if (result != null && result.IsSuccess)
+                {
+                    TempData["SuccessMessage"] = "Tarifa eliminada correctamente.";
+                    return Json(new { success = true, message = "Tarifa eliminada correctamente." });
+                }
+                else
+                {
+                    string errorMessage = result?.Message ?? "No se pudo eliminar la habitación.";
+                    return Json(new { success = false, message = errorMessage });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al eliminar: " + ex.Message });
+            }
+        }
     }
 }
 

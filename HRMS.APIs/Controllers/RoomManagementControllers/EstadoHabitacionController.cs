@@ -22,7 +22,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// Obtiene todos los estados de habitación activos
         /// </summary>
         /// <returns>Lista de estados de habitación</returns>
-        [HttpGet]
+        [HttpGet("GetEstadoHabitaciones")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -44,7 +44,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="id">ID del estado de habitación</param>
         /// <returns>Estado de habitación</returns>
-        [HttpGet("{id}")]
+        [HttpGet("GetEstadoBy(id){id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,7 +74,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="descripcion">Descripción a buscar</param>
         /// <returns>Estado(s) de habitación que coinciden con la descripción</returns>
-        [HttpGet("buscar")]
+        [HttpGet("GetEstadoBy(descripcion){descripcion}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -105,7 +105,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="dto">Datos del estado de habitación</param>
         /// <returns>Estado de habitación creado</returns>
-        [HttpPost]
+        [HttpPost("CreateEstadoHabitacion")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -134,7 +134,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="dto">Datos del estado de habitación</param>
         /// <returns>Estado de habitación actualizado</returns>
-        [HttpPatch]
+        [HttpPatch("UpdateEstadoHabitacionById{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -165,9 +165,9 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <summary>
         /// Elimina lógicamente un estado de habitación
         /// </summary>
-        /// <param name="dto">Datos del estado de habitación a eliminar</param>
+        /// <param name="id">Datos del estado de habitación a eliminar</param>
         /// <returns>Estado de habitación eliminado</returns>
-        [HttpDelete]
+        [HttpDelete("DeleteEstadoHabitacionById{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
