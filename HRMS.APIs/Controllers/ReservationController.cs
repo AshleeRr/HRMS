@@ -3,6 +3,7 @@ using HRMS.Application.Interfaces.Reservation_2023_0731;
 using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Reservations;
+using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,15 +16,15 @@ namespace HRMS.APIs.Controllers
         private readonly IReservationRepository _reservationRepository;
         private readonly IReservationService _reservationServices;
         private readonly IValidator<ReservationAddDTO> _validatorAdd;
-        private readonly ILogger<ReservationsController> _logger;
+        private readonly ILoggingServices _loggingServices;
 
-        public ReservationsController(IReservationRepository reservationRepository, ILogger<ReservationsController> logger
+        public ReservationsController(IReservationRepository reservationRepository, ILoggingServices logger
             , IValidator<ReservationAddDTO> validatorAdd, IReservationService reservationService)
         {
             _reservationServices = reservationService;
             _validatorAdd = validatorAdd;
             _reservationRepository = reservationRepository;
-            _logger = logger;
+            _loggingServices = logger;
         }
 
         [HttpGet("GetAll")]

@@ -4,7 +4,7 @@ using HRMS.Domain.Base;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-
+ 
 namespace HRMS.Application.Services.UsersServices
 {
     public class ClientService : IClientService

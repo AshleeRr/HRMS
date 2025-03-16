@@ -10,6 +10,7 @@ using HRMS.Domain.Entities.Users;
 using HRMS.Domain.Repository;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Repositories.Reserv;
+using HRMS.Persistence.Test.ReservationTests;
 using HRMS.Persistence.Test.TestContext;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -31,52 +32,12 @@ namespace HRMS.Application.Test.ReservationAppTest
         public ReservationServiceTest()
         {
             var _dbContextOptions = new DbContextOptionsBuilder<HRMSContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString()) // Nombre de la BD en memoria
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()) 
             .Options;
 
             var _context = new HRMSContext(_dbContextOptions);
-            var CategoryPlaceholder = new Categoria { IdCategoria = 1, Capacidad = 4, Descripcion = "Deluxe", FechaCreacion = DateTime.Now, Estado = true };
-            var pisoPlaceholder = new Piso { IdPiso = 1, Descripcion = "Primer Piso" };
-            var RoomPlaceholder = new Habitacion
-            {
-                IdHabitacion = 1,
-                IdCategoria = 1,
-                IdEstadoHabitacion = 1,
-                Numero = "101",
-                Detalle = "Habitacion de lujo",
-                Estado = true,
-                FechaCreacion = DateTime.Now,
-                IdPiso = 1,
-            };
-
-            var serv1 = new Servicios
-            {
-                IdSercicio = 1,
-                Nombre = "SPA",
-                Descripcion = "Prueba 1",
-                Estado = true,
-                FechaCreacion = DateTime.Now
-            };
-            var serv2 = new Servicios
-            {
-                IdSercicio = 2,
-                Nombre = "CINE",
-                Descripcion = "Prueba 2",
-                Estado = true,
-                FechaCreacion = DateTime.Now
-            };
-            var TarifaPlaceholder = new Tarifas
-            {
-                IdTarifa = 1,
-                IdCategoria = 1,
-                PrecioPorNoche = 1000,
-                Estado = true,
-                Descripcion = "",
-                FechaInicio = DateTime.Now.AddDays(2),
-                FechaCreacion = DateTime.Now,
-                FechaFin = DateTime.Now.AddDays(200),
-                Descuento = 0
-            };
+            _context.LoadPlaceHolders();
+           
             clientePlaceholder = new Client
             {
                 Correo = "fulano@gmail.com",
@@ -134,13 +95,6 @@ namespace HRMS.Application.Test.ReservationAppTest
                 FechaCreacion = DateTime.Now
             };
 
-            _context.Categorias.Add(CategoryPlaceholder);
-            _context.Pisos.Add(pisoPlaceholder);
-            _context.Habitaciones.Add(RoomPlaceholder);
-            _context.Tarifas.Add(TarifaPlaceholder);
-            _context.Clients.Add(clientePlaceholder);
-            _context.Servicios.Add(serv1);
-            _context.Servicios.Add(serv2);
             _context.Reservations.Add(ReservToReadPlaceHolder);
             _context.Reservations.Add(ReservCanceledPlaceHolder);
             _context.Reservations.Add(ReservToCancel);  
