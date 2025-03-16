@@ -16,9 +16,9 @@ namespace HRMS.Domain.Base.Validator.UsersValidations
             AddRule(c => c.Correo != null && c.Correo.Length <= 50)
                 .WithErrorMessage("El correo debe de tener menos de 50 caracteres");
             AddRule(c => c.IdUsuario != null)
-                .WithErrorMessage("El id de usuario no puede ser nulo");
+                .WithErrorMessage("El id de usuario debe ser especififcado");
             AddRule(u => ValidateClave(u.Clave))
-                .WithErrorMessage("La clave del usuario debe tener al menos 8 caracteres, un número, una letra mayúscula, un caracter especial y una letra minúscula para ser segura");
+                .WithErrorMessage("La clave del cliente debe tener al menos 8 caracteres, un número, una letra mayúscula, un caracter especial y una letra minúscula para ser segura");
         }
         private bool ValidateClave(string? clave)
         {

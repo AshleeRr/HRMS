@@ -7,7 +7,6 @@ using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace HRMS.Persistence.Repositories.UsersRepository
@@ -16,13 +15,10 @@ namespace HRMS.Persistence.Repositories.UsersRepository
     {
         private readonly IConfiguration _configuration;
         private readonly ILoggingServices _loggerServices;
-        private readonly ILogger<ClientRepository> _logger;
         private readonly IValidator<Client> _validator;
-        public ClientRepository(HRMSContext context, ILogger<ClientRepository> logger,
-                                                     ILoggingServices loggingServices,
+        public ClientRepository(HRMSContext context, ILoggingServices loggingServices,
                                                      IConfiguration configuration, IValidator<Client> validator) : base(context)
         {
-            _logger = logger;
             _configuration = configuration;
             _loggerServices = loggingServices;
             _validator = validator;
@@ -30,47 +26,37 @@ namespace HRMS.Persistence.Repositories.UsersRepository
        
         public async Task<Client> GetClientByEmailAsync(string correo) 
         {
-            if (string.IsNullOrWhiteSpace(correo))
-            {
-                throw new ArgumentNullException(nameof(correo), "El correo no puede estar vacío");
-            }
+            ValidateNulleable(correo, "correo");
             var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Correo == correo);
             if (cliente == null) 
             {
-                _logger.LogWarning("No se encontró un cliente con ese correo");
+                await _loggerServices.LogWarning("No se encontró un cliente con este correo", this, nameof(GetClientByEmailAsync));
             }
             return cliente;
         }
         public async Task<Client> GetClientByDocumentAsync(string documento)
         {
-
-            if (string.IsNullOrWhiteSpace(documento))
-            {
-                throw new ArgumentNullException(nameof(documento), "El documento no puede estar vacío");
-            }
+            ValidateNulleable(documento, "documento");
             var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Documento == documento);
             if (cliente == null)
             {
-                _logger.LogWarning("No se encontró un cliente con ese correo");
+                await _loggerServices.LogWarning("No se encontró un cliente con este documento", this, nameof(GetClientByDocumentAsync));
             }
             return cliente;
         }
         public async Task<List<Client>> GetClientsByTypeDocumentAsync(string tipoDocumento)
         {
-
-            if (string.IsNullOrWhiteSpace(tipoDocumento))
-            {
-                throw new ArgumentNullException(nameof(tipoDocumento), "El tipo de documento no puede estar vacío");
-            }
+            ValidateNulleable(tipoDocumento, "tipo documento");
             var clientes = await _context.Clients.Where(c => c.TipoDocumento == tipoDocumento).ToListAsync();
             if (!clientes.Any())
             {
-                _logger.LogWarning("No se encontraron clientes con ese tipo de documento");
+                await _loggerServices.LogWarning("No se encontraron clientes con ese tipo de documento", this, nameof(GetClientsByTypeDocumentAsync));
             }
             return clientes;
         }
         public async Task<Client> GetClientByUserIdAsync(int idUsuario)
         {
+            ValidateId(idUsuario);
             return await _context.Clients.FirstOrDefaultAsync(c => c.IdUsuario == idUsuario);
         }
         public override async Task<OperationResult> GetAllAsync(Expression<Func<Client, bool>> filter)
@@ -81,7 +67,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var clientes = await _context.Clients.Where(c => c.Estado == true).ToListAsync();
                 if (!clientes.Any())
                 {
-                    _logger.LogWarning("No se encontraron clientes activos");
+                    await _loggerServices.LogWarning("No se encontraron clientes activos", this, nameof(GetAllAsync));
                 }
                 result.Data = clientes; 
                 result.IsSuccess = true;
@@ -95,14 +81,11 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         
         public override async Task<Client> GetEntityByIdAsync(int id)
         {
-            if(id < 1)
-            {
-                throw new ArgumentNullException(nameof(id), "El id debe ser mayor que 0");
-            }
+            ValidateId(id);
             var entity = await _context.Clients.FindAsync(id);
             if (entity == null)
             {
-                _logger.LogWarning("No se encontró un cliente con ese id");
+                await _loggerServices.LogWarning("No se encontró un cliente con ese id", this, nameof(GetEntityByIdAsync));
             }
             return entity;
         }
@@ -119,7 +102,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var validClient = _validClient(entity);
                 if (!validClient.IsSuccess)
                 {
-                    return validClient;
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos del cliente para actualizar";
+                    return result; ;
                 }
                 var cliente = await _context.Clients.FindAsync(entity.IdUsuario);
                 if (cliente == null)
@@ -153,7 +138,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var validClient = _validClient(entity);
                 if (!validClient.IsSuccess)
                 {
-                    return validClient;
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos del cliente para guardar";
+                    return result;
                 }
                 entity.Estado = true;
                 entity.FechaCreacion = DateTime.Now;
@@ -168,6 +155,21 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
+        }
+        private int ValidateId(int id)
+        {
+            if (id <= 0)
+            {
+                throw new ArgumentNullException("El id debe ser mayor que 0");
+            }
+            return id;
+        }
+        private void ValidateNulleable(string x, string message)
+        {
+            if (string.IsNullOrEmpty(x))
+            {
+                _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
+            }
         }
     }
 }

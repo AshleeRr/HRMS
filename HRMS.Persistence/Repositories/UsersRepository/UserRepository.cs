@@ -7,7 +7,6 @@ using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace HRMS.Persistence.Repositories.UsersRepository
@@ -16,14 +15,11 @@ namespace HRMS.Persistence.Repositories.UsersRepository
     {
         private readonly IConfiguration _configuration;
         private readonly ILoggingServices _loggerServices;
-        private readonly ILogger<UserRepository> _logger;
         private readonly IValidator<User> _validator;
 
-        public UserRepository(HRMSContext context, ILogger<UserRepository> logger,
-                                                   ILoggingServices loggingServices,
+        public UserRepository(HRMSContext context, ILoggingServices loggingServices,
                                                    IConfiguration configuration, IValidator<User> validator) : base(context)
         {
-            _logger = logger;
             _configuration = configuration;
             _loggerServices = loggingServices;
             _validator = validator;
@@ -31,21 +27,21 @@ namespace HRMS.Persistence.Repositories.UsersRepository
 
         public async Task<List<User>> GetUsersByNameAsync(string nombreCompleto)
         {
-            ArgumentException.ThrowIfNullOrEmpty(nombreCompleto, nameof(nombreCompleto));
+            ValidateNulleable(nombreCompleto, "nombre completo");
             var usuarios = await _context.Users.Where(u => u.NombreCompleto == nombreCompleto).ToListAsync();
             if (!usuarios.Any())
             {
-                _logger.LogWarning("No se encontraron usuarios activos");
+                await _loggerServices.LogError("No se encontraron usuarios con este nombre", this, nameof(GetUsersByNameAsync));
             }
             return usuarios;
         }
         public async Task<User> GetUserByEmailAsync(string correo)
         {
-            ArgumentException.ThrowIfNullOrEmpty(correo, nameof(correo));
+            ValidateNulleable(correo, "correo");
             var usuario = await _context.Users.FirstOrDefaultAsync(u => u.Correo == correo);
             if (usuario == null)
             {
-                _logger.LogWarning("No se encontró un usuario con ese correo");
+                await _loggerServices.LogWarning("No se encontró un usuario con este correo", this, nameof(GetUserByEmailAsync));
             }
             return usuario;
         }
@@ -57,7 +53,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var usuarios = await _context.Users.Where(u => u.Estado == true).ToListAsync();
                 if (!usuarios.Any())
                 {
-                    _logger.LogWarning("No se encontraron usuarios activos");
+                    await _loggerServices.LogWarning("No se encontraron un usuarios activos", this, nameof(GetAllAsync));
                 }
                 result.Data = usuarios;
                 result.IsSuccess = true;
@@ -70,10 +66,14 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         }
         public override async Task<User> GetEntityByIdAsync(int id)
         {
+            if (id <= 0)
+            {
+                throw new ArgumentNullException("El id debe ser mayor que 0");
+            }
             var entityById = await _context.Users.FindAsync(id);
             if (entityById == null)
             {
-                _logger.LogWarning("No se encontró un usuario con ese id");
+                await _loggerServices.LogWarning("No se encontró un usuario con este id", this, nameof(GetEntityByIdAsync));
             }
             return entityById;
         }
@@ -139,33 +139,33 @@ namespace HRMS.Persistence.Repositories.UsersRepository
 
         public async Task<User> GetUserByDocumentAsync(string documento)
         {
-
-            if (string.IsNullOrWhiteSpace(documento))
-            {
-                throw new ArgumentNullException(nameof(documento), "El documento no puede estar vacío");
-            }
+            ValidateNulleable(documento, "documento");
             var usuario = await _context.Users.FirstOrDefaultAsync(u => u.Documento == documento);
 
             if (usuario == null)
             {
-                _logger.LogWarning("No se encontró un cliente con ese correo");
+                await _loggerServices.LogWarning("No se encontró un usuario con este documento", this, nameof(GetUserByDocumentAsync));
             }
             return usuario;
         }
 
         public async Task<List<User>> GetUsersByTypeDocumentAsync(string tipoDocumento)
         {
-            if (string.IsNullOrWhiteSpace(tipoDocumento))
-            {
-                throw new ArgumentNullException(nameof(tipoDocumento), "El tipo de documento no puede estar vacío");
-            }
+            ValidateNulleable(tipoDocumento, "tipodocumento");
             var usuarios = await _context.Users.Where(u => u.TipoDocumento == tipoDocumento).ToListAsync();
             if (!usuarios.Any())
             {
-                _logger.LogWarning("No se encontraron clientes con ese tipo de documento");
+                await _loggerServices.LogWarning("No se encontraron usuarios con este tipo de documentio", this, nameof(GetUsersByTypeDocumentAsync));
             }
             return usuarios;
         }
-        
+        private void ValidateNulleable(string x, string message)
+        {
+            if (string.IsNullOrEmpty(x))
+            {
+                _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
+            }
+        }
+
     }
 }
