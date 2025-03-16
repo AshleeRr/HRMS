@@ -101,7 +101,7 @@ namespace HRMS.APIs.Controllers
             return BadRequest(res.Message);
         }
 
-        [HttpPatch("ConfirmReservation/{reservationId}")]
+        [HttpPut("ConfirmReservation/{reservationId}")]
         public async Task<IActionResult> ConfirmReservation(ReservationConfirmDTO dto)
         {
             if(dto.UserID == 0)
@@ -120,7 +120,7 @@ namespace HRMS.APIs.Controllers
             return BadRequest(res.Message);
         }
 
-        [HttpPatch("CancelReservation/{reservationId}")]
+        [HttpPut("CancelReservation/{reservationId}")]
         public async Task<IActionResult> CancelReservation(int reservationId)
         {
             var res = await _reservationServices.CancelReservation(reservationId);
@@ -142,43 +142,7 @@ namespace HRMS.APIs.Controllers
             return BadRequest(res.Message);
         }
 
-        private OperationResult _validSave(Reservation r)
-        {
-            OperationResult operationResult = new OperationResult();
-            List<string> errors = new List<string>(); 
-            if(r.IdCliente == 0)
-            {
-                errors.Add("El ID del cliente no puede ser cero");
-            }
-            if (r.IdHabitacion == 0)
-            {
-                errors.Add("El ID de la habitación no puede ser cero");
-            }
-            if(r.PrecioInicial == 0)
-            {
-                errors.Add("El Precio Inicial la habitación no puede ser cero");
-            }
-            if(r.TotalPagado == 0)
-            {
-                errors.Add("El total pagado no puede ser cero");
-            }
-            if(r.FechaEntrada == null)
-            {
-                errors.Add("La fecha de entrada no puede ser nula");
-            }
-            if(r.FechaSalida == null)
-            {
-                errors.Add("La fecha de salida no puede ser nula");
-            }
 
-
-            if (errors.Count > 0)
-            {
-                operationResult.IsSuccess = false;
-                operationResult.Message =  string.Join(Environment.NewLine, errors);
-            }
-            return operationResult;
-        }
 
     }
 }
