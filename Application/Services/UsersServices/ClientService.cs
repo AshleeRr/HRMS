@@ -2,10 +2,10 @@
 using HRMS.Application.DTOs.UserDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
-using Microsoft.EntityFrameworkCore;
 
 namespace HRMS.Application.Services.UsersServices
 {
@@ -13,9 +13,11 @@ namespace HRMS.Application.Services.UsersServices
     {
         private readonly IClientRepository _clientRepository;
         private readonly ILoggingServices _loggingServices;
-        public ClientService(IClientRepository clientRepository, ILoggingServices loggingServices)
+        private readonly IValidator<SaveClientDTO> _validator;
+        public ClientService(IClientRepository clientRepository, IValidator<SaveClientDTO> validator, ILoggingServices loggingServices)
         {
             _clientRepository = clientRepository;
+            _validator = validator;
             _loggingServices = loggingServices;
         }
 
@@ -63,7 +65,7 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateClientDto(dto);
+                ValidateId(dto.Id);
                 var client = await _clientRepository.GetEntityByIdAsync(dto.Id);
                 ValidateClient(client);
                 dto.Deleted = true;
@@ -87,8 +89,7 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateClave(dto.Clave);
-                ValidateClientDto(dto);
+
                 var client = new Client()
                 {
                     IdUsuario = dto.IdUsuario,
@@ -119,7 +120,7 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateClientDto(dto);
+                ValidateId(dto.IdUsuario);
                 var client = await _clientRepository.GetEntityByIdAsync(dto.IdUsuario);
                 ValidateClient(client);
                 client.IdUsuario = dto.IdUsuario;
@@ -242,14 +243,6 @@ namespace HRMS.Application.Services.UsersServices
             }
             return client;
         }
-        private object ValidateClientDto(object dto)
-        {
-            if (dto == null)
-            {
-                throw new ArgumentNullException("Dto nulo");
-            }
-            return dto;
-        }
         private void ValidateNulleable(string x, string message)
         {
             if (string.IsNullOrEmpty(x))
@@ -270,6 +263,9 @@ namespace HRMS.Application.Services.UsersServices
 
             string caracteresEspeciales = "@#!*?$/,{}=.;:";
             if (!clave.Any(c => caracteresEspeciales.Contains(c)))
+                return false;
+
+            if (clave.Contains(" "))
                 return false;
 
             return true;

@@ -1,6 +1,7 @@
 ﻿using HRMS.Application.DTOs.UserDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -11,10 +12,12 @@ namespace HRMS.Application.Services.UsersServices
     {
         private readonly ILoggingServices _loggerServices;
         private readonly IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository,
+        private readonly IValidator<SaveUserClientDTO> _validator;
+        public UserService(IUserRepository userRepository, IValidator<SaveUserClientDTO> validator
                                 ILoggingServices loggerServices)
         {
             _userRepository = userRepository;
+            _validator = validator;
             _loggerServices = loggerServices;
         }
         public async Task<OperationResult> GetAll()
@@ -60,7 +63,7 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateUserDto(dto);
+                ValidateId(dto.Id);
                 var user = await _userRepository.GetEntityByIdAsync(dto.Id);
                 ValidateUser(user);
                 dto.Deleted = true;
@@ -81,9 +84,12 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateUserDto(dto);
-                ValidateClave(dto.Clave);
-                ValidateId(dto.IdUserRole);
+                var validDTO = _validator.Validate(dto);
+                if (!validDTO.IsSuccess) 
+                {
+                    result.Message = "Error validando los datos para guardar";
+                    result.IsSuccess = true;
+                }
                 var usuario = new User
                 {
                     Correo = dto.Correo,
@@ -113,10 +119,7 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateUserDto(dto);
                 ValidateId(dto.IdUsuario);
-                ValidateClave(dto.Clave);
-                ValidateId(dto.IdUserRole);
                 var user = await _userRepository.GetEntityByIdAsync(dto.IdUsuario);
                 ValidateUser(user);
                 user.Correo = dto.Correo;
@@ -256,13 +259,6 @@ namespace HRMS.Application.Services.UsersServices
                 throw new ArgumentNullException("El usuario no existe");
             }
         }
-        private void ValidateUserDto(object dto)
-        {
-            if (dto == null)
-            {
-                throw new ArgumentNullException("Dto nulo");
-            }
-        }
         private void ValidateNulleable(string x, string message)
         {
             if (string.IsNullOrEmpty(x))
@@ -283,6 +279,9 @@ namespace HRMS.Application.Services.UsersServices
 
             string caracteresEspeciales = "@#!*?$/,{}=.;:";
             if (!clave.Any(c => caracteresEspeciales.Contains(c)))
+                return false;
+
+            if (clave.Contains(" "))
                 return false;
 
             return true;

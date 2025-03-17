@@ -1,6 +1,7 @@
 ﻿using HRMS.Application.DTOs.UserRoleDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Domain.Base;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -11,10 +12,12 @@ namespace HRMS.Application.Services.UsersServices
     {
         private readonly ILoggingServices _loggerServices;
         private readonly IUserRoleRepository _userRoleRepository;
-        public UserRoleService(IUserRoleRepository userRoleRepository,
+        private readonly IValidator<SaveUserRoleDTO> _validator;
+        public UserRoleService(IUserRoleRepository userRoleRepository, IValidator<SaveUserRoleDTO> validator,
                                 ILoggingServices loggerServices) 
         {
             _userRoleRepository = userRoleRepository;
+            _validator = validator;
             _loggerServices = loggerServices;
         }
 
@@ -62,7 +65,7 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateUserRoletDto(dto);
+                ValidateId(dto.IdUserRole);
                 var rolInUse = await _userRoleRepository.GetUsersByUserRoleIdAsync(dto.IdUserRole);
                 if (rolInUse != null) 
                 {
@@ -88,7 +91,13 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateUserRoletDto(dto); 
+                var validDTO = _validator.Validate(dto);
+                if (!validDTO.IsSuccess)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos para guardar";
+                    result.Data = dto;
+                }
                 var userRole = new UserRole()
                 {
                     Descripcion = dto.Descripcion,
@@ -113,7 +122,7 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateUserRoletDto(dto);
+                ValidateId(dto.IdUserRole);
                 var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
                 ValidateUserRole(userRole);
                 userRole.Descripcion = dto.Descripcion;
@@ -167,14 +176,6 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _loggerServices.LogError(ex.Message, this);
             }
             return result;
-        }
-        private object ValidateUserRoletDto(object dto)
-        {
-            if (dto == null)
-            {
-                throw new ArgumentNullException("Dto nulo");
-            }
-            return dto;
         }
         private UserRole ValidateUserRole(UserRole userRole)
         {

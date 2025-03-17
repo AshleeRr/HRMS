@@ -16,7 +16,7 @@ namespace HRMS.Domain.Base.Validator.UsersValidations
             AddRule(u => u.IdRolUsuario >= 1)
                 .WithErrorMessage("El rol del usuario debe ser mayor que 0");
             AddRule(u => ValidateClave(u.Clave))
-                .WithErrorMessage("La clave del usuario debe tener al menos 8 caracteres, un número, una letra mayúscula, un caracter especial y una letra minúscula para ser segura");
+                .WithErrorMessage("La clave no debe contener espacios. Debe tener al menos 8 caracteres, un número, una letra mayúscula, un caracter especial y una letra minúscula para ser segura");
             AddRule(u => u.TipoDocumento != null && u.TipoDocumento.Length <= 15)
                 .WithErrorMessage("El tipo de documento debe de tener menos de 15 caracteres");
             AddRule(u => u.Documento != null && u.Documento.Length <= 15 && u.Documento.Length >= 6)
@@ -35,6 +35,9 @@ namespace HRMS.Domain.Base.Validator.UsersValidations
 
             string caracteresEspeciales = "@#!*?$/,{}=.;:";
             if (!clave.Any(c => caracteresEspeciales.Contains(c)))
+                return false;
+
+            if (clave.Contains(" "))
                 return false;
 
             return true;

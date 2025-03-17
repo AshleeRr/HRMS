@@ -18,7 +18,7 @@ namespace HRMS.Domain.Base.Validator.UsersValidations
             AddRule(c => c.IdUsuario != null)
                 .WithErrorMessage("El id de usuario debe ser especififcado");
             AddRule(u => ValidateClave(u.Clave))
-                .WithErrorMessage("La clave del cliente debe tener al menos 8 caracteres, un número, una letra mayúscula, un caracter especial y una letra minúscula para ser segura");
+                .WithErrorMessage("La clave no debe contener espacios. Debe tener al menos 8 caracteres, un número, una letra mayúscula, un caracter especial y una letra minúscula para ser segura");
         }
         private bool ValidateClave(string? clave)
         {
@@ -35,6 +35,8 @@ namespace HRMS.Domain.Base.Validator.UsersValidations
             if (!clave.Any(c => caracteresEspeciales.Contains(c)))
                 return false;
 
+            if (clave.Contains(" "))
+                return false;
             return true;
         }
     }
