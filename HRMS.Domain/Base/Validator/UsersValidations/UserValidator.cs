@@ -42,5 +42,6 @@ namespace HRMS.Domain.Base.Validator.UsersValidations
 
             return true;
         }
+
     }
 }

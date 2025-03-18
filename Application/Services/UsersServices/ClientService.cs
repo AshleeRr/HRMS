@@ -89,7 +89,24 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-
+                var validDTO = _validator.Validate(dto);
+                if (!validDTO.IsSuccess)
+                {
+                    result.Message = "Error validando los datos para guardar";
+                    result.IsSuccess = true;
+                }
+                var existingCorreo = await _clientRepository.GetClientByEmailAsync(dto.Correo);
+                if (existingCorreo != null)
+                {
+                    result.Message = "Este correo ya esta registrado";
+                    result.IsSuccess = true;
+                }
+                var existingDocument = await _clientRepository.GetClientByDocumentAsync(dto.Documento);
+                if (existingDocument != null)
+                {
+                    result.Message = "Este documento ya esta registrado";
+                    result.IsSuccess = true;
+                }
                 var client = new Client()
                 {
                     IdUsuario = dto.IdUsuario,
@@ -123,6 +140,18 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateId(dto.IdUsuario);
                 var client = await _clientRepository.GetEntityByIdAsync(dto.IdUsuario);
                 ValidateClient(client);
+                var existingCorreo = await _clientRepository.GetClientByEmailAsync(dto.Correo);
+                if (existingCorreo != null && existingCorreo.IdUsuario != dto.IdUsuario)
+                {
+                    result.Message = "Este correo ya esta registrado";
+                    result.IsSuccess = true;
+                }
+                var existingDocument = await _clientRepository.GetClientByDocumentAsync(dto.Documento);
+                if (existingDocument != null && existingDocument.IdUsuario != dto.IdUsuario)
+                {
+                    result.Message = "Este documento ya esta registrado";
+                    result.IsSuccess = true;
+                }
                 client.IdUsuario = dto.IdUsuario;
                 client.NombreCompleto = dto.NombreCompleto;
                 client.TipoDocumento = dto.TipoDocumento;
@@ -169,6 +198,12 @@ namespace HRMS.Application.Services.UsersServices
             {
                 ValidateId(id);
                 ValidateNulleable(nuevoCorreo, "nuevo correo");
+                var existingCorreo = await _clientRepository.GetClientByEmailAsync(nuevoCorreo);
+                if (existingCorreo != null && existingCorreo.IdUsuario != id)
+                {
+                    result.Message = "Este correo ya esta registrado";
+                    result.IsSuccess = true;
+                }
                 var client = await _clientRepository.GetClientByUserIdAsync(id);
                 ValidateClient(client);
                 client.Correo = nuevoCorreo;
@@ -213,6 +248,12 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateId(id);
                 ValidateNulleable(documento, "documento");
                 ValidateNulleable(tipoDocumento, "tipo documento");
+                var existingDocument = await _clientRepository.GetClientByDocumentAsync(documento);
+                if (existingDocument != null && existingDocument.IdUsuario != id)
+                {
+                    result.Message = "Este documento ya esta registrado";
+                    result.IsSuccess = true;
+                }
                 var cliente = await _clientRepository.GetClientByUserIdAsync(id);
                 ValidateClient(cliente);
                 cliente.Documento = documento;

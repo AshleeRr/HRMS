@@ -70,7 +70,7 @@ namespace HRMS.Application.Services.UsersServices
                 user.Estado = false;
                 await _userRepository.UpdateEntityAsync(user);
                 result.IsSuccess = true; 
-                result.Message = "Usuario eliminado";
+                result.Message = "Usuario eliminado correctamente";
                 result.Data = dto;
             }
             catch (Exception ex)
@@ -88,6 +88,18 @@ namespace HRMS.Application.Services.UsersServices
                 if (!validDTO.IsSuccess) 
                 {
                     result.Message = "Error validando los datos para guardar";
+                    result.IsSuccess = true;
+                }
+                var existingCorreo = await _userRepository.GetUserByEmailAsync(dto.Correo);
+                if (existingCorreo != null)
+                {
+                    result.Message = "Este correo ya esta registrado";
+                    result.IsSuccess = true;
+                }
+                var existingDocument = await _userRepository.GetUserByDocumentAsync(dto.Documento);
+                if (existingDocument != null)
+                {
+                    result.Message = "Este documento ya esta registrado";
                     result.IsSuccess = true;
                 }
                 var usuario = new User
@@ -122,6 +134,18 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateId(dto.IdUsuario);
                 var user = await _userRepository.GetEntityByIdAsync(dto.IdUsuario);
                 ValidateUser(user);
+                var existingCorreo = await _userRepository.GetUserByEmailAsync(dto.Correo);
+                if (existingCorreo != null && existingCorreo.IdUsuario != dto.IdUsuario)
+                {
+                    result.Message = "Este correo ya esta registrado";
+                    result.IsSuccess = true;
+                }
+                var existingDocument = await _userRepository.GetUserByDocumentAsync(dto.Documento);
+                if (existingDocument != null && existingDocument.IdUsuario != dto.IdUsuario)
+                {
+                    result.Message = "Este documento ya esta registrado";
+                    result.IsSuccess = true;
+                }
                 user.Correo = dto.Correo;
                 user.NombreCompleto = dto.NombreCompleto;
                 user.TipoDocumento = dto.TipoDocumento;
@@ -129,7 +153,7 @@ namespace HRMS.Application.Services.UsersServices
                 user.Clave = dto.Clave;
                 dto.ChangeTime = DateTime.Now;
                 await _userRepository.UpdateEntityAsync(user);
-                result.Message = "Usuario actualizado";
+                result.Message = "Usuario actualizado correctamente";
                 result.IsSuccess = true;
             }
             catch (Exception ex)
@@ -145,6 +169,13 @@ namespace HRMS.Application.Services.UsersServices
             {
                 ValidateId(idUsuario);
                 ValidateNulleable(nuevoCorreo, "nuevo correo");
+
+                var existingCorreo = await _userRepository.GetUserByEmailAsync(nuevoCorreo);
+                if (existingCorreo != null && existingCorreo.IdUsuario != idUsuario)
+                {
+                    result.Message = "Este correo ya esta registrado";
+                    result.IsSuccess = true;
+                }
                 var user = await _userRepository.GetEntityByIdAsync(idUsuario);
                 ValidateUser(user);
                 user.Correo = nuevoCorreo;
@@ -209,6 +240,13 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateId(idUsuario);
                 ValidateNulleable(tipoDocumento, "tipo de documento");
                 ValidateNulleable(documento, "documento");
+
+                var existingDocument = await _userRepository.GetUserByDocumentAsync(documento);
+                if (existingDocument != null && existingDocument.IdUsuario != idUsuario)
+                {
+                    result.Message = "Este documento ya esta registrado";
+                    result.IsSuccess = true;
+                }
                 var usuario = await _userRepository.GetEntityByIdAsync(idUsuario);
                 ValidateUser(usuario);
                 usuario.TipoDocumento = tipoDocumento;
@@ -249,7 +287,7 @@ namespace HRMS.Application.Services.UsersServices
         {
             if (id <= 0)
             {
-                throw new ArgumentNullException("El id del usuario  debe ser mayor que 0");
+                throw new ArgumentNullException("El id del usuario debe ser mayor que 0");
             }
         }
         private void ValidateUser(User user)

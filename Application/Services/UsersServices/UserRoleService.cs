@@ -129,7 +129,7 @@ namespace HRMS.Application.Services.UsersServices
                 userRole.RolNombre = dto.Nombre;
                 dto.ChangeTime = DateTime.Now;
                 await _userRoleRepository.UpdateEntityAsync(userRole);
-                result.Message = "Rol de usuario actualizado";
+                result.Message = "Rol de usuario actualizado correctamente";
                 result.IsSuccess = true;
                 result.Data = dto;
             }
@@ -151,6 +151,11 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
                 result.IsSuccess = true;
                 result.Message = "Se actualizó la descripción del rol de usuario";
+                if (!result.IsSuccess) 
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Error actualizando la descripcion del rol de usuario";
+                }
             }
             catch (Exception ex)
             {
@@ -170,6 +175,11 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
                 result.IsSuccess = true;
                 result.Message = "Se actualizó el nombre del rol de usuario";
+                if (!result.IsSuccess)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Error actualizando el nombre del rol de usuario";
+                }
             }
             catch (Exception ex)
             {
