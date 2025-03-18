@@ -38,7 +38,7 @@ namespace HRMS.Application.Test.UsersTests
             Assert.IsType<List<Client>>(result.Data);
         }
         [Fact]
-        public async Task GetAll_ShoulReturnSuccess_WhensClientsDoesNotExist()
+        public async Task GetAll_ShoulReturnFailure_WhensClientsDoesNotExist()
         {
             //arrange
             _mockClientRepository.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Client>());
@@ -46,7 +46,7 @@ namespace HRMS.Application.Test.UsersTests
             var result = await _clientService.GetAll();
             var expectedMessage = "No hay clientes registrados";
             //assert
-            Assert.True(!result.IsSuccess);
+            Assert.False(result.IsSuccess);
             Assert.NotNull(result);
             Assert.Equal(expectedMessage, result.Message);
         }

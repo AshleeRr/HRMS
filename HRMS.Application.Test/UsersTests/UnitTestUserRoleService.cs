@@ -45,7 +45,7 @@ namespace HRMS.Application.Test.UsersTests
             var result = await _userRoleService.GetAll();
             var expectedMessage = "No hay roles de usuario registrados";
             //assert
-            Assert.True(!result.IsSuccess);
+            Assert.False(result.IsSuccess);
             Assert.NotNull(result);
             Assert.Equal(expectedMessage, result.Message);
         }
@@ -185,7 +185,7 @@ namespace HRMS.Application.Test.UsersTests
             _mockUserRoleRepository.Setup(r => r.UpdateEntityAsync(It.IsAny<UserRole>())).ReturnsAsync(oP);
 
             //act
-            var result = await _userRoleService.Remove(new RemoveUserRoleDTO { IdUserRole = 1 });
+            var result = await _userRoleService.Update(new UpdateUserRoleDTO { IdUserRole = 1 });
             var expectedMessage = "Rol de usuario actualizado correctamente";
 
             //assert
@@ -320,7 +320,7 @@ namespace HRMS.Application.Test.UsersTests
             var expectedMessage = "Error actualizando el nombre del rol de usuario";
 
             //assert
-            Assert.True(result.IsSuccess);
+            Assert.False(result.IsSuccess);
             Assert.Equal(expectedMessage, result.Message);
         }
 

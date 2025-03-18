@@ -112,7 +112,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var validUser = _validUser(entity);
                 if (!validUser.IsSuccess)
                 {
-                    return validUser;
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos para actualizar";
+                    return result;
                 }
                 var userExistente = await _context.Users.FindAsync(entity.IdUsuario);
                 if (userExistente == null)

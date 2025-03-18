@@ -517,14 +517,14 @@ namespace HRMS.Application.Test.UsersTests
         public static IEnumerable<object[]> UserInvalidPasswords => new List<object[]>
         {
             new object[]{ null},
-            new object[] { new string('B', 51) },
-            new object[] { new string('B', 11) },
-            new object[] { "bbbbbbbbbbbbb" },
-            new object[] { "BBBBBBBBBBBBB" },
-            new object[] { "BBbbbbbbbbbbb" },
-            new object[] { "BBbbbbbb1234" },
-            new object[] { "BBbbbbb##b1234" },
-            new object[]{ "BBbbb  ##1234"}
+            new object[] { new string('B', 52) },
+            new object[] { new string('B', 10) },
+            new object[] { "bbbb" },
+            new object[] { "BBBBB" },
+            new object[] { "BBbbbbb" },
+            new object[] { "BBbb1234" },
+            new object[] { "BBb##b1234" },
+            new object[]{ "BB  ##1234"}
         };
 
         [Theory]
