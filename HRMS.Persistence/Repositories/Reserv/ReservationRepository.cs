@@ -386,8 +386,8 @@ namespace HRMS.Persistence.Repositories.Reserv
                     var query = from c in _context.Categorias
                                 join t in _context.Tarifas on c.IdCategoria equals t.IdCategoria
                                 where c.IdCategoria == categoryId
-                                //  &&t.FechaInicio >= start && t.FechaInicio < end &&
-                                //t.FechaFin > start && t.FechaFin <= end
+                                  && t.FechaInicio >= start && t.FechaInicio < end
+                                  && t.FechaFin > start && t.FechaFin <= end
                                 select new CategoryRoomForReserv
                                 {
                                     Id = c.IdCategoria,
@@ -437,8 +437,8 @@ namespace HRMS.Persistence.Repositories.Reserv
                                 join h in _context.Habitaciones on c.IdCategoria equals h.IdCategoria
                                 join t in _context.Tarifas on c.IdCategoria equals t.IdCategoria
                                 where h.IdHabitacion == rommId
-                                //  &&t.FechaInicio >= start && t.FechaInicio < end &&
-                                //t.FechaFin > start && t.FechaFin <= end
+                                  && t.FechaInicio >= start && t.FechaInicio < end
+                                  && t.FechaFin > start && t.FechaFin <= end
                                 select new CategoryRoomForReserv
                                 {
                                     Id = c.IdCategoria,
