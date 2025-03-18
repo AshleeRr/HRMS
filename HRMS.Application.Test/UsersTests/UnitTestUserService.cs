@@ -5,6 +5,7 @@ using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
+using HRMS.Persistence.Repositories.UsersRepository;
 using Moq;
 
 namespace HRMS.Application.Test.UsersTests
@@ -400,7 +401,7 @@ namespace HRMS.Application.Test.UsersTests
             Assert.Equal(expectedMessage, result.Message);
         }
         [Fact]
-        public async Task UpdateUserRoleToUserAsync_ShouldReturnSuccess_WhenIdUserIsNotValid()
+        public async Task UpdateUserRoleToUserAsync_ShouldReturnFailure_WhenIdUserIsNotValid()
         {
             //arrange
             int idUser = 0;
@@ -414,7 +415,7 @@ namespace HRMS.Application.Test.UsersTests
             Assert.Equal(expectedMessage, result.Message);
         }
         [Fact]
-        public async Task UpdateUserRoleToUserAsync_ShouldReturnSuccess_WhenIdUserRoleIsNotValid()
+        public async Task UpdateUserRoleToUserAsync_ShouldReturnFailure_WhenIdUserRoleIsNotValid()
         {
             //arrange
             int idUser = 8;
@@ -428,7 +429,7 @@ namespace HRMS.Application.Test.UsersTests
             Assert.Equal(expectedMessage, result.Message);
         }
         [Fact]
-        public async Task UpdateUserRoleToUserAsync_ShouldReturnSuccess_WhenUserIsNotFound()
+        public async Task UpdateUserRoleToUserAsync_ShouldReturnFailure_WhenUserIsNotFound()
         {
             //assert
             _mockUserRepository.Setup(r => r.GetEntityByIdAsync(It.IsAny<int>())).ReturnsAsync((User)null);
@@ -491,12 +492,67 @@ namespace HRMS.Application.Test.UsersTests
             Assert.Equal(expectedMessage, result.Message);
         }
         [Fact]
-        public async Task Update_ShouldReturnError_WhenUserIsUpdatedSuccesfully() {
+        public async Task Update_ShouldReturnSuccess_WhenUserIsUpdatedSuccesfully() {
             _mockUserRepository.Setup(r => r.GetEntityByIdAsync(1)).ReturnsAsync(new User { IdUsuario = 1});
             //act
             var result = await _userService.Update(new UpdateUserClientDTO { IdUsuario = 1 });
             var expectedMessage = "Usuario actualizado correctamente";
             //asserts
+            Assert.True(result.IsSuccess);
+            Assert.Equal(expectedMessage, result.Message);
+        }
+        [Fact]
+        public async Task UpdatePasswordAsync_ShouldReturnError_WhenIdIsInvalid()
+        {
+            //arrange
+            int invalidId = 0;
+            string newPassword = "AAAAAAAAAAAaaa12312312#@#@";
+            //act
+            var result = await _userService.UpdatePasswordAsync(invalidId, newPassword);
+            var expectedMessage = "El id debe ser mayor que 0";
+
+            //assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(expectedMessage, result.Message);
+        }
+        public static IEnumerable<object[]> UserInvalidPasswords => new List<object[]>
+        {
+            new object[]{ null},
+            new object[] { new string('B', 51) },
+            new object[] { new string('B', 11) },
+            new object[] { "bbbbbbbbbbbbb" },
+            new object[] { "BBBBBBBBBBBBB" },
+            new object[] { "BBbbbbbbbbbbb" },
+            new object[] { "BBbbbbbb1234" },
+            new object[] { "BBbbbbb##b1234" },
+            new object[]{ "BBbbb  ##1234"}
+        };
+
+        [Theory]
+        [MemberData(nameof(UserInvalidPasswords))]
+        public async Task UpdatePasswordAsync_ShouldReturnError_WhenPasswordIsNotValid(string invalidPassword)
+        {
+            ///arrange
+            _mockUserRepository.Setup(mr => mr.GetEntityByIdAsync(1)).ReturnsAsync(new User { IdUsuario = 1 });
+            
+            //act
+            var expectedMessage = "La clave no debe contener espacios. Debe tener al menos 8 caracteres, un número, una letra mayúscula, un caracter especial y una letra minúscula para ser segura";
+            var result = await _userService.UpdatePasswordAsync(1, invalidPassword);
+            //assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal(expectedMessage, result.Message);
+        }
+        [Fact]
+        public async Task UpdatePasswordAsync_ShouldReturnSuccess_WhenPasswordIsUpdatedSuccesfully()
+        {
+            ///arrange
+            string validPassword = "12323qweqASDAS#@";
+            _mockUserRepository.Setup(mr => mr.GetEntityByIdAsync(1)).ReturnsAsync(new User { IdUsuario = 1 });
+
+            //act
+            var expectedMessage = "Clave actualizada correctamente";
+            var result = await _userService.UpdatePasswordAsync(1, validPassword);
+            //assert
             Assert.True(result.IsSuccess);
             Assert.Equal(expectedMessage, result.Message);
         }

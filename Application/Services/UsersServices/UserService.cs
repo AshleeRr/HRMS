@@ -274,7 +274,7 @@ namespace HRMS.Application.Services.UsersServices
                 usuario.Clave = nuevaClave;
                 await _userRepository.UpdateEntityAsync(usuario);
                 result.IsSuccess = true;
-                result.Message = "Clave actualizada";
+                result.Message = "Clave actualizada correctamente";
                 result.Data = usuario;
             }
             catch (Exception ex)
