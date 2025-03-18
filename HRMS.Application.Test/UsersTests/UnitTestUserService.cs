@@ -5,7 +5,6 @@ using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
-using HRMS.Persistence.Repositories.UsersRepository;
 using Moq;
 
 namespace HRMS.Application.Test.UsersTests
@@ -103,7 +102,7 @@ namespace HRMS.Application.Test.UsersTests
             
             //act
             var result = await _userService.Save(dto);
-            var expectedMessage = "Usuario actualizado correctamente";
+            var expectedMessage = "Usuario guardado correctamente";
             //assert
             Assert.True(result.IsSuccess);
             Assert.Equal(expectedMessage, result.Message);

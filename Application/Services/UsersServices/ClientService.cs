@@ -72,7 +72,7 @@ namespace HRMS.Application.Services.UsersServices
                 client.Estado = false;
                 result = await _clientRepository.UpdateEntityAsync(client);
                 result.IsSuccess = true;
-                result.Message = "Rol de usuario eliminado correctamente";
+                result.Message = "Cliente eliminado correctamente";
             }
             catch (Exception ex)
             {
@@ -160,7 +160,7 @@ namespace HRMS.Application.Services.UsersServices
                 client.Correo = dto.Correo;
                 dto.ChangeTime = DateTime.Now;
                 await _clientRepository.UpdateEntityAsync(client);
-                result.Message = "Cliente actualizado";
+                result.Message = "Cliente actualizado correctamente";
                 result.IsSuccess = true;
                 result.Data = dto;
             }
@@ -182,7 +182,7 @@ namespace HRMS.Application.Services.UsersServices
                 client.Clave = nuevaClave;
                 await _clientRepository.UpdateEntityAsync(client);
                 result.IsSuccess = true;
-                result.Message = "Clave actualizada";
+                result.Message = "Clave actualizada correctamente";
             }
             catch (Exception ex)
             {
@@ -209,7 +209,7 @@ namespace HRMS.Application.Services.UsersServices
                 client.Correo = nuevoCorreo;
                 await _clientRepository.UpdateEntityAsync(client);
                 result.IsSuccess = true;
-                result.Message = "Correo actualizado";
+                result.Message = "Correo actualizado correctamente";
             }
             catch (Exception ex)
             {
@@ -231,7 +231,7 @@ namespace HRMS.Application.Services.UsersServices
                 client.NombreCompleto = nuevoNombreCompleto;
                 await _clientRepository.UpdateEntityAsync(client);
                 result.IsSuccess = true;
-                result.Message = "Nombre actualizado";
+                result.Message = "Nombre actualizado correctamente";
             }
             catch (Exception ex)
             {
@@ -260,7 +260,7 @@ namespace HRMS.Application.Services.UsersServices
                 cliente.TipoDocumento = tipoDocumento;
                 await _clientRepository.UpdateEntityAsync(cliente);
                 result.IsSuccess = true;
-                result.Message = "Nombre actualizado";
+                result.Message = "Datos actualizados correctamente";
             }
             catch (Exception ex)
             {
@@ -280,7 +280,7 @@ namespace HRMS.Application.Services.UsersServices
         {
             if (client == null)
             {
-                throw new ArgumentNullException("No existe un client con este id");
+                throw new ArgumentNullException("No existe un cliente con este id");
             }
             return client;
         }
