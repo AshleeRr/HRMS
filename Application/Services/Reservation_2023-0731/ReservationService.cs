@@ -97,7 +97,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                     result = await _reservationRepository.UpdateEntityAsync(resv);
                     result.Data = resv;
                 }
-                _notificationService.SendNotification(dto.UserID, "Su reservación ha sido confirmada");
+                await _notificationService.SendNotification(dto.UserID, "Su reservación ha sido confirmada");
             }
             catch (Exception ex)
             {
@@ -301,7 +301,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                                         ReservacionID = reservation.IdRecepcion
                                     });
                                     */
-                                    _notificationService.SendNotification(dto.UserID, "Su reservación ha sido creada");
+                                    await _notificationService.SendNotification(dto.UserID, "Su reservación ha sido creada");
                                 }
                                 else
                                 {
