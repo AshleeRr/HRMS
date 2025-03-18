@@ -13,7 +13,7 @@ namespace HRMS.Application.Services.UsersServices
         private readonly ILoggingServices _loggerServices;
         private readonly IUserRepository _userRepository;
         private readonly IValidator<SaveUserClientDTO> _validator;
-        public UserService(IUserRepository userRepository, IValidator<SaveUserClientDTO> validator
+        public UserService(IUserRepository userRepository, IValidator<SaveUserClientDTO> validator,
                                 ILoggingServices loggerServices)
         {
             _userRepository = userRepository;
