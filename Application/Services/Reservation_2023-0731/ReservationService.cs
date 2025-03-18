@@ -5,6 +5,7 @@ using HRMS.Domain.Entities.Reservations;
 using HRMS.Domain.Entities.Servicio;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Domain.Repository;
+using HRMS.Infraestructure.Notification;
 using HRMS.Models.Models.ReservationModels;
 
 namespace HRMS.Application.Services.Reservation_2023_0731
@@ -12,11 +13,13 @@ namespace HRMS.Application.Services.Reservation_2023_0731
     public class ReservationService : IReservationService
     {
         private readonly IReservationRepository _reservationRepository;
+        private readonly INotificationService _notificationService;
         private readonly ILoggingServices _loggingServices;
 
-        public ReservationService(IReservationRepository reservationRepository, ILoggingServices loggingServices)
+        public ReservationService(IReservationRepository reservationRepository, INotificationService notificationService, ILoggingServices loggingServices)
         {
             _reservationRepository = reservationRepository;
+            _notificationService = notificationService;
             _loggingServices = loggingServices;
         }
 
@@ -94,6 +97,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                     result = await _reservationRepository.UpdateEntityAsync(resv);
                     result.Data = resv;
                 }
+                _notificationService.SendNotification(dto.UserID, "Su reservación ha sido confirmada");
             }
             catch (Exception ex)
             {
@@ -297,6 +301,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                                         ReservacionID = reservation.IdRecepcion
                                     });
                                     */
+                                    _notificationService.SendNotification(dto.UserID, "Su reservación ha sido creada");
                                 }
                                 else
                                 {

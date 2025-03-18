@@ -8,6 +8,7 @@ using HRMS.Domain.Entities.Reservations;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Domain.Repository;
 using HRMS.Infraestructure.Logging;
+using HRMS.Infraestructure.Notification;
 using HRMS.Persistence.Repositories.Reserv;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,6 +24,7 @@ namespace HRMS.IOC.ReservationDepedencies
             services.AddScoped<IReservationService, ReservationService>();
             services.AddScoped<IValidator<ReservationAddDTO>, ReservAddDtoValidator>();
             services.AddScoped<ILoggingServices, LoggingServices>();
+            services.AddScoped<INotificationService, NotificationServiceFake>();
             return services;
         }
     }
