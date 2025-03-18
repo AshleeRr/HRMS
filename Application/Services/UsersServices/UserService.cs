@@ -180,7 +180,7 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateUser(user);
                 user.Correo = nuevoCorreo;
                 await _userRepository.UpdateEntityAsync(user);
-                result.Message = "Correo actualizado";
+                result.Message = "Correo actualizado correctamente";
                 result.IsSuccess = true;
                 result.Data = user;
             }
@@ -201,7 +201,7 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateUser(user);
                 user.NombreCompleto = nuevoNombreCompleto;
                 await _userRepository.UpdateEntityAsync(user);
-                result.Message = "Nombre actualizado";
+                result.Message = "Nombre actualizado correctamente";
                 result.IsSuccess = true;
                 result.Data = user;
             }
@@ -223,7 +223,7 @@ namespace HRMS.Application.Services.UsersServices
                 user.IdRolUsuario = idUserRole;
                 await _userRepository.UpdateEntityAsync(user);
                 result.IsSuccess = true;
-                result.Message = "Rol de usuario actualizado al usuario";
+                result.Message = "Rol de usuario actualizado al usuario correctamente";
                 result.Data = user;
             }
             catch (Exception ex)
@@ -253,7 +253,7 @@ namespace HRMS.Application.Services.UsersServices
                 usuario.Documento = documento;
                 await _userRepository.UpdateEntityAsync(usuario);
                 result.IsSuccess = true;
-                result.Message = "Datos actualizados";
+                result.Message = "Datos actualizados correctamente";
                 result.Data = usuario;
             }
             catch (Exception ex) 
