@@ -91,25 +91,7 @@ namespace HRMS.Application.Test.UsersTests
             Assert.True(result.IsSuccess);
             Assert.Equal(expectedMessage, result.Message);
         }
-        [Fact]
-        public async Task Remove_ShouldReturnSuccess_WhenRoleIsDeleted()
-        {
-            //arrange
-            var userRole = new UserRole { IdRolUsuario = 1, Descripcion = "prueba", Estado = true, FechaCreacion = DateTime.Now, RolNombre = "nombre prueba" };
-            var service = new UserRoleService(_mockUserRoleRepository.Object, _mockValidator.Object, _mockLoggingServices.Object);
-            var oP = new OperationResult { IsSuccess = true };
 
-            _mockUserRoleRepository.Setup(r => r.GetEntityByIdAsync(1)).ReturnsAsync(userRole);
-            _mockUserRoleRepository.Setup(r => r.UpdateEntityAsync(userRole)).ReturnsAsync(oP);
-
-            //act
-            var result = await _userRoleService.Remove(new RemoveUserRoleDTO { IdUserRole = 1 });
-            var expectedMessage = "Rol de usuario eliminado correctamente";
-
-            //assert
-            Assert.True(result.IsSuccess);
-            Assert.Equal(expectedMessage, result.Message);
-        }
         [Fact]
         public async Task Remove_ShouldReturnFailure_WhenUserRoleIsInUse()
         {

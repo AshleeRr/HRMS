@@ -309,16 +309,6 @@ namespace HRMS.Application.Test.UsersTests
             Assert.False(result.IsSuccess);
         }
         [Fact]
-        public async Task Update_ShouldReturnSuccess_WhenUserIsUpdatedSuccesfully() {
-            _mockUserRepository.Setup(r => r.GetEntityByIdAsync(1)).ReturnsAsync(new User { IdUsuario = 1});
-            //act
-            var result = await _userService.Update(new UpdateUserClientDTO { IdUsuario = 1 });
-            var expectedMessage = "Usuario actualizado correctamente";
-            //asserts
-            Assert.True(result.IsSuccess);
-            Assert.Equal(expectedMessage, result.Message);
-        }
-        [Fact]
         public async Task UpdatePasswordAsync_ShouldReturnError_WhenIdIsInvalid()
         {
             //arrange

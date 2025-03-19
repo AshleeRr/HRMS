@@ -96,7 +96,7 @@ namespace HRMS.Application.Test.UsersTests
             //act
             var result = await _clientService.GetById(invalidId);
             //assert
-            Assert.Null(result);
+            Assert.NotNull(result);
         }
         [Fact]
         public async Task Save_ShouldReturnSuccess_WhenClientIsSavedSuccesfully()

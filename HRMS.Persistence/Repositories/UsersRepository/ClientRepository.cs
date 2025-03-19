@@ -86,6 +86,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             if (entity == null)
             {
                 await _loggerServices.LogWarning("No se encontró un cliente con ese id", this, nameof(GetEntityByIdAsync));
+                return null;
             }
             return entity;
         }
@@ -160,7 +161,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         {
             if (id <= 0)
             {
-                throw new ArgumentNullException("El id debe ser mayor que 0");
+                throw new ArgumentException("El id debe ser mayor que 0");
             }
             return id;
         }
@@ -169,6 +170,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             if (string.IsNullOrEmpty(x))
             {
                 _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
+                throw new ArgumentException($"El campo: {message} no puede estar vacío.");
             }
         }
     }

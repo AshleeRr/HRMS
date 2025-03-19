@@ -82,12 +82,20 @@ namespace HRMS.Application.Services.UsersServices
                     return result;
                 }
                 var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
+                ValidateUserRole(userRole);
                 dto.Deleted = true;
                 userRole.Estado = false;
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
-                result.IsSuccess = true;
-                result.Message = "Rol de usuario eliminado correctamente";
-                result.Data = dto;
+                if (!result.IsSuccess)
+                {
+                    result.Message = "Error eliminando el rol";
+                }
+                else
+                {
+                    result.Message = "Rol de usuario eliminado correctamente";
+                    result.Data = dto;
+
+                }
             }
             catch (ArgumentException ex)
             {
@@ -223,7 +231,7 @@ namespace HRMS.Application.Services.UsersServices
         {
             if (userRole == null)
             {
-                throw new ArgumentNullException("No existe un rol con este id");
+                throw new ArgumentException("No existe un rol con este id");
             }
             return userRole;
         }

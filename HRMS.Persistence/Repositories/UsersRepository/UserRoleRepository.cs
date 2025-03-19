@@ -177,6 +177,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             if (id <= 0)
             {
                 _loggerServices.LogError($"{id}", "El id debe ser mayor que 0");
+                throw new ArgumentException("El id debe ser mayor que 0");
             }
         }
         private void ValidateNulleable(string x, string message)
@@ -184,6 +185,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             if (string.IsNullOrEmpty(x))
             {
                 _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
+                throw new ArgumentException($"El campo: {message} no puede estar vacío.");
             }
         }
     }

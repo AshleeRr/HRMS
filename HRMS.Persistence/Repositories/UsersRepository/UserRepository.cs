@@ -166,6 +166,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             if (string.IsNullOrEmpty(x))
             {
                 _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
+                throw new ArgumentException($"El campo: {message} no puede estar vacío.");
             }
         }
 
