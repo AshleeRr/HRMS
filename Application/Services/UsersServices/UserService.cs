@@ -52,6 +52,11 @@ namespace HRMS.Application.Services.UsersServices
                 result.IsSuccess = true;
                 result.Data = usuario;
             }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+            }
             catch (Exception ex)
             {
                 result = await _loggerServices.LogError(ex.Message, this);
@@ -73,6 +78,11 @@ namespace HRMS.Application.Services.UsersServices
                 result.Message = "Usuario eliminado correctamente";
                 result.Data = dto;
             }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+            }
             catch (Exception ex)
             {
                 result = await _loggerServices.LogError(ex.Message, this);
@@ -88,19 +98,22 @@ namespace HRMS.Application.Services.UsersServices
                 if (!validDTO.IsSuccess) 
                 {
                     result.Message = "Error validando los datos para guardar";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
+                    return result;
                 }
                 var existingCorreo = await _userRepository.GetUserByEmailAsync(dto.Correo);
                 if (existingCorreo != null)
                 {
                     result.Message = "Este correo ya esta registrado";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
+                    return result;
                 }
                 var existingDocument = await _userRepository.GetUserByDocumentAsync(dto.Documento);
                 if (existingDocument != null)
                 {
                     result.Message = "Este documento ya esta registrado";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
+                    return result;
                 }
                 var usuario = new User
                 {
@@ -115,10 +128,18 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _userRepository.SaveEntityAsync(usuario);
                 if (result.IsSuccess)
                 {
-                    result.Message = "Usuario guardado";
-                    result.IsSuccess = true;
+                    result.Message = "Usuario guardado correctamente";
                     result.Data = usuario;
                 }
+                else
+                {
+                    result.Message = "Error guardando el usuario";
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -138,13 +159,13 @@ namespace HRMS.Application.Services.UsersServices
                 if (existingCorreo != null && existingCorreo.IdUsuario != dto.IdUsuario)
                 {
                     result.Message = "Este correo ya esta registrado";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
                 }
                 var existingDocument = await _userRepository.GetUserByDocumentAsync(dto.Documento);
                 if (existingDocument != null && existingDocument.IdUsuario != dto.IdUsuario)
                 {
                     result.Message = "Este documento ya esta registrado";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
                 }
                 user.Correo = dto.Correo;
                 user.NombreCompleto = dto.NombreCompleto;
@@ -152,9 +173,22 @@ namespace HRMS.Application.Services.UsersServices
                 user.Documento = dto.Documento;
                 user.Clave = dto.Clave;
                 dto.ChangeTime = DateTime.Now;
-                await _userRepository.UpdateEntityAsync(user);
-                result.Message = "Usuario actualizado correctamente";
-                result.IsSuccess = true;
+                result = await _userRepository.UpdateEntityAsync(user);
+                if (result.IsSuccess)
+                {
+                    result.Message = "Usuario actualizado correctamente";
+                    result.IsSuccess = true;
+                }
+                else
+                {
+                    result.Message = "Error actualizando al usuario";
+                }
+                
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -179,10 +213,22 @@ namespace HRMS.Application.Services.UsersServices
                 var user = await _userRepository.GetEntityByIdAsync(idUsuario);
                 ValidateUser(user);
                 user.Correo = nuevoCorreo;
-                await _userRepository.UpdateEntityAsync(user);
-                result.Message = "Correo actualizado correctamente";
-                result.IsSuccess = true;
-                result.Data = user;
+                result = await _userRepository.UpdateEntityAsync(user);
+                if (!result.IsSuccess)
+                {
+                    result.Message = "Error actualizando el correo";
+                }
+                else
+                {
+                    result.Message = "Correo actualizado correctamente";
+                    result.Data = user;
+
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -200,10 +246,23 @@ namespace HRMS.Application.Services.UsersServices
                 var user = await _userRepository.GetEntityByIdAsync(idUsuario);
                 ValidateUser(user);
                 user.NombreCompleto = nuevoNombreCompleto;
-                await _userRepository.UpdateEntityAsync(user);
-                result.Message = "Nombre actualizado correctamente";
-                result.IsSuccess = true;
-                result.Data = user;
+                result = await _userRepository.UpdateEntityAsync(user);
+                if (!result.IsSuccess)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Error actualizando el nombre";
+                } else
+                {
+                    result.Message = "Nombre actualizado correctamente";
+                    result.Data = user;
+
+                }
+                
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -225,6 +284,11 @@ namespace HRMS.Application.Services.UsersServices
                 result.IsSuccess = true;
                 result.Message = "Rol de usuario actualizado al usuario correctamente";
                 result.Data = user;
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -256,6 +320,11 @@ namespace HRMS.Application.Services.UsersServices
                 result.Message = "Datos actualizados correctamente";
                 result.Data = usuario;
             }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+            }
             catch (Exception ex) 
             {
                 result = await _loggerServices.LogError(ex.Message, this);
@@ -277,6 +346,11 @@ namespace HRMS.Application.Services.UsersServices
                 result.Message = "Clave actualizada correctamente";
                 result.Data = usuario;
             }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+            }
             catch (Exception ex)
             {
                 result = await _loggerServices.LogError(ex.Message, this);
@@ -287,7 +361,7 @@ namespace HRMS.Application.Services.UsersServices
         {
             if (id <= 0)
             {
-                throw new ArgumentNullException("El id del usuario debe ser mayor que 0");
+                throw new ArgumentException("El id del usuario debe ser mayor que 0");
             }
         }
         private void ValidateUser(User user)
@@ -304,25 +378,33 @@ namespace HRMS.Application.Services.UsersServices
                 throw new ArgumentNullException($"El campo: {message} no puede estar vacio.");
             }
         }
-        private bool ValidateClave(string? clave)
+        private void ValidateClave(string? clave)
         {
             if (string.IsNullOrEmpty(clave))
-                return false;
+            {
+                throw new ArgumentException("La clave no puede estar vacia");
+            }
 
             if (clave.Length < 12 || clave.Length > 50)
-                return false;
+            {
+                throw new ArgumentException("La clave debe contener tener entre 12 y 50 caracteres");
+            }
 
             if (!clave.Any(char.IsUpper) || !clave.Any(char.IsDigit) || !clave.Any(char.IsLower))
-                return false;
+            {
+                throw new ArgumentException("La clave debe contener al menos una letra mayuscula, una minuscula y un numero");
+            }
 
             string caracteresEspeciales = "@#!*?$/,{}=.;:";
             if (!clave.Any(c => caracteresEspeciales.Contains(c)))
-                return false;
+            {
+                throw new ArgumentException("La clave debe contener al menos un carácter especial.");
+            }
 
             if (clave.Contains(" "))
-                return false;
-
-            return true;
+            {
+                throw new ArgumentException("La clave no debe contener espacios.");
+            }
         }
     }
 }

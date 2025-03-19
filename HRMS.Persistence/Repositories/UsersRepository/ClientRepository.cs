@@ -100,7 +100,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             try
             {
                 var validClient = _validClient(entity);
-                if (!validClient.IsSuccess)
+                if (!validClient.IsSuccess || validClient == null)
                 {
                     result.IsSuccess = false;
                     result.Message = "Error validando los campos del cliente para actualizar";

@@ -1,4 +1,5 @@
 ﻿using HRMS.Domain.Base;
+using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,9 @@ namespace HRMS.Persistence.Test.FakeContext
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).
             Options)
         { }
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
         public static Mock<ILoggingServices> GetLoggingServiceMock()
         {
             var mockLogger = new Mock<ILoggingServices>();

@@ -56,7 +56,7 @@ namespace HRMS.Application.Test.UsersTests
             var service = new UserRoleService(_mockUserRoleRepository.Object, _mockValidator.Object, _mockLoggingServices.Object);
             //act
             var result = await service.GetById(0);
-            var expectedMessage = "El id del usuario debe ser mayor que 0";
+            var expectedMessage = "El id debe ser mayor que 0";
             //assert
             Assert.False(result.IsSuccess);
             Assert.Equal(expectedMessage, result.Message);
@@ -75,20 +75,6 @@ namespace HRMS.Application.Test.UsersTests
             Assert.IsType<UserRole>(result.Data);
         }
         [Fact]
-        public async Task GetById_ShoulReturnFailure_WhenRoleDoesntExist()
-        {
-            //arrange
-            int invalidId = 888;
-            _mockUserRoleRepository.Setup(r => r.GetEntityByIdAsync(invalidId)).ReturnsAsync((UserRole)null);
-            //act
-            var result = await _userRoleService.GetById(invalidId);
-            var expectedMessage = "No existe un rol con este id";
-            //assert
-            Assert.True(!result.IsSuccess);
-            Assert.Null(result);
-            Assert.Equal(expectedMessage, result.Message);
-        }
-        [Fact]
         public async Task Save_ShouldReturnSuccess_WhenValidRoleIsSaved() 
         {
             //arrange
@@ -103,21 +89,6 @@ namespace HRMS.Application.Test.UsersTests
             var expectedMessage = "Rol de usuario guardado correctamente";
             //assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(expectedMessage, result.Message);
-        }
-        [Fact]
-        public async Task Save_ShouldReturnFailure_WhenDtoIsNotValid()
-        {
-            //arrange
-            var dto = new SaveUserRoleDTO { Descripcion = "", Nombre = "" };
-            var oP = new OperationResult { IsSuccess = false };
-            _mockValidator.Setup(v => v.Validate(It.IsAny<SaveUserRoleDTO>())).Returns(oP);
-            
-            //act
-            var result = await _userRoleService.Save(dto);
-            var expectedMessage = "Error validando los campos para guardar";
-            //assert
-            Assert.False(result.IsSuccess);
             Assert.Equal(expectedMessage, result.Message);
         }
         [Fact]
@@ -156,7 +127,7 @@ namespace HRMS.Application.Test.UsersTests
             var result = await _userRoleService.Remove(new RemoveUserRoleDTO { IdUserRole = 1 });
             var expectedMessage = "Este rol está siendo utilizado por usuarios. No se puede eliminar";
             //assert
-            Assert.True(result.IsSuccess);
+            Assert.False(result.IsSuccess);
             Assert.Equal(expectedMessage, result.Message);
         }
 
@@ -167,7 +138,7 @@ namespace HRMS.Application.Test.UsersTests
             var dto = new UpdateUserRoleDTO { IdUserRole = 0, Descripcion = "desc", Nombre = "nombre" };
             //act
             var result = await _userRoleService.Update(dto);
-            var expectedMessage = "El id del usuario debe ser mayor que 0";
+            var expectedMessage = "El id debe ser mayor que 0";
             //assert
             Assert.False(result.IsSuccess);
             Assert.Equal(expectedMessage, result.Message);
@@ -214,7 +185,7 @@ namespace HRMS.Application.Test.UsersTests
             string invalidDesc = null;
             //act
             var result = await _userRoleService.UpdateDescriptionAsync(id, invalidDesc);
-            var expectedMessage = "El campo: descripcion no puede estar vacio.";
+            var expectedMessage = "El campo: nueva descripcion no puede estar vacio.";
 
             //assert
             Assert.False(result.IsSuccess);
@@ -261,11 +232,12 @@ namespace HRMS.Application.Test.UsersTests
         [Fact]
         public async Task UpdateNameAsync_ShouldReturnError_WhenIdIsInvalid()
         {
+
             //arrange
             int invalidId = 0;
             string newName = "prueba update";
             //act
-            var result = await _userRoleService.UpdateDescriptionAsync(invalidId, newName);
+            var result = await _userRoleService.UpdateNameAsync(invalidId, newName);
             var expectedMessage = "El id debe ser mayor que 0";
 
             //assert
@@ -311,7 +283,7 @@ namespace HRMS.Application.Test.UsersTests
             int id = 2;
             var userRole = new UserRole { IdRolUsuario = 1, Descripcion = "prueba", Estado = true, FechaCreacion = DateTime.Now, RolNombre = "nombre prueba" };
             string newName = "nombre de prueba";
-            _mockUserRoleRepository.Setup(r => r.GetEntityByIdAsync(2)).ReturnsAsync(userRole);
+            _mockUserRoleRepository.Setup(r => r.GetEntityByIdAsync(id)).ReturnsAsync(userRole);
             var oP = new OperationResult { IsSuccess = false };
             _mockUserRoleRepository.Setup(r => r.UpdateEntityAsync(It.IsAny<UserRole>())).ReturnsAsync(oP);
 

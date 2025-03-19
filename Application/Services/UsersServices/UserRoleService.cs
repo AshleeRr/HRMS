@@ -32,8 +32,11 @@ namespace HRMS.Application.Services.UsersServices
                     result.IsSuccess = false;
                     result.Message = "No hay roles de usuario registrados";
                 }
-                result.IsSuccess = true;
-                result.Data = userRoles;
+                else
+                {
+                    result.IsSuccess = true;
+                    result.Data = userRoles;
+                }
             }
             catch (Exception ex)
             {
@@ -53,6 +56,11 @@ namespace HRMS.Application.Services.UsersServices
                 result.IsSuccess = true;
                 result.Data = userRole;
             }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+            }
             catch (Exception ex)
             {
                 result = await _loggerServices.LogError(ex.Message, this);
@@ -67,10 +75,11 @@ namespace HRMS.Application.Services.UsersServices
             {
                 ValidateId(dto.IdUserRole);
                 var rolInUse = await _userRoleRepository.GetUsersByUserRoleIdAsync(dto.IdUserRole);
-                if (rolInUse != null) 
+                if (!rolInUse.IsSuccess || rolInUse.Data.Any()) 
                 {
                     result.IsSuccess = false;
                     result.Message = "Este rol está siendo utilizado por usuarios. No se puede eliminar";
+                    return result;
                 }
                 var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
                 dto.Deleted = true;
@@ -79,6 +88,11 @@ namespace HRMS.Application.Services.UsersServices
                 result.IsSuccess = true;
                 result.Message = "Rol de usuario eliminado correctamente";
                 result.Data = dto;
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -133,6 +147,11 @@ namespace HRMS.Application.Services.UsersServices
                 result.IsSuccess = true;
                 result.Data = dto;
             }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+            }
             catch (Exception ex)
             {
                 result = await _loggerServices.LogError(ex.Message, this);
@@ -149,13 +168,19 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateNulleable(nuevaDescripcion, "nueva descripcion");
                 userRole.Descripcion = nuevaDescripcion;
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
-                result.IsSuccess = true;
-                result.Message = "Se actualizó la descripción del rol de usuario";
                 if (!result.IsSuccess) 
                 {
                     result.IsSuccess = false;
                     result.Message = "Error actualizando la descripcion del rol de usuario";
+                } else
+                {
+                    result.Message = "Se actualizó la descripción del rol de usuario";
                 }
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -173,13 +198,20 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateNulleable(nuevoNombre, "nuevo nombre");
                 userRole.RolNombre = nuevoNombre;
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
-                result.IsSuccess = true;
-                result.Message = "Se actualizó el nombre del rol de usuario";
                 if (!result.IsSuccess)
                 {
                     result.IsSuccess = false;
                     result.Message = "Error actualizando el nombre del rol de usuario";
                 }
+                else
+                {
+                    result.Message = "Se actualizó el nombre del rol de usuario";
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -199,7 +231,7 @@ namespace HRMS.Application.Services.UsersServices
         {
             if (id <= 0)
             {
-                throw new ArgumentNullException("El id debe ser mayor que 0");
+                throw new ArgumentException("El id debe ser mayor que 0");
             }
             return id;
         }
@@ -207,7 +239,7 @@ namespace HRMS.Application.Services.UsersServices
         {
             if (string.IsNullOrEmpty(x))
             {
-                throw new ArgumentNullException($"El campo: {message} no puede estar vacio.");
+                throw new ArgumentException($"El campo: {message} no puede estar vacio.");
             }
         }
     }

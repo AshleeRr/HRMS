@@ -32,8 +32,11 @@ namespace HRMS.Application.Services.UsersServices
                     result.IsSuccess = false;
                     result.Message = "No hay clientes registrados";
                 }
-                result.IsSuccess = true;
-                result.Data = clients;
+                else
+                {
+                    result.IsSuccess = true;
+                    result.Data = clients;
+                }
             }
             catch (Exception ex)
             {
@@ -52,6 +55,11 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateClient(client);
                 result.IsSuccess = true;
                 result.Data = client;
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex) 
             {
@@ -74,6 +82,11 @@ namespace HRMS.Application.Services.UsersServices
                 result.IsSuccess = true;
                 result.Message = "Cliente eliminado correctamente";
             }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+            }
             catch (Exception ex)
             {
                 result = await _loggingServices.LogError(ex.Message, this);
@@ -93,19 +106,22 @@ namespace HRMS.Application.Services.UsersServices
                 if (!validDTO.IsSuccess)
                 {
                     result.Message = "Error validando los datos para guardar";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
+                    return result;
                 }
                 var existingCorreo = await _clientRepository.GetClientByEmailAsync(dto.Correo);
                 if (existingCorreo != null)
                 {
                     result.Message = "Este correo ya esta registrado";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
+                    return result;
                 }
                 var existingDocument = await _clientRepository.GetClientByDocumentAsync(dto.Documento);
                 if (existingDocument != null)
                 {
                     result.Message = "Este documento ya esta registrado";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
+                    return result;
                 }
                 var client = new Client()
                 {
@@ -120,7 +136,6 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _clientRepository.SaveEntityAsync(client);
                 if (result.IsSuccess)
                 {
-                    result.IsSuccess = true;
                     result.Message = "Cliente guardado correctamente";
                     result.Data = dto;
                 }
@@ -164,6 +179,11 @@ namespace HRMS.Application.Services.UsersServices
                 result.IsSuccess = true;
                 result.Data = dto;
             }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+            }
             catch (Exception ex)
             {
                 result = await _loggingServices.LogError(ex.Message, this);
@@ -180,9 +200,20 @@ namespace HRMS.Application.Services.UsersServices
                 var client = await _clientRepository.GetClientByUserIdAsync(id);
                 ValidateClient(client);
                 client.Clave = nuevaClave;
-                await _clientRepository.UpdateEntityAsync(client);
-                result.IsSuccess = true;
-                result.Message = "Clave actualizada correctamente";
+                result = await _clientRepository.UpdateEntityAsync(client);
+                if(!result.IsSuccess)
+                {
+                    result.Message = "Error actualizando la clave cliente";
+                }
+                else
+                {
+                    result.Message = "Se actualizó la clave del cliente";
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -207,9 +238,20 @@ namespace HRMS.Application.Services.UsersServices
                 var client = await _clientRepository.GetClientByUserIdAsync(id);
                 ValidateClient(client);
                 client.Correo = nuevoCorreo;
-                await _clientRepository.UpdateEntityAsync(client);
-                result.IsSuccess = true;
-                result.Message = "Correo actualizado correctamente";
+                result = await _clientRepository.UpdateEntityAsync(client);
+                if (!result.IsSuccess)
+                {
+                    result.Message = "Error actualizando el correo del cliente";
+                }
+                else
+                {
+                    result.Message = "Se actualizó el correo del cliente";
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -229,9 +271,21 @@ namespace HRMS.Application.Services.UsersServices
                 var client = await _clientRepository.GetClientByUserIdAsync(id);
                 ValidateClient(client);
                 client.NombreCompleto = nuevoNombreCompleto;
-                await _clientRepository.UpdateEntityAsync(client);
-                result.IsSuccess = true;
-                result.Message = "Nombre actualizado correctamente";
+                result = await _clientRepository.UpdateEntityAsync(client);
+                if (!result.IsSuccess)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Error actualizando el nombre del cliente";
+                }
+                else
+                {
+                    result.Message = "Se actualizó el nombre del cliente";
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -259,8 +313,20 @@ namespace HRMS.Application.Services.UsersServices
                 cliente.Documento = documento;
                 cliente.TipoDocumento = tipoDocumento;
                 await _clientRepository.UpdateEntityAsync(cliente);
-                result.IsSuccess = true;
-                result.Message = "Datos actualizados correctamente";
+                if (!result.IsSuccess)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Error actualizando los datos";
+                }
+                else
+                {
+                    result.Message = "Datos actualizados correctamente";
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -272,7 +338,7 @@ namespace HRMS.Application.Services.UsersServices
         {
             if (id <= 0)
             {
-                throw new ArgumentNullException("El id debe ser mayor que 0");
+                throw new ArgumentException("El id debe ser mayor que 0");
             }
             return id;
         }
@@ -288,28 +354,36 @@ namespace HRMS.Application.Services.UsersServices
         {
             if (string.IsNullOrEmpty(x))
             {
-                throw new ArgumentNullException($"El campo: {message} no puede estar vacio.");
+                throw new ArgumentException($"El campo: {message} no puede estar vacio.");
             }
         }
-        private bool ValidateClave(string? clave)
+        private void ValidateClave(string? clave)
         {
             if (string.IsNullOrEmpty(clave))
-                return false;
+            {
+                throw new ArgumentException("La clave no puede estar vacia");
+            }
 
             if (clave.Length < 12 || clave.Length > 50)
-                return false;
+            {
+                throw new ArgumentException("La clave debe contener tener entre 12 y 50 caracteres");
+            }
 
             if (!clave.Any(char.IsUpper) || !clave.Any(char.IsDigit) || !clave.Any(char.IsLower))
-                return false;
+            {
+                throw new ArgumentException("La clave debe contener al menos una letra mayuscula, una minuscula y un numero");
+            }
 
             string caracteresEspeciales = "@#!*?$/,{}=.;:";
             if (!clave.Any(c => caracteresEspeciales.Contains(c)))
-                return false;
+            {
+                throw new ArgumentException("La clave debe contener al menos un carácter especial.");
+            }
 
             if (clave.Contains(" "))
-                return false;
-
-            return true;
+            {
+                throw new ArgumentException("La clave no debe contener espacios.");
+            }
         }
     }
 }
