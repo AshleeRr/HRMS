@@ -7,15 +7,14 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PisoController : ControllerBase
+    public class PisoController : ApiControllerBase
     {
         private readonly IPisoService _pisoService;
-        private readonly ILogger<PisoController> _logger;
 
-        public PisoController(IPisoService pisoService, ILogger<PisoController> logger)
+        public PisoController(IPisoService pisoService, ILogger<PisoController> logger) :
+            base (logger)
         {
             _pisoService = pisoService;
-            _logger = logger;
         }
 
         /// <summary>
@@ -23,17 +22,13 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <returns>Lista de pisos</returns>
         [HttpGet("GetAllPisos")]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<PisoDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAll()
         {
             _logger.LogInformation("Obteniendo todos los pisos");
             var result = await _pisoService.GetAll();
-            
-            return result.IsSuccess 
-                ? Ok(result) 
-                : NotFound(result);
+            return HandleResponse(result);
         }
 
         /// <summary>
@@ -42,17 +37,18 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <param name="id">ID del piso</param>
         /// <returns>Piso encontrado</returns>
         [HttpGet("GetPisoById{id}")]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(PisoDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
             _logger.LogInformation($"Obteniendo piso por ID: {id}");
-            var result = await _pisoService.GetById(id);
             
-            return result.IsSuccess 
-                ? Ok(result) 
-                : NotFound(result);
+            var validation = ValidateId(id);
+            if (validation != null) return validation;
+            
+            var result = await _pisoService.GetById(id);
+            return HandleResponse(result);
         }
 
         /// <summary>
@@ -61,17 +57,18 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <param name="descripcion">Descripción del piso</param>
         /// <returns>Piso encontrado</returns>
         [HttpGet("GetPisoByDescripcion{descripcion}")]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(IEnumerable<PisoDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByDescripcion(string descripcion)
         {
-            _logger.LogInformation($"Buscando piso por descripción: {descripcion}");
-            var result = await _pisoService.GetPisoByDescripcion(descripcion);
+            _logger.LogInformation("Buscando pisos con descripción: {Descripcion}", descripcion);
             
-            return result.IsSuccess 
-                ? Ok(result) 
-                : NotFound(result);
+            var validation = ValidateString(descripcion , "Piso Descripción");
+            if (validation != null) return validation;
+            
+            var result = await _pisoService.GetPisoByDescripcion(descripcion);
+            return HandleResponse(result);
         }
 
         /// <summary>
@@ -84,18 +81,24 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] CreatePisoDto dto)
-        {
+        { 
+            _logger.LogInformation("Creando un nuevo piso {Descripcion}", dto.Descripcion);
+
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
 
-            _logger.LogInformation("Creando nuevo piso");
             var result = await _pisoService.Save(dto);
-            
-            return result.IsSuccess 
-                ? Created($"api/piso/{result.Data?.GetType().GetProperty("IdPiso")?.GetValue(result.Data, null)}", result) 
-                : BadRequest(result);
+
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("Error al crear la piso: {Message}", result.Message);
+                return BadRequest(CreateProblemDetails(result.Message, StatusCodes.Status400BadRequest));
+            }
+
+            var pisoDto = (PisoDto)result.Data;
+            return CreatedAtAction(nameof(GetById), new { id = pisoDto.IdPiso }, pisoDto);
         }
 
         /// <summary>
@@ -112,23 +115,18 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
-            if(id != dto.IdPiso)
-                return BadRequest(new ProblemDetails { 
-                Title = "El ID no coincide", 
-                Detail = "El ID en la URL no coincide con el ID en el cuerpo de la solicitud",
-                Status = StatusCodes.Status400BadRequest
-            });
-            
-            _logger.LogInformation($"Actualizando piso con ID: {dto.IdPiso}");
+
+            if (id != dto.IdPiso)
+            {
+                return BadRequest(CreateProblemDetails(
+                    "El ID en la URL no coincide con el ID en el cuerpo de la solicitud", 
+                    StatusCodes.Status400BadRequest));
+            }
+
             var result = await _pisoService.Update(dto);
-            
-            return result.IsSuccess 
-                ? Ok(result) 
-                : result.Message.Contains("No se encontró") 
-                    ? NotFound(result) 
-                    : BadRequest(result);
+            return HandleOperationResult(result);
         }
 
         /// <summary>
@@ -138,18 +136,22 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <returns>Resultado de la operación</returns>
         [HttpDelete("DeletePiso{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id)
         {
             _logger.LogInformation("Eliminando el piso con el id {id}", id);
-            var dto = new DeletePisoDto { IdPiso = id };
+            
+            
+            var validation = ValidateId(id);
+            if (validation!= null) return BadRequest(validation);
+
+            var dto = new DeletePisoDto() { IdPiso = id };
+            
             var result = await _pisoService.Remove(dto);
-    
-            if (!result.IsSuccess) 
-                return BadRequest(result);
-            return result.Data == null ? NotFound(result) : Ok(result);
+
+            return HandleResponse(result);
         }
     }
 }

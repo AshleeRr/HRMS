@@ -17,32 +17,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/HabitacionDtos/InfoHabitacionDTO.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/PisoController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/PisoController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/TarifaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/TarifaController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/ServiceValidations/TarifasValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/ServiceValidations/TarifasValidator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/CategoriaRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/CategoriaRepositoryTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/EstadoHabitacionRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/EstadoHabitacionRepositoryTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/HabitacionRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/HabitacionRepositoryTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/PisoRepositoryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/PisoRepositoryTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/PisoRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/PisoRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/CategoriaController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/EstadoHabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/PisoController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/PisoController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/RoomController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/RoomController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/TarifaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/TarifaController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Shared/_Layout.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Tarifa/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Tarifa/Index.cshtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,11 +55,14 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/BaseEstadoHabitacionDto.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Controllers/ReservationController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/WebApplication1/Controllers/HomeController.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/WebApplication1/Models/ErrorViewModel.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/WebApplication1/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/HRMS.Domain/Base/Validator/UsersValidations/ClientValidator.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRMS.Persistence.Test/FakeContext/FakeHRMSContext.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/HRMS.Persistence/Repositories/UsersRepository/ClientRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/HRMS.Persistence/Repositories/UsersRepository/UserRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/HRMS.Persistence/Repositories/UsersRepository/UserRoleRepository.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0fbc4d3b821e47d7a79878451a0956b944928/d0/f35b51ac/ValidationSummary.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5acc345db3c207bc9d886a36ff14867ef8d65557432172c2a42f19aeac04d1b/Nullable.cs" root0="FORCE_HIGHLIGHTING" />
@@ -116,10 +99,11 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.Web: http">
+  <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.APIs: http">
     <configuration name="Unnamed (1)" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false" temporary="true">
       <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.Application.Test/HRMS.Application.Test.csproj" />
       <option name="PROJECT_TFM" value="" />
@@ -365,7 +349,10 @@
       <workItem from="1741850804932" duration="13500000" />
       <workItem from="1741930897695" duration="8318000" />
       <workItem from="1741981403503" duration="14033000" />
-      <workItem from="1742067051260" duration="16617000" />
+      <workItem from="1742067051260" duration="20390000" />
+      <workItem from="1742193071640" duration="3097000" />
+      <workItem from="1742276800883" duration="3297000" />
+      <workItem from="1742348438548" duration="3715000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
@@ -479,7 +466,23 @@
       <option name="project" value="LOCAL" />
       <updated>1741844936903</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Envio">
+      <option name="closed" value="true" />
+      <created>1742102726089</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1742102726089</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Git momento">
+      <option name="closed" value="true" />
+      <created>1742102843315</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1742102843315</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -525,7 +528,9 @@
     <MESSAGE value="Validaciones a la capa de servicios hecha" />
     <MESSAGE value="Se ha agregado los test de la capa de Servicios, agregado los MapToDTo en la capa de Servicio, se ha quitado validaciones innecesarias en la capa de persistencia , se edito los controladores de la Api, las entidades de dominio se han hecho publicas y no &quot;Sealed&quot;, se ha agreado el Id a los Dto" />
     <MESSAGE value="Se ha separado la logica de negocios de la capa de repositorios, se ha incluido los DTO base para cada entidad, se ha modificado los Validadores para que sigan la estructura, se ha modificado los Tests para que pasen y todo este correcto, la api funciona correctamente, falta eliminar codigo repetido en la api" />
-    <option name="LAST_COMMIT_MESSAGE" value="Se ha separado la logica de negocios de la capa de repositorios, se ha incluido los DTO base para cada entidad, se ha modificado los Validadores para que sigan la estructura, se ha modificado los Tests para que pasen y todo este correcto, la api funciona correctamente, falta eliminar codigo repetido en la api" />
+    <MESSAGE value="Envio" />
+    <MESSAGE value="Git momento" />
+    <option name="LAST_COMMIT_MESSAGE" value="Git momento" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

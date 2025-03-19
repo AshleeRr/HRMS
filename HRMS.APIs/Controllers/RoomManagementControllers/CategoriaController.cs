@@ -7,15 +7,13 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriaController : ControllerBase
+    public class CategoriaController : ApiControllerBase
     {
         private readonly ICategoryService _categoryService;
-        private readonly ILogger<CategoriaController> _logger;
 
-        public CategoriaController(ICategoryService categoryService, ILogger<CategoriaController> logger)
+        public CategoriaController(ICategoryService categoryService , ILogger<CategoriaController> logger) : base(logger)
         {
             _categoryService = categoryService;
-            _logger = logger;
         }
 
         /// <summary>
@@ -23,17 +21,13 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <returns>Lista de categorias</returns>
         [HttpGet("GetAllCategorias")]
+        [ProducesResponseType(typeof(IEnumerable<CategoriaDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OperationResult), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAll()
         {
             _logger.LogInformation("Obteniendo todas las categorías");
             var result = await _categoryService.GetAll();
-
-            if (!result.IsSuccess)
-                _logger.LogWarning("No se encontraron estados de habitación: {Message}", result.Message);
-
-            return result.IsSuccess
-                ? Ok(result.Data)
-                : NotFound(new { message = result.Message });
+            return HandleResponse(result);
         }
 
         /// <summary>
@@ -42,24 +36,17 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <param name="id"></param>
         /// <returnsCategoria></returns>
         [HttpGet("GetCategoriaById{id}")]
+        [ProducesResponseType(typeof(CategoriaDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
             _logger.LogInformation("Obteniendo Categoria con ID: {Id}", id);
-
-            if (id <= 0)
-            {
-                _logger.LogWarning("Solicitud con ID inválido: {Id}", id);
-                return BadRequest(new { message = "El ID debe ser mayor que cero." });
-            }
-
+            var validation = ValidateId(id);
+            if (validation != null) return validation;
+            
             var result = await _categoryService.GetById(id);
-
-            if (!result.IsSuccess)
-                _logger.LogWarning("No se encontró la categoria con ID {Id}: {Message}", id, result.Message);
-
-            return result.IsSuccess
-                ? Ok(result.Data)
-                : NotFound(new { message = result.Message });
+            return HandleResponse(result);
 
         }
 
@@ -69,24 +56,28 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <param name="dto"></param>
         /// <returns>Piso creado</returns>
         [HttpPost("CreateCategoria")]
+        [ProducesResponseType(typeof(CategoriaDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create([FromBody] CreateCategoriaDto dto)
         {
             _logger.LogInformation("Creando una nueva categoria  {Descripcion}", dto.Descripcion);
 
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Modelo inválido para crear estado de habitación");
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
 
             var result = await _categoryService.Save(dto);
 
             if (!result.IsSuccess)
+            {
                 _logger.LogWarning("Error al crear la categoria: {Message}", result.Message);
+                return BadRequest(CreateProblemDetails(result.Message, StatusCodes.Status400BadRequest));
+            }
 
-            return result.IsSuccess
-                ? CreatedAtAction(nameof(GetById), new { id = ((CategoriaDto)result.Data) }, result.Data)
-                : BadRequest(new { message = result.Message });
+            var categoriaDto = (CategoriaDto)result.Data;
+            return CreatedAtAction(nameof(GetById), new { id = categoriaDto.IdCategoria }, categoriaDto);
         }
 
         /// <summary>
@@ -105,25 +96,18 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return ValidationProblem(ModelState);
             }
 
             if (id != dto.IdCategoria)
-                return BadRequest(new ProblemDetails
-                {
-                    Title = "El ID no coincide",
-                    Detail = "El ID en la URL no coincide con el ID en el cuerpo de la solicitud",
-                    Status = StatusCodes.Status400BadRequest
-                });
+            {
+                return BadRequest(CreateProblemDetails(
+                    "El ID en la URL no coincide con el ID en el cuerpo de la solicitud", 
+                    StatusCodes.Status400BadRequest));
+            }
 
-            _logger.LogInformation($"Actualizando categoria con ID: {dto.IdCategoria}");
             var result = await _categoryService.Update(dto);
-
-            return result.IsSuccess
-                ? Ok(result)
-                : result.Message.Contains("No se encontró")
-                    ? NotFound(result)
-                    : BadRequest(result);
+            return HandleOperationResult(result);
         }
 
         /// <summary>
@@ -133,32 +117,19 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <returns>Categoria eliminada</returns>
         [HttpDelete("DeleteCategoriaById{id}")]
         [ProducesResponseType(typeof(OperationResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id)
         {
             _logger.LogInformation("Eliminand la categoria ID: {Id}", id);
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Modelo inválido para eliminar estado de habitación");
-                return BadRequest(ModelState);
-            }
-
-            var dto = new DeleteCategoriaDto() { IdCategoria = id };
-
+            
+            var validation = ValidateId(id);
+            if (validation != null) return validation;
+            
+            var dto = new DeleteCategoriaDto { IdCategoria = id };
             var result = await _categoryService.Remove(dto);
-
-            if (!result.IsSuccess)
-                _logger.LogWarning("Error al eliminar la categoria ID {Id}: {Message}",
-                    dto.IdCategoria, result.Message);
-
-            return result.IsSuccess
-                ? Ok(result.Data)
-                : result.Message.Contains("No se encontró")
-                    ? NotFound(new { message = result.Message })
-                    : BadRequest(new { message = result.Message });
+            
+            return HandleOperationResult(result);
         }
 
         /// <summary>
@@ -167,25 +138,18 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <param name="nombreServicio"></param>
         /// <returns>Categoria list</returns>
         [HttpGet("GetCategoriaByNombreServicio/{nombreServicio}")]
+        [ProducesResponseType(typeof(IEnumerable<CategoriaDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByServicio(string nombreServicio)
         {
-            _logger.LogInformation("Buscando categorias con los servicios: {nombreServcio}", nombreServicio);
-
-            if (string.IsNullOrWhiteSpace(nombreServicio))
-            {
-                _logger.LogWarning("Solicitud con nombre del sercicio vacía");
-                return BadRequest(new { message = "El nombre del servicio no puede estar vacía." });
-            }
-
-            var result = await _categoryService.GetCategoriaByServicio(nombreServicio);
-
-            if (!result.IsSuccess)
-                _logger.LogWarning("No se encontraron categorias con el servicio '{nombreServicio}': {Message}",
-                    nombreServicio, result.Message);
-
-            return result.IsSuccess
-                ? Ok(result.Data)
-                : NotFound(new { message = result.Message });
+          _logger.LogInformation("Buscando categorias con nombre de servicio: {nombreServicio}", nombreServicio);
+          
+          var validation = ValidateString(nombreServicio, "nombreServicio");
+          if(validation != null) return validation;
+          
+          var result = await _categoryService.GetCategoriaByServicio(nombreServicio);
+          return HandleResponse(result);
         }
 
         /// <summary>
@@ -194,25 +158,19 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// <param name="descripcion"></param>
         /// <returns>Categoria por descripcion</returns>
         [HttpGet("GetCategoriaByDescripcion/{descripcion}")]
+        [ProducesResponseType(typeof(CategoriaDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetServiciosByDescripcion(string descripcion)
         {
             _logger.LogInformation("Buscando categorias con descripción: {descripcion}", descripcion);
-
-            if (string.IsNullOrWhiteSpace(descripcion))
-            {
-                _logger.LogWarning("Solicitud con descripción vacía");
-                return BadRequest(new { message = "La descripción no puede estar vacía." });
-            }
-
+            
+            var validation = ValidateString(descripcion, "descripcion");
+            if(validation != null) return validation;
+            
             var result = await _categoryService.GetCategoriaByDescripcion(descripcion);
-
-            if (!result.IsSuccess)
-                _logger.LogWarning("No se encontraron categorias con la descripcion '{nombreServicio}': {Message}",
-                    descripcion, result.Message);
-
-            return result.IsSuccess
-                ? Ok(result.Data)
-                : NotFound(new { message = result.Message });
+            return HandleResponse(result);
+            
         }
 
         /// <summary>
@@ -226,20 +184,12 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
             _logger.LogInformation("Buscando habitacion con capacidad: {capacida}", capacidad);
 
             if (capacidad <= 0)
-                return BadRequest(new OperationResult
-                    { IsSuccess = false, Message = "la capacidad debe ser mayor que 0." });
-
-            var result = await _categoryService.GetHabitacionesByCapacidad(capacidad);
-
-            if (!result.IsSuccess)
-                _logger.LogWarning("No se encontraron habitacion con la capcidad '{capacidad}': {Message}",
-                    capacidad, result.Message);
-
-            return result.IsSuccess
-                ? Ok(result.Data)
-                : NotFound(new { message = result.Message });
+            {
+                return BadRequest("La capaciddad debe ser mayor a 0");
+            }
             
+            var result = await _categoryService.GetHabitacionesByCapacidad(capacidad);
+            return HandleResponse(result);
         }
-
     }
 }
