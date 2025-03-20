@@ -1,8 +1,6 @@
 ﻿using HRMS.Application.DTOs.Reservation_2023_0731;
 using HRMS.Application.Interfaces.Reservation_2023_0731;
-using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
-using HRMS.Domain.Entities.Reservations;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Domain.Repository;
 using Microsoft.AspNetCore.Mvc;
