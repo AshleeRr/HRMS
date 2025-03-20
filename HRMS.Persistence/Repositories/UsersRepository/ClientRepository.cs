@@ -145,9 +145,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 }
                 entity.Estado = true;
                 entity.FechaCreacion = DateTime.Now;
-                result.IsSuccess = true;
                 await _context.Clients.AddAsync(entity);
                 await _context.SaveChangesAsync();
+                result.IsSuccess = true;
                 result.Message = "Cliente guardado correctamente";
                 result.Data = entity;
             }

@@ -83,7 +83,6 @@ namespace HRMS.Application.Services.UsersServices
                 }
                 var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
                 ValidateUserRole(userRole);
-                dto.Deleted = true;
                 userRole.Estado = false;
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
                 if (!result.IsSuccess)
@@ -116,7 +115,6 @@ namespace HRMS.Application.Services.UsersServices
                 var validDTO = _validator.Validate(dto);
                 if (!validDTO.IsSuccess)
                 {
-                    result.IsSuccess = false;
                     result.Message = "Error validando los campos para guardar";
                     result.Data = dto;
                 }
@@ -128,7 +126,6 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _userRoleRepository.SaveEntityAsync(userRole);
                 if (result.IsSuccess)
                 {
-                    result.IsSuccess = true;
                     result.Message = "Rol de usuario guardado correctamente";
                     result.Data = dto;
                 }
@@ -173,12 +170,12 @@ namespace HRMS.Application.Services.UsersServices
             {
                 ValidateId(idRolUsuario);
                 var userRole = await _userRoleRepository.GetEntityByIdAsync(idRolUsuario);
+                ValidateUserRole(userRole);
                 ValidateNulleable(nuevaDescripcion, "nueva descripcion");
                 userRole.Descripcion = nuevaDescripcion;
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
                 if (!result.IsSuccess) 
                 {
-                    result.IsSuccess = false;
                     result.Message = "Error actualizando la descripcion del rol de usuario";
                 } else
                 {
@@ -203,12 +200,12 @@ namespace HRMS.Application.Services.UsersServices
             {
                 ValidateId(idRolUsuario);
                 var userRole = await _userRoleRepository.GetEntityByIdAsync(idRolUsuario);
+                ValidateUserRole(userRole);
                 ValidateNulleable(nuevoNombre, "nuevo nombre");
                 userRole.RolNombre = nuevoNombre;
                 result = await _userRoleRepository.UpdateEntityAsync(userRole);
                 if (!result.IsSuccess)
                 {
-                    result.IsSuccess = false;
                     result.Message = "Error actualizando el nombre del rol de usuario";
                 }
                 else

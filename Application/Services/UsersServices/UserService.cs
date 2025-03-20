@@ -71,7 +71,6 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateId(dto.Id);
                 var user = await _userRepository.GetEntityByIdAsync(dto.Id);
                 ValidateUser(user);
-                dto.Deleted = true;
                 user.Estado = false;
                 await _userRepository.UpdateEntityAsync(user);
                 result.IsSuccess = true; 
@@ -98,7 +97,6 @@ namespace HRMS.Application.Services.UsersServices
                 if (!validDTO.IsSuccess) 
                 {
                     result.Message = "Error validando los datos para guardar";
-                    result.IsSuccess = false;
                     return result;
                 }
                 var existingCorreo = await _userRepository.GetUserByEmailAsync(dto.Correo);
@@ -249,7 +247,6 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _userRepository.UpdateEntityAsync(user);
                 if (!result.IsSuccess)
                 {
-                    result.IsSuccess = false;
                     result.Message = "Error actualizando el nombre";
                 } else
                 {
@@ -309,7 +306,7 @@ namespace HRMS.Application.Services.UsersServices
                 if (existingDocument != null && existingDocument.IdUsuario != idUsuario)
                 {
                     result.Message = "Este documento ya esta registrado";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
                 }
                 var usuario = await _userRepository.GetEntityByIdAsync(idUsuario);
                 ValidateUser(usuario);

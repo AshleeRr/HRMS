@@ -76,11 +76,16 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateId(dto.Id);
                 var client = await _clientRepository.GetEntityByIdAsync(dto.Id);
                 ValidateClient(client);
-                dto.Deleted = true;
                 client.Estado = false;
                 result = await _clientRepository.UpdateEntityAsync(client);
-                result.IsSuccess = true;
-                result.Message = "Cliente eliminado correctamente";
+                if(!result.IsSuccess)
+                {
+                    result.Message = "Error eliminando el cliente";
+                }
+                else
+                {
+                    result.Message = "Cliente eliminado correctamente";
+                }
             }
             catch (ArgumentException ex)
             {
@@ -274,7 +279,6 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _clientRepository.UpdateEntityAsync(client);
                 if (!result.IsSuccess)
                 {
-                    result.IsSuccess = false;
                     result.Message = "Error actualizando el nombre del cliente";
                 }
                 else
@@ -315,7 +319,6 @@ namespace HRMS.Application.Services.UsersServices
                 await _clientRepository.UpdateEntityAsync(cliente);
                 if (!result.IsSuccess)
                 {
-                    result.IsSuccess = false;
                     result.Message = "Error actualizando los datos";
                 }
                 else

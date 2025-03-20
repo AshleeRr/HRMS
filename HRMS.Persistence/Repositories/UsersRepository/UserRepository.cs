@@ -53,7 +53,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var usuarios = await _context.Users.Where(u => u.Estado == true).ToListAsync();
                 if (!usuarios.Any())
                 {
-                    await _loggerServices.LogWarning("No se encontraron un usuarios activos", this, nameof(GetAllAsync));
+                    await _loggerServices.LogWarning("No se encontraron usuarios activos", this, nameof(GetAllAsync));
                 }
                 result.Data = usuarios;
                 result.IsSuccess = true;
