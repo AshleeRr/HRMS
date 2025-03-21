@@ -3,7 +3,6 @@ using HRMS.Application.Interfaces.RoomManagementService;
 using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
-using HRMS.Domain.Entities.Servicio;
 using HRMS.Domain.Repository;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.Extensions.Logging;

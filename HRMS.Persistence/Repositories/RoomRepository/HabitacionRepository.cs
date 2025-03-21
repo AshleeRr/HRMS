@@ -202,14 +202,9 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 var existingRoom = await _context.Habitaciones.FindAsync(habitacion.IdHabitacion);
                 if (existingRoom == null)
                     return OperationResult.Failure("La habitación no existe.");
-
-                existingRoom.Numero = habitacion.Numero;
-                existingRoom.Detalle = habitacion.Detalle;
-                existingRoom.Precio = habitacion.Precio;
-                existingRoom.IdPiso = habitacion.IdPiso;
-                existingRoom.IdCategoria = habitacion.IdCategoria;
-                existingRoom.IdEstadoHabitacion = habitacion.IdEstadoHabitacion;
-                existingRoom.Estado = habitacion.Estado;
+                
+                
+                UpdateHabitacion(existingRoom, habitacion);
                 
                 await _context.SaveChangesAsync();
 
@@ -226,6 +221,16 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             if (string.IsNullOrWhiteSpace(value))
                 return OperationResult.Failure(message);
             return OperationResult.Success();
+        }
+        
+        private static void UpdateHabitacion(Habitacion existingRoom, Habitacion room)
+        {
+            existingRoom.Numero = room.Numero;
+            existingRoom.Detalle = room.Detalle;
+            existingRoom.Precio = room.Precio;
+            existingRoom.IdPiso = room.IdPiso;
+            existingRoom.IdCategoria = room.IdCategoria;
+            existingRoom.IdEstadoHabitacion = room.IdEstadoHabitacion;
         }
         
         private static OperationResult ValidateId(int id, string message)
