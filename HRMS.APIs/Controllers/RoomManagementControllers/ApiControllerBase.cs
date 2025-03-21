@@ -5,7 +5,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ApiControllerBase : ControllerBase
+    public abstract class ApiControllerBase : ControllerBase
     {
         protected readonly ILogger<ApiControllerBase> _logger;
 
