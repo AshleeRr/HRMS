@@ -83,9 +83,9 @@ namespace HRMS.Application.Services.RoomServices
             try
             {
                 _logger.LogInformation($"Creando habitación con número: {dto.Numero}");
-
-                if (await _habitacionRepository.ExistsAsync(e => e.Numero == dto.Numero))
-                    return OperationResult.Failure($"Ya existe una habitación con el número {dto.Numero}");
+                
+                var uniqueValidation = await ValidateUniqueRoomNumber(dto.Numero);
+                if (!uniqueValidation.IsSuccess) return uniqueValidation;
         
                 var validationDto = _habitacionValidator.Validate(dto);
                 if (!validationDto.IsSuccess) return validationDto;
@@ -130,12 +130,9 @@ namespace HRMS.Application.Services.RoomServices
                 var habitacion = await _habitacionRepository.GetEntityByIdAsync(dto.IdHabitacion);
                 if (habitacion == null) 
                     return OperationResult.Failure("La habitación a actualizar no existe");
-
-                if (!string.IsNullOrWhiteSpace(dto.Numero) && dto.Numero != habitacion.Numero)
-                {
-                    if (await _habitacionRepository.ExistsAsync(h => h.Numero == dto.Numero && h.IdHabitacion != dto.IdHabitacion))
-                        return OperationResult.Failure($"Ya existe otra habitación con el número {dto.Numero}");
-                }
+                
+                var uniqueValidation = await ValidateUniqueRoomNumber(dto.Numero, dto.IdHabitacion);
+                if (!uniqueValidation.IsSuccess) return uniqueValidation;
                 
                 var foreignKeyValidation = await ValidateForeignKeys(dto.IdPiso, dto.IdCategoria, dto.IdEstadoHabitacion);
                 if (!foreignKeyValidation.IsSuccess)
@@ -193,6 +190,19 @@ namespace HRMS.Application.Services.RoomServices
                 _logger.LogError(ex, $"Error al eliminar la habitación con ID {dto.IdHabitacion}");
                 return OperationResult.Failure($"Error al eliminar la habitación con ID {dto.IdHabitacion}: {ex.Message}");
             }
+        }
+        
+        private async Task<OperationResult> ValidateUniqueRoomNumber(string numero, int? idHabitacion = null)
+        {
+            if (string.IsNullOrWhiteSpace(numero))
+                return OperationResult.Failure("El número de habitación no puede estar vacío");
+            bool exists = idHabitacion.HasValue
+                ? await _habitacionRepository.ExistsAsync(h => h.Numero == numero && h.IdHabitacion != idHabitacion.Value)
+                : await _habitacionRepository.ExistsAsync(h => h.Numero == numero);
+        
+            return exists
+                ? OperationResult.Failure($"Ya existe una habitación con el número {numero}")
+                : OperationResult.Success();
         }
         
         public async Task<OperationResult> GetByPiso(int idPiso)
