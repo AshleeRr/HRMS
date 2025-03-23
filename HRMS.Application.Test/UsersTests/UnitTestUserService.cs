@@ -125,11 +125,11 @@ namespace HRMS.Application.Test.UsersTests
             string newEmail = "prueba1555@gmail.com";
             //act
             var result = await _userService.UpdateCorreoAsync(invalidId, newEmail);
-            var expectedMessage = "El id del usuario debe ser mayor que 0";
+            var messgaeExpected = "El id del usuario debe ser mayor que 0";
 
             //assert
             Assert.False(result.IsSuccess);
-            Assert.Equal(expectedMessage, result.Message);
+            Assert.Equal(messgaeExpected, result.Message);
         }
         [Fact]
         public async Task UpdateCorreoAsync_ShouldReturnError_WhenNuevoCorreoIsNullOrEmpty()

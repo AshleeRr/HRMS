@@ -57,10 +57,10 @@ namespace HRMS.Application.Test.UsersTests
             var service = new ClientService(_mockClientRepository.Object, _mockValidator.Object, _mockLoggingServices.Object);
             //act
             var result = await service.GetById(0);
-            var expectedMessage = "El id debe ser mayor que 0";
+            var message = "El id debe ser mayor que 0";
             //assert
             Assert.False(result.IsSuccess);
-            Assert.Equal(expectedMessage, result.Message);
+            Assert.Equal(message, result.Message);
         }
         [Fact]
         public async Task GetById_ShoulReturnSuccess_WhenClientExists()

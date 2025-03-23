@@ -11,20 +11,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="Todos los metodos de &quot;RoomManagement&quot; agregados">
-      <change afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/CategoriaDependency.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/HabitacionDependency.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/PisoDependency.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.IOC/RoomDependencies/TarifasDependency.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HRMS.IOC/ServicesDependency/ServicioDependency.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Interfaces/Reservation_2023-0731/IReservationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Interfaces/Reservation_2023-0731/IReservationService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Entities/RoomManagement/Tarifas.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.IOC/ReservationDepedencies/ResevDependencies.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/ReservationDepedencies/ResevDependencies.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.IOC/RoomDependency/HabitacionDependency.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Interfaces/IRoomRepository/IHabitacionrepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/HabitacionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestClientService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestClientService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestUserRoleService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestUserRoleService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestUserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestUserService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,12 +38,12 @@
     &quot;assignee&quot;: &quot;AshleeRr&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/AshleeRr/HRMS.git&quot;,
-    &quot;accountId&quot;: &quot;8765d5b0-4ae0-45eb-bd7e-646c0152af17&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/AshleeRr/HRMS.git",
+    "accountId": "76dfa0fa-1d5e-4a4c-a6d0-03d055ee9b39"
   }
-}</component>
+}]]></component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.IOC/AuditDependencies/AuditoriaDependency.cs" root0="FORCE_HIGHLIGHTING" />
@@ -78,7 +68,8 @@
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "#51 on HabitFloors-20240045",
+    "git-widget-placeholder": "ClientHistory-20240007",
+    "last_opened_file_path": "C:/HRMS",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -181,6 +172,7 @@
       <workItem from="1740581140216" duration="9929000" />
       <workItem from="1740682724871" duration="27313000" />
       <workItem from="1740857208023" duration="11682000" />
+      <workItem from="1742705272088" duration="453000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
@@ -203,7 +195,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="ClientHistory-20240007" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
