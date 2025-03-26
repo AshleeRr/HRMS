@@ -20,7 +20,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         public TarifaRepository(
             HRMSContext context,
             ILogger<TarifaRepository> logger,
-            IConfiguration configuration,
             IValidator<Tarifas> validator
         ) : base(context)
         {

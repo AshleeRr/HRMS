@@ -22,7 +22,8 @@ namespace HRMS.Application.Services.RoomServices
 
         public HabitacionServices(IHabitacionRepository habitacionRepository,
             ILogger<HabitacionServices> logger,IValidator<CreateHabitacionDTo> habitacionValidator, 
-            IReservationRepository reservaRepository, IPisoRepository pisoRepository, IEstadoHabitacionRepository estadoHabitacionRepository, ICategoryRepository categoryRepository)
+            IReservationRepository reservaRepository, IPisoRepository pisoRepository, IEstadoHabitacionRepository
+                estadoHabitacionRepository, ICategoryRepository categoryRepository)
         {
             _habitacionRepository = habitacionRepository;
             _logger = logger;
@@ -92,6 +93,7 @@ namespace HRMS.Application.Services.RoomServices
                 
                 var foreignKeyValidation = await ValidateForeignKeys(dto.IdPiso,
                     dto.IdCategoria, dto.IdEstadoHabitacion);
+                
                 if (!foreignKeyValidation.IsSuccess)
                     return foreignKeyValidation;
         

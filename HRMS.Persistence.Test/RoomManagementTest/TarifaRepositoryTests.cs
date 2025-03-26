@@ -14,7 +14,6 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         private readonly DbContextOptions<HRMSContext> _dbOptions;
         private readonly Mock<IValidator<Tarifas>> _validatorMock;
         private readonly Mock<ILogger<TarifaRepository>> _loggerMock;
-        private readonly Mock<IConfiguration> _configMock;
 
         public TarifaRepositoryTests()
         {
@@ -24,7 +23,6 @@ namespace HRMS.Persistence.Test.RoomManagementTest
             
             _validatorMock = new Mock<IValidator<Tarifas>>();
             _loggerMock = new Mock<ILogger<TarifaRepository>>();
-            _configMock = new Mock<IConfiguration>();
         }
 
         #region GetAllAsync
@@ -43,7 +41,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new TarifaRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new TarifaRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetAllAsync();
@@ -61,7 +59,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new TarifaRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new TarifaRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetTarifasVigentesAsync("invalid-date");
@@ -96,7 +94,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new TarifaRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new TarifaRepository(context, _loggerMock.Object,  _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetTarifasVigentesAsync(today);
@@ -114,14 +112,14 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         {
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new TarifaRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new TarifaRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetHabitacionByPrecioAsync(-100);
 
                 // Assert
                 Assert.False(result.IsSuccess);
-                Assert.Contains("El precio debe ser mayor a 0.", result.Message);
+                Assert.Contains("El precio debe ser mayor que cero", result.Message);
             }
         }
 
@@ -155,7 +153,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new TarifaRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new TarifaRepository(context, _loggerMock.Object,  _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetHabitacionByPrecioAsync(150);
@@ -180,7 +178,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
             using (var context = new HRMSContext(_dbOptions))
             {
-                var repo = new TarifaRepository(context, _loggerMock.Object, _configMock.Object, _validatorMock.Object);
+                var repo = new TarifaRepository(context, _loggerMock.Object, _validatorMock.Object);
 
                 // Act
                 var result = await repo.GetEntityByIdAsync(1);

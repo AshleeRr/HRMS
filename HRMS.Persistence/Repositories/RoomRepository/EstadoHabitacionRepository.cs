@@ -46,7 +46,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 if (!validationResult.IsSuccess)
                 {
                     _logger.LogWarning("Error de validación al agregar un : {Error}", validationResult.Message);
-                    return OperationResult.Failure(validationResult.Message);
+                    return OperationResult.Failure(validationResult.Message!);
                 }
                 
                 await _context.EstadoHabitaciones.AddAsync(estadoHabitacion);
@@ -66,7 +66,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             try
             {
                 _logger.LogInformation($"Buscando estados por descripción '{descripcion}'");
-                var validationResult = await validateString(descripcion, "La descripción no puede estar vacía.");
+                var validationResult = await ValidateString(descripcion, "La descripción no puede estar vacía.");
                 if (!validationResult.IsSuccess)
                 {
                     return validationResult;
@@ -101,7 +101,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 if (!validationResult.IsSuccess)
                 {
                     _logger.LogWarning("Error de validación al actualizar el estado de habitación: {Error}", validationResult.Message);
-                    return OperationResult.Failure(validationResult.Message);
+                    return OperationResult.Failure(validationResult.Message!);
                 }
                 
                 var existingEstado = await _context.EstadoHabitaciones.FindAsync(estadoHabitacion.IdEstadoHabitacion);
@@ -109,9 +109,9 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 {
                     return OperationResult.Failure("El estado de habitación no existe.");
                 }
-
-                existingEstado.Descripcion = estadoHabitacion.Descripcion;
-                existingEstado.Estado = estadoHabitacion.Estado;
+                
+                UpdateEstadoHabitacion(existingEstado, estadoHabitacion);
+                
                 await _context.SaveChangesAsync();
 
                 return OperationResult.Success(existingEstado, "Estado de habitación actualizado correctamente.");
@@ -122,7 +122,14 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 return OperationResult.Failure($"Error al actualizar: {ex.Message}");
             }
         }
-        private async Task<OperationResult> validateString(string value, string message)
+        
+        private static void UpdateEstadoHabitacion(EstadoHabitacion existingEstado, EstadoHabitacion estadoHabitacion)
+        {
+            existingEstado.Descripcion = estadoHabitacion.Descripcion;
+            existingEstado.Estado = estadoHabitacion.Estado;
+        }
+        
+        private async Task<OperationResult> ValidateString(string value, string message)
         {
             if (string.IsNullOrWhiteSpace(value))
             {

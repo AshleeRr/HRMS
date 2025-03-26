@@ -18,11 +18,12 @@
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/PisoController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/PisoController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/TarifaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/TarifaController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/TarifaRepositoryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/TarifaRepositoryTests.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,14 +56,11 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/BaseEstadoHabitacionDto.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Controllers/ReservationController.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.APIs/Controllers/RoomManagementControllers/CategoriaController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.Domain/Base/Validator/UsersValidations/ClientValidator.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Persistence.Test/FakeContext/FakeHRMSContext.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.Persistence/Repositories/UsersRepository/ClientRepository.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.Persistence/Repositories/UsersRepository/UserRepository.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/HRMS.Persistence/Repositories/UsersRepository/UserRoleRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/EstadoHabitacionController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0fbc4d3b821e47d7a79878451a0956b944928/d0/f35b51ac/ValidationSummary.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5acc345db3c207bc9d886a36ff14867ef8d65557432172c2a42f19aeac04d1b/Nullable.cs" root0="FORCE_HIGHLIGHTING" />
@@ -352,7 +350,14 @@
       <workItem from="1742067051260" duration="20390000" />
       <workItem from="1742193071640" duration="3097000" />
       <workItem from="1742276800883" duration="3297000" />
-      <workItem from="1742348438548" duration="3715000" />
+      <workItem from="1742348438548" duration="10073000" />
+      <workItem from="1742536097608" duration="42000" />
+      <workItem from="1742541909718" duration="1599000" />
+      <workItem from="1742545060783" duration="113000" />
+      <workItem from="1742587278911" duration="248000" />
+      <workItem from="1742679878861" duration="6594000" />
+      <workItem from="1742855409493" duration="126000" />
+      <workItem from="1742921608795" duration="4342000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
@@ -482,7 +487,31 @@
       <option name="project" value="LOCAL" />
       <updated>1742102843315</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="ApiBaseClass Refactorizado">
+      <option name="closed" value="true" />
+      <created>1742543604119</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1742543604119</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Metodo agregados para refactory">
+      <option name="closed" value="true" />
+      <created>1742587503621</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1742587503621</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Enviado para mejora">
+      <option name="closed" value="true" />
+      <created>1742680142776</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1742680142777</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -530,7 +559,10 @@
     <MESSAGE value="Se ha separado la logica de negocios de la capa de repositorios, se ha incluido los DTO base para cada entidad, se ha modificado los Validadores para que sigan la estructura, se ha modificado los Tests para que pasen y todo este correcto, la api funciona correctamente, falta eliminar codigo repetido en la api" />
     <MESSAGE value="Envio" />
     <MESSAGE value="Git momento" />
-    <option name="LAST_COMMIT_MESSAGE" value="Git momento" />
+    <MESSAGE value="ApiBaseClass Refactorizado" />
+    <MESSAGE value="Metodo agregados para refactory" />
+    <MESSAGE value="Enviado para mejora" />
+    <option name="LAST_COMMIT_MESSAGE" value="Enviado para mejora" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

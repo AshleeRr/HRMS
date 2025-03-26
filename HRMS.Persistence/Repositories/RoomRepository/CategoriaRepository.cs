@@ -80,7 +80,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         public async Task<OperationResult> GetCategoriaByServiciosAsync(string nombre) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
-                var validation = await validateString(nombre, "El nombre del servicio no puede ser nulo o vacío.");
+                var validation = await ValidateString(nombre, "El nombre del servicio no puede ser nulo o vacío.");
                 if (!validation.IsSuccess)
                     return validation;
                 _logger.LogInformation($"Obteniendo categorías por servicio '{nombre}'");
@@ -104,7 +104,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
         public async Task<OperationResult> GetCategoriaByDescripcionAsync(string descripcion) =>
             await OperationResult.ExecuteOperationAsync(async () =>
             {
-                var validation = await validateString(descripcion, "La descripción no puede ser nula o vacía.");
+                var validation = await ValidateString(descripcion, "La descripción no puede ser nula o vacía.");
                 if (!validation.IsSuccess)
                     return validation;
                 
@@ -125,7 +125,7 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             await OperationResult.ExecuteOperationAsync(async () =>
             {
                 
-                var validation = await validateInt(capacidad, "La capacidad debe ser mayor a 0.");
+                var validation = await ValidateInt(capacidad, "La capacidad debe ser mayor a 0.");
                 if (!validation.IsSuccess)
                     return validation;
                 
@@ -149,14 +149,14 @@ namespace HRMS.Persistence.Repositories.RoomRepository
                 return OperationResult.Success(habitaciones, "Habitaciones obtenidas correctamente.");
             });
         
-        private async Task<OperationResult> validateInt(int id , string message)
+        private async Task<OperationResult> ValidateInt(int id , string message)
         {
             if (id <= 0)
                 return OperationResult.Failure(message);
             return OperationResult.Success();
         }
         
-        private async Task<OperationResult> validateString(string message , string error)
+        private async Task<OperationResult> ValidateString(string message , string error)
         {
             if (string.IsNullOrEmpty(message))
                 return OperationResult.Failure(error);
@@ -168,8 +168,6 @@ namespace HRMS.Persistence.Repositories.RoomRepository
             existing.Descripcion = updated.Descripcion;
             existing.IdServicio = updated.IdServicio;
             existing.Capacidad = updated.Capacidad;
-            existing.Estado = updated.Estado;
         }
-        
     }
 }

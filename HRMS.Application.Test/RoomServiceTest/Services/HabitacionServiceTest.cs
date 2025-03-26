@@ -272,7 +272,7 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Equal("La validación del DTO ha fallado", result.Message);
+            Assert.Equal("El numero de habitacion no puede estar vacio", result.Message);
             _mockRepository.Verify(r => r.SaveEntityAsync(It.IsAny<Habitacion>()), Times.Never);
         }
 
@@ -478,7 +478,7 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Equal($"Ya existe otra habitación con el número {dto.Numero}", result.Message);
+            Assert.Equal($"Ya existe una habitación con el número {dto.Numero}", result.Message);
             _mockRepository.Verify(r => r.UpdateEntityAsync(It.IsAny<Habitacion>()), Times.Never);
         }
 
