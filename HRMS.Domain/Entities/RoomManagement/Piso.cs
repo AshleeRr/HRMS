@@ -5,7 +5,7 @@ using HRMS.Domain.Base;
 namespace HRMS.Domain.Entities.RoomManagement;
 
 [Table("Piso")]
-public sealed class Piso : AuditEntity
+public class Piso : AuditEntity
 {
     [Key]
     public int IdPiso { get; set; }

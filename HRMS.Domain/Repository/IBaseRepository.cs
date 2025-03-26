@@ -5,7 +5,7 @@ namespace HRMS.Domain.Repository
 {
     public interface IBaseRepository <TEntity, TType> where TEntity : class
     {
-       Task<TEntity> GetEntityByIdAsync(int id);
+       Task<TEntity> GetEntityByIdAsync(TType id);
        Task<OperationResult> UpdateEntityAsync(TEntity entity);
        Task<OperationResult> SaveEntityAsync(TEntity entity);
        Task<List<TEntity>> GetAllAsync();

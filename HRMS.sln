@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HRMS.Application.Test", "HR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HRMS.Persistence.Test", "HRMS.Persistence.Test\HRMS.Persistence.Test.csproj", "{11413065-513A-4249-AD04-F46972C72CAF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiTest", "ApiTest\ApiTest.csproj", "{350948D1-B26E-4334-9CF3-7D48CCAF04AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{11413065-513A-4249-AD04-F46972C72CAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11413065-513A-4249-AD04-F46972C72CAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11413065-513A-4249-AD04-F46972C72CAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{350948D1-B26E-4334-9CF3-7D48CCAF04AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{350948D1-B26E-4334-9CF3-7D48CCAF04AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{350948D1-B26E-4334-9CF3-7D48CCAF04AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{350948D1-B26E-4334-9CF3-7D48CCAF04AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +104,7 @@ Global
 		{D017D8FE-C241-4F3C-95AC-4F4B9DC900E6} = {289814B2-432C-4F82-8F34-09BFFBBF13BD}
 		{44E7F420-06BA-4792-A259-C20804FF1A7E} = {B5920CF1-9118-4D8E-8D00-F45C62DE800F}
 		{11413065-513A-4249-AD04-F46972C72CAF} = {B5920CF1-9118-4D8E-8D00-F45C62DE800F}
+		{350948D1-B26E-4334-9CF3-7D48CCAF04AE} = {B5920CF1-9118-4D8E-8D00-F45C62DE800F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {48407AB6-BC66-4273-8FFE-1C3B0E6AD25D}

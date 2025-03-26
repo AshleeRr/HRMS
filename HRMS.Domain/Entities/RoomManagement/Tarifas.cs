@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 
 using HRMS.Domain.Base;
-using System.ComponentModel.DataAnnotations;
 
 namespace HRMS.Domain.Entities.RoomManagement
 {

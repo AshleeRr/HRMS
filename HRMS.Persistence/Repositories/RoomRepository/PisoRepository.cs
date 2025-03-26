@@ -1,119 +1,126 @@
 ﻿using HRMS.Domain.Base;
-using HRMS.Domain.Base.Validator.RoomValidations;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
-namespace HRMS.Persistence.Repositories.RoomRepository;
-
-public class PisoRepository : BaseRepository<Piso, int>, IPisoRepository
+namespace HRMS.Persistence.Repositories.RoomRepository
 {
-    public PisoRepository(HRMSContext context) : base(context)
+    public class PisoRepository : BaseRepository<Piso, int>, IPisoRepository
     {
-    }
-
-    public override async Task<List<Piso>> GetAllAsync()
-    {
-        return _context.Pisos.Where(p =>
-                p.Estado == true)
-            .ToList();
-    }
-
-
-    public override async Task<Piso> GetEntityByIdAsync(int id)
-    {
-        if (id != 0)
+        private readonly ILogger<PisoRepository> _logger;
+        private readonly IValidator<Piso> _validator;
+        public PisoRepository(HRMSContext context, ILogger<PisoRepository> logger, IValidator<Piso> validator) : base(context)
         {
-            return await _context.Set<Piso>().FindAsync(id);
+            _logger = logger;
+            _validator = validator;
         }
 
-        return null;
-    }
-
-    public override async Task<OperationResult> UpdateEntityAsync(Piso piso)
-    {
-        var result = new OperationResult();
-        try
+        public override async Task<List<Piso>> GetAllAsync()
         {
-            var validator = new PisoValidator();
-            var validation = validator.Validate(piso);
-            if (!validation.IsSuccess)
-            {
-                return validation;
-            }
-
-            var existingPiso = await _context.Pisos.FindAsync(piso.IdPiso);
-            if (existingPiso == null)
-            {
-                result.IsSuccess = false;
-                result.Message = "El piso no existe.";
-                return result;
-            }
-
-            bool exists = await _context.Pisos
-                .AnyAsync(p => p.Descripcion == piso.Descripcion && p.IdPiso != piso.IdPiso);
-            if (exists)
-            {
-                result.IsSuccess = false;
-                result.Message = $"Ya existe otro piso con la descripción '{piso.Descripcion}'.";
-                return result;
-            }
-
-            existingPiso.Descripcion = piso.Descripcion;
-            existingPiso.Estado = piso.Estado;
-
-            await _context.SaveChangesAsync();
-
-            result.IsSuccess = true;
-            result.Message = "Piso actualizado correctamente.";
-            result.Data = existingPiso;
+            _logger.LogInformation("Obteniendo todos los pisos activos");
+            return await _context.Pisos.Where(p => p.Estado == true).ToListAsync();
         }
-        catch (DbUpdateConcurrencyException)
+        
+        public override async Task<OperationResult> SaveEntityAsync(Piso piso)
         {
-            result.IsSuccess = false;
-            result.Message = "El piso fue modificado por otro usuario. Intente nuevamente.";
-        }
-        catch (Exception ex)
-        {
-            result.IsSuccess = false;
-            result.Message = $"Ocurrió un error actualizando el piso: {ex.Message}";
-        }
-
-        return result;
-    }
-
-    public async Task<OperationResult> GetPisoByDescripcion(string descripcion)
-    {
-        var result = new OperationResult();
-        try
-        {
-            if (string.IsNullOrWhiteSpace(descripcion))
+            try
             {
-                result.IsSuccess = false;
-                result.Message = "La descripción del piso no puede estar vacía.";
-                return result;
+                _logger.LogInformation("Guardando nuevo piso");
+                var validationResult = _validator.Validate(piso);
+                if (!validationResult.IsSuccess)
+                {
+                    _logger.LogWarning("Error de validación al guardar piso: {Error}", validationResult.Message);
+                    return OperationResult.Failure(validationResult.Message);
+                }
+                
+                await _context.Pisos.AddAsync(piso);
+                await _context.SaveChangesAsync();
+                return OperationResult.Success(piso, "Piso guardada exitosamente.");
             }
-
-            var pisos = await _context.Pisos
-                .Where(p => p.Descripcion.Contains(descripcion) && p.Estado == true)
-                .ToListAsync();
-
-            result.Data = pisos;
-            result.IsSuccess = true;
-
-            if (!pisos.Any())
+            catch (Exception ex)
             {
-                result.Message = $"No se encontraron pisos con la descripción '{descripcion}'.";
+                return OperationResult.Failure($"Error al guardar habitación: {ex.Message}");
             }
         }
-        catch (Exception ex)
+
+        public async override Task<OperationResult> UpdateEntityAsync(Piso entity)
         {
-            result.IsSuccess = false;
-            result.Message = $"Ocurrió un error obteniendo el piso por descripción: {ex.Message}";
+            try
+            {
+                _logger.LogInformation("Actualizando piso");
+                var validationResult = _validator.Validate(entity);
+                if (!validationResult.IsSuccess)
+                {
+                    _logger.LogWarning("Error de validación al actualizar piso: {Error}", validationResult.Message);
+                    return OperationResult.Failure(validationResult.Message);
+                }
+                var existingPiso = await _context.Pisos.FindAsync(entity.IdPiso);
+                if (existingPiso == null)
+                    return OperationResult.Failure("El piso no existe.");
+
+                existingPiso.Descripcion = entity.Descripcion;
+
+                await _context.SaveChangesAsync();
+
+                return OperationResult.Success(existingPiso, "Habitación actualizada correctamente.");
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failure($"Error al actualizar piso: {ex.Message}");
+            }
         }
 
-        return result;
+        public override async Task<Piso> GetEntityByIdAsync(int id)
+        {
+            _logger.LogInformation($"Obteniendo piso por ID: {id}");
+            
+            return (id == 0 ? null : await _context.Pisos
+                .FirstOrDefaultAsync(p => p.IdPiso == id && p.Estado == true))!;
+        }
+
+        public async Task<OperationResult> GetPisoByDescripcion(string descripcion)
+        {
+            return await OperationResult.ExecuteOperationAsync(async () =>
+            {
+                _logger.LogInformation($"Buscando pisos por descripción '{descripcion}'");
+                
+                var validationResult = ValidateString(descripcion, "La descripción no puede estar vacía.");
+                if (!validationResult.IsSuccess)
+                {
+                    return validationResult;
+                }
+                var pisos = await _context.Pisos
+                    .Where(p => p.Descripcion != null && 
+                                EF.Functions.Like(p.Descripcion, $"%{descripcion}%") && 
+                                p.Estado == true)
+                    .ToListAsync();
+            
+                return pisos.Any() 
+                    ? OperationResult.Success(pisos) 
+                    : OperationResult.Failure($"No se encontraron pisos con la descripción '{descripcion}'.");
+            });
+        }
+
+        
+        public virtual async Task<bool> ExistsByDescripcionAsync(string descripcion, int excludePisoId = 0)
+        {
+            return await _context.Pisos.AnyAsync(p => 
+                p.Descripcion == descripcion && 
+                p.IdPiso != excludePisoId && 
+                p.Estado == true);
+        }
+        
+        private static OperationResult ValidateString( string value, string message)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return OperationResult.Failure(message);
+            }
+            return OperationResult.Success();
+        }
     }
 }
