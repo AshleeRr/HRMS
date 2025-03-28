@@ -105,9 +105,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 {
                     result.IsSuccess = false;
                     result.Message = "Error validando los campos del cliente para actualizar";
-                    return result; ;
+                    return result; 
                 }
-                var cliente = await _context.Clients.FindAsync(entity.IdUsuario);
+                var cliente = await _context.Clients.FindAsync(entity.IdCliente);
                 if (cliente == null)
                 {
                     result.IsSuccess = false;

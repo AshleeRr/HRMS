@@ -1,0 +1,59 @@
+﻿@model HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs.UserRoleViewDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+           
+            <span>IdUserRole</span>
+        </dt>
+        <dd class = "col-sm-10">
+           
+            <span>@Model.IdUserRole</span>
+        </dd>
+        <dt class = "col-sm-2">
+          
+            <span>Descripcion</span>
+        </dt>
+        <dd class = "col-sm-10">
+           
+            <span>@Model.Descripcion</span>
+        </dd>
+        <dt class = "col-sm-2">
+          
+            <span>Nombre</span>
+        </dt>
+        <dd class = "col-sm-10">
+          
+            <span>@Model.Nombre</span>
+        </dd>
+        <dt class = "col-sm-2">
+          
+            <span>ChangeTime</span>
+        </dt>
+        <dd class = "col-sm-10">
+           
+
+            <span>@Model.ChangeTime</span>
+        </dd>
+        <dt class = "col-sm-2">
+           
+			<span>UserID</span>
+        </dt>
+        <dd class = "col-sm-10">
+           
+            <span>@Model.UserID</span>
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.IdUserRole }) |
+    <a asp-action="Index">Back to List</a>
+</div>

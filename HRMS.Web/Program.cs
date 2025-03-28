@@ -1,3 +1,7 @@
+using HRMS.IOC.UsersDependencies;
+using HRMS.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
+
 namespace HRMS.Web
 {
     public class Program
@@ -7,7 +11,14 @@ namespace HRMS.Web
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddDbContext<HRMSContext>(options => {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DBHotel"));
+            });
             builder.Services.AddControllersWithViews();
+            builder.Services.AddClientDependencies();
+            builder.Services.AddUserDependencies();
+            builder.Services.AddUserRoleDependencies();
+
 
             var app = builder.Build();
 

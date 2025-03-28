@@ -1,4 +1,4 @@
-﻿using HRMS.Application.DTOs.UserDTOs;
+﻿using HRMS.Application.DTOs.UsersDTOs.UserDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
@@ -12,14 +12,40 @@ namespace HRMS.Application.Services.UsersServices
     {
         private readonly ILoggingServices _loggerServices;
         private readonly IUserRepository _userRepository;
-        private readonly IValidator<SaveUserClientDTO> _validator;
-        public UserService(IUserRepository userRepository, IValidator<SaveUserClientDTO> validator,
+        private readonly IValidator<SaveUserDTO> _validator;
+        public UserService(IUserRepository userRepository, IValidator<SaveUserDTO> validator,
                                 ILoggingServices loggerServices)
         {
             _userRepository = userRepository;
             _validator = validator;
             _loggerServices = loggerServices;
         }
+        // mappers
+        private User MapSaveDto(SaveUserDTO dto) { 
+            return new User
+            {
+                Correo = dto.Correo,
+                Clave = dto.Clave,
+                NombreCompleto = dto.NombreCompleto,
+                Documento = dto.Documento,
+                TipoDocumento = dto.TipoDocumento,
+                IdRolUsuario = dto.IdUserRole,
+                FechaCreacion = DateTime.Now, //
+			};
+        }
+        private UserViewDTO MapUserToViewDTO(User user) {
+            return new UserViewDTO
+            {
+                IdUsuario = user.IdUsuario,
+                IdUserRole = user.IdRolUsuario,
+                NombreCompleto = user.NombreCompleto,
+                Correo = user.Correo,
+                TipoDocumento = user.TipoDocumento,
+                Documento = user.Documento,
+				ChangeTime = (DateTime)user.FechaCreacion,
+			};
+        }
+        //methods
         public async Task<OperationResult> GetAll()
         {
             OperationResult result = new OperationResult();
@@ -29,11 +55,11 @@ namespace HRMS.Application.Services.UsersServices
                 if (!usuarios.Any())
                 {
                     result.IsSuccess = false;
+                    result.Data = new List<UserDTO>();
                     result.Message = "No hay usuarios registrados";
-                    return result;
                 }
                 result.IsSuccess = true;
-                result.Data = usuarios;
+                result.Data = usuarios.Select(MapUserToViewDTO).ToList();
             }
             catch (Exception ex)
             {
@@ -50,7 +76,7 @@ namespace HRMS.Application.Services.UsersServices
                 var usuario = await _userRepository.GetEntityByIdAsync(id);
                 ValidateUser(usuario);
                 result.IsSuccess = true;
-                result.Data = usuario;
+                result.Data = MapUserToViewDTO(usuario);
             }
             catch (ArgumentException ex)
             {
@@ -88,7 +114,7 @@ namespace HRMS.Application.Services.UsersServices
             }
             return result;
         }
-        public async Task<OperationResult> Save(SaveUserClientDTO dto)
+        public async Task<OperationResult> Save(SaveUserDTO dto)
         {
             OperationResult result = new OperationResult();
             try
@@ -113,21 +139,12 @@ namespace HRMS.Application.Services.UsersServices
                     result.IsSuccess = false;
                     return result;
                 }
-                var usuario = new User
-                {
-                    Correo = dto.Correo,
-                    Clave = dto.Clave,
-                    NombreCompleto = dto.NombreCompleto,
-                    Documento = dto.Documento,
-                    TipoDocumento = dto.TipoDocumento,
-                    IdRolUsuario = dto.IdUserRole,
-                    FechaCreacion = DateTime.Now,
-                };
+                var usuario = MapSaveDto(dto);
                 result = await _userRepository.SaveEntityAsync(usuario);
                 if (result.IsSuccess)
                 {
                     result.Message = "Usuario guardado correctamente";
-                    result.Data = usuario;
+                    result.Data = MapUserToViewDTO(usuario);
                 }
                 else
                 {
@@ -170,12 +187,13 @@ namespace HRMS.Application.Services.UsersServices
                 user.TipoDocumento = dto.TipoDocumento;
                 user.Documento = dto.Documento;
                 user.Clave = dto.Clave;
-                dto.ChangeTime = DateTime.Now;
+                dto.ChangeTime = dto.ChangeTime;
                 result = await _userRepository.UpdateEntityAsync(user);
                 if (result.IsSuccess)
                 {
                     result.Message = "Usuario actualizado correctamente";
                     result.IsSuccess = true;
+                    result.Data = MapUserToViewDTO(user);
                 }
                 else
                 {
@@ -219,7 +237,7 @@ namespace HRMS.Application.Services.UsersServices
                 else
                 {
                     result.Message = "Correo actualizado correctamente";
-                    result.Data = user;
+                    result.Data = MapUserToViewDTO(user);
 
                 }
             }
@@ -251,7 +269,7 @@ namespace HRMS.Application.Services.UsersServices
                 } else
                 {
                     result.Message = "Nombre actualizado correctamente";
-                    result.Data = user;
+                    result.Data = MapUserToViewDTO(user);
 
                 }
                 
@@ -280,7 +298,7 @@ namespace HRMS.Application.Services.UsersServices
                 await _userRepository.UpdateEntityAsync(user);
                 result.IsSuccess = true;
                 result.Message = "Rol de usuario actualizado al usuario correctamente";
-                result.Data = user;
+                result.Data = MapUserToViewDTO(user);
             }
             catch (ArgumentException ex)
             {
@@ -315,7 +333,7 @@ namespace HRMS.Application.Services.UsersServices
                 await _userRepository.UpdateEntityAsync(usuario);
                 result.IsSuccess = true;
                 result.Message = "Datos actualizados correctamente";
-                result.Data = usuario;
+                result.Data = MapUserToViewDTO(usuario);
             }
             catch (ArgumentException ex)
             {
@@ -341,7 +359,7 @@ namespace HRMS.Application.Services.UsersServices
                 await _userRepository.UpdateEntityAsync(usuario);
                 result.IsSuccess = true;
                 result.Message = "Clave actualizada correctamente";
-                result.Data = usuario;
+                result.Data = MapUserToViewDTO(usuario);
             }
             catch (ArgumentException ex)
             {

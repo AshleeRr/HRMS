@@ -1,5 +1,5 @@
-﻿using HRMS.Application.DTOs.ClientDTOs;
-using HRMS.Application.DTOs.UserDTOs;
+﻿using HRMS.Application.DTOs.UsersDTOs.ClientDTOs;
+using HRMS.Application.DTOs.UsersDTOs.UserDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -30,7 +30,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
 
         // POST api/<UserController>
         [HttpPost("/user")]
-        public async Task<IActionResult> SaveUser([FromBody] SaveUserClientDTO user)
+        public async Task<IActionResult> SaveUser([FromBody] SaveUserDTO user)
         {
             var u = await _userService.Save(user);
             if (!u.IsSuccess)
@@ -51,7 +51,6 @@ namespace HRMS.APIs.Controllers.UsersControllers
                     Clave = user.Clave,
                     Documento = user.Documento,
                     TipoDocumento = user.TipoDocumento,
-                    IdUserRole = user.IdUserRole,
                     IdUsuario = userId 
                 };
                 var client = await _clientService.Save(clientDto);

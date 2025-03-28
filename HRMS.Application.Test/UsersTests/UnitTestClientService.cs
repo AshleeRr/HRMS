@@ -1,12 +1,12 @@
-﻿using HRMS.Application.DTOs.ClientDTOs;
-using HRMS.Application.Services.UsersServices;
+﻿using HRMS.Application.Services.UsersServices;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Moq;
-using HRMS.Application.DTOs.UserDTOs;
+using HRMS.Application.DTOs.UsersDTOs.ClientDTOs;
+using HRMS.Application.DTOs.UsersDTOs.UserDTOs;
 
 namespace HRMS.Application.Test.UsersTests
 {
@@ -102,7 +102,7 @@ namespace HRMS.Application.Test.UsersTests
         public async Task Save_ShouldReturnSuccess_WhenClientIsSavedSuccesfully()
         {
             //arrange
-            var dto = new SaveClientDTO { ChangeTime = DateTime.Now, TipoDocumento = "pasaporte", NombreCompleto = "cliente", Documento = "ABC123456", Correo = "pruebacliente1555@gmail.com", Clave = "123AAAAqqq####", IdUserRole = 1, IdUsuario = 1};
+            var dto = new SaveClientDTO { ChangeTime = DateTime.Now, TipoDocumento = "pasaporte", NombreCompleto = "cliente", Documento = "ABC123456", Correo = "pruebacliente1555@gmail.com", Clave = "123AAAAqqq####", IdUsuario = 1};
             var oP = new OperationResult { IsSuccess = true };
             _mockValidator.Setup(v => v.Validate(It.IsAny<SaveClientDTO>())).Returns(oP);
             _mockClientRepository.Setup(r => r.SaveEntityAsync(It.IsAny<Client>())).ReturnsAsync(oP);

@@ -1,5 +1,5 @@
 ﻿using HRMS.Application.Base;
-using HRMS.Application.DTOs.UserRoleDTOs;
+using HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs;
 using HRMS.Domain.Base;
 
 namespace HRMS.Application.Interfaces.IUsersServices

@@ -1,4 +1,4 @@
-﻿using HRMS.Application.DTOs.UserDTOs;
+﻿using HRMS.Application.DTOs.UsersDTOs.UserDTOs;
 using HRMS.Application.Services.UsersServices;
 using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
@@ -13,12 +13,12 @@ namespace HRMS.Application.Test.UsersTests
     {
         private readonly Mock<IUserRepository> _mockUserRepository;
         private readonly UserService _userService;
-        private readonly Mock<IValidator<SaveUserClientDTO>> _mockValidator;
+        private readonly Mock<IValidator<SaveUserDTO>> _mockValidator;
         private readonly Mock<ILoggingServices> _mockLoggingServices;
         public UnitTestUserService()
         {
             _mockUserRepository = new Mock<IUserRepository>();
-            _mockValidator = new Mock<IValidator<SaveUserClientDTO>>();
+            _mockValidator = new Mock<IValidator<SaveUserDTO>>();
             _mockLoggingServices = new Mock<ILoggingServices>();
             _userService = new UserService(_mockUserRepository.Object, _mockValidator.Object, _mockLoggingServices.Object);
         }

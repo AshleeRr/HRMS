@@ -105,6 +105,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
 
                 rolUsuario.Descripcion = entity.Descripcion;
                 rolUsuario.RolNombre = entity.RolNombre;
+                rolUsuario.FechaCreacion = entity.FechaCreacion;
 
                 _context.UserRoles.Update(rolUsuario);
                 await _context.SaveChangesAsync();

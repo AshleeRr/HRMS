@@ -1,5 +1,6 @@
-﻿using HRMS.Application.DTOs.ClientDTOs;
-using HRMS.Application.DTOs.UserDTOs;
+﻿using HRMS.Application.DTOs.UsersDTOs.ClientDTOs;
+using HRMS.Application.DTOs.UsersDTOs.UserDTOs;
+using HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
@@ -21,6 +22,35 @@ namespace HRMS.Application.Services.UsersServices
             _loggingServices = loggingServices;
         }
 
+        //mappers
+        private Client MapSaveToDto(SaveClientDTO dto) { 
+            return new Client()
+            {
+                IdUsuario = dto.IdUsuario,
+                NombreCompleto = dto.NombreCompleto,
+                Correo = dto.Correo,
+                Clave = dto.Clave,
+                Documento = dto.Documento,
+                TipoDocumento = dto.TipoDocumento,
+                FechaCreacion = DateTime.Now,
+            };
+        }
+
+        private ClientViewDTO MapClientToViewDto(Client client)
+        {
+            return new ClientViewDTO()
+            {
+                IdClient = client.IdCliente,
+                IdUsuario = client.IdUsuario,
+                NombreCompleto = client.NombreCompleto,
+                Correo = client.Correo,
+                Clave = client.Clave,
+                Documento = client.Documento,
+                TipoDocumento = client.TipoDocumento,
+                ChangeTime = (DateTime)client.FechaCreacion,
+            };
+        }
+        //methods
         public async Task<OperationResult> GetAll()
         {
             OperationResult result = new OperationResult();
@@ -30,12 +60,13 @@ namespace HRMS.Application.Services.UsersServices
                 if (!clients.Any())
                 {
                     result.IsSuccess = false;
+                    result.Data = new List<UserRoleDTO>();
                     result.Message = "No hay clientes registrados";
                 }
                 else
                 {
                     result.IsSuccess = true;
-                    result.Data = clients;
+                    result.Data = clients.Select(MapClientToViewDto).ToList();
                 }
             }
             catch (Exception ex)
@@ -54,7 +85,7 @@ namespace HRMS.Application.Services.UsersServices
                 var client = await _clientRepository.GetEntityByIdAsync(id);
                 ValidateClient(client);
                 result.IsSuccess = true;
-                result.Data = client;
+                result.Data = MapClientToViewDto(client);
             }
             catch (ArgumentException ex)
             {
@@ -84,6 +115,7 @@ namespace HRMS.Application.Services.UsersServices
                 }
                 else
                 {
+                    result.Data = dto;
                     result.Message = "Cliente eliminado correctamente";
                 }
             }
@@ -128,21 +160,13 @@ namespace HRMS.Application.Services.UsersServices
                     result.IsSuccess = false;
                     return result;
                 }
-                var client = new Client()
-                {
-                    IdUsuario = dto.IdUsuario,
-                    NombreCompleto = dto.NombreCompleto,
-                    Correo = dto.Correo,
-                    Clave = dto.Clave,
-                    Documento = dto.Documento,
-                    TipoDocumento = dto.TipoDocumento,
-                };
+                var client = MapSaveToDto(dto);
 
                 result = await _clientRepository.SaveEntityAsync(client);
                 if (result.IsSuccess)
                 {
                     result.Message = "Cliente guardado correctamente";
-                    result.Data = dto;
+                    result.Data = MapClientToViewDto(client);
                 }
             }
             catch (Exception ex)
@@ -158,31 +182,32 @@ namespace HRMS.Application.Services.UsersServices
             try
             {
                 ValidateId(dto.IdUsuario);
-                var client = await _clientRepository.GetEntityByIdAsync(dto.IdUsuario);
+                var client = await _clientRepository.GetClientByUserIdAsync(dto.IdUsuario);
                 ValidateClient(client);
                 var existingCorreo = await _clientRepository.GetClientByEmailAsync(dto.Correo);
                 if (existingCorreo != null && existingCorreo.IdUsuario != dto.IdUsuario)
                 {
                     result.Message = "Este correo ya esta registrado";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
                 }
                 var existingDocument = await _clientRepository.GetClientByDocumentAsync(dto.Documento);
                 if (existingDocument != null && existingDocument.IdUsuario != dto.IdUsuario)
                 {
                     result.Message = "Este documento ya esta registrado";
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
                 }
+                
                 client.IdUsuario = dto.IdUsuario;
                 client.NombreCompleto = dto.NombreCompleto;
                 client.TipoDocumento = dto.TipoDocumento;
                 client.Documento = dto.Documento;
                 client.Clave = dto.Clave;
                 client.Correo = dto.Correo;
-                dto.ChangeTime = DateTime.Now;
+                dto.ChangeTime = dto.ChangeTime;
                 await _clientRepository.UpdateEntityAsync(client);
                 result.Message = "Cliente actualizado correctamente";
                 result.IsSuccess = true;
-                result.Data = dto;
+                result.Data = MapClientToViewDto(client);
             }
             catch (ArgumentException ex)
             {
@@ -212,6 +237,7 @@ namespace HRMS.Application.Services.UsersServices
                 }
                 else
                 {
+                    result.Data = MapClientToViewDto(client);
                     result.Message = "Se actualizó la clave del cliente";
                 }
             }
@@ -250,6 +276,7 @@ namespace HRMS.Application.Services.UsersServices
                 }
                 else
                 {
+                    result.Data = MapClientToViewDto(client);
                     result.Message = "Se actualizó el correo del cliente";
                 }
             }
@@ -283,6 +310,7 @@ namespace HRMS.Application.Services.UsersServices
                 }
                 else
                 {
+                    result.Data = MapClientToViewDto(client);
                     result.Message = "Se actualizó el nombre del cliente";
                 }
             }
@@ -323,6 +351,7 @@ namespace HRMS.Application.Services.UsersServices
                 }
                 else
                 {
+                    result.Data = MapClientToViewDto(cliente);
                     result.Message = "Datos actualizados correctamente";
                 }
             }

@@ -10,11 +10,37 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="Todos los metodos de &quot;RoomManagement&quot; agregados">
+    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/ClientDTOs/SaveClientDTO.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserDTOs/RemoveUserClientDTO.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserDTOs/SaveUserClientDTO.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserDTOs/UpdateUserClientDTO.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserDTOs/UserDTO.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserRoleDTOs/RemoveUserRoleDTO.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserRoleDTOs/SaveUserRoleDTO.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserRoleDTOs/UpdateUserRoleDTO.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/DTOs/UserRoleDTOs/UserRoleDTO.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Interfaces/IUsersServices/IClientService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Interfaces/IUsersServices/IClientService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Interfaces/IUsersServices/IUserRoleService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Interfaces/IUsersServices/IUserRoleService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Interfaces/IUsersServices/IUserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Interfaces/IUsersServices/IUserService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/UsersServices/ClientService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/UsersServices/ClientService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/UsersServices/UserRoleService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/UsersServices/UserRoleService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/UsersServices/UserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/UsersServices/UserService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserRoleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserRoleController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestClientService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestClientService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestUserRoleService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestUserRoleService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestUserService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/UsersTests/UnitTestUserService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/UsersValidations/ClientValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/UsersValidations/ClientValidator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/UsersValidations/UserValidator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Domain/Base/Validator/UsersValidations/UserValidator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/UsersDependencies/ClientDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/UsersDependencies/ClientDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/UsersDependencies/UserDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/UsersDependencies/UserDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.IOC/UsersDependencies/UserRoleDependency.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.IOC/UsersDependencies/UserRoleDependency.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/HRMS.Web.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/HRMS.Web.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/Views/Shared/_Layout.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/appsettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,22 +64,20 @@
     &quot;assignee&quot;: &quot;AshleeRr&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/AshleeRr/HRMS.git",
-    "accountId": "76dfa0fa-1d5e-4a4c-a6d0-03d055ee9b39"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/AshleeRr/HRMS.git&quot;,
+    &quot;accountId&quot;: &quot;76dfa0fa-1d5e-4a4c-a6d0-03d055ee9b39&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRMS.IOC/AuditDependencies/AuditoriaDependency.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRMS.IOC/ClientDependencies/ClientDependency.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRMS.IOC/UserDependencies/UserDependency.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/HRMS.IOC/UserRoleDependencies/UserRoleDependency.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b741f17422844062bda644589ab84b32337fefcb677bc51957a62c3df8ad4d/AuthorizationAppBuilderExtensions.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/HRMS.Persistence.Test/UsersPersistenceTests/UnitTestClientRepository.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="SWEA" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -65,10 +89,11 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     ".NET Launch Settings Profile.HRMS.APIs: http.executor": "Debug",
+    ".NET Launch Settings Profile.HRMS.Web: http.executor": "Run",
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "ClientHistory-20240007",
+    "git-widget-placeholder": "#66 on ClientHistory-20240007",
     "last_opened_file_path": "C:/HRMS",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -172,7 +197,8 @@
       <workItem from="1740581140216" duration="9929000" />
       <workItem from="1740682724871" duration="27313000" />
       <workItem from="1740857208023" duration="11682000" />
-      <workItem from="1742705272088" duration="453000" />
+      <workItem from="1742705272088" duration="899000" />
+      <workItem from="1742852380057" duration="2562000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />

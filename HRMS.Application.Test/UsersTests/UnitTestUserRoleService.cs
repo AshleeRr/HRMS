@@ -1,4 +1,4 @@
-﻿using HRMS.Application.DTOs.UserRoleDTOs;
+﻿using HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs;
 using HRMS.Application.Services.UsersServices;
 using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
