@@ -1,13 +1,13 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - HRMS.Web</title>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/HRMS.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/HRMS.Web.styles.css" asp-append-version="true"/>
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <!-- Bootstrap JS Bundle with Popper -->
@@ -65,11 +65,19 @@
         #content.active {
             margin-left: 280px;
         }
+<<<<<<< HEAD
 
         .sidebar {
             margin-left: 0;
         }
 
+=======
+        
+        .sidebar {
+            margin-left: 0;
+        }
+        
+>>>>>>> b82a567a20ef6673138d4ce412e019b2d946db6d
         .sidebar .nav-link {
             padding: 12px 20px;
             color: #fff;
@@ -88,6 +96,7 @@
 </head>
 <body class="bg-light">
 
+<<<<<<< HEAD
     <!-- Sidebar -->
     <div class="sidebar bg-primary">
         <div class="sidebar-header p-3 border-bottom">
@@ -231,5 +240,140 @@
             });
         });
     </script>
+=======
+<!-- Sidebar -->
+<div class="sidebar bg-primary">
+    <div class="sidebar-header p-3 border-bottom">
+        <h3 class="text-white">HRMS.Web</h3>
+        <a href="#" class="dismiss text-white">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+    </div>
+
+    <div class="sidebar-body p-0">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-house-door me-3"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Privacy">
+                    <i class="bi bi-shield-lock me-3"></i> Privacy
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Room" asp-action="Index">
+                    <i class="bi bi-door-closed me-3"></i> Rooms
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Piso" asp-action="Index">
+                    <i class="bi bi-layers me-3"></i> Pisos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Tarifa" asp-action="Index">
+                    <i class="bi bi-cash-stack me-3"></i> Tarifas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Categoria" asp-action="Index">
+                    <i class="bi bi-tag me-3"></i> Categorias
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="EstadoHabitacion" asp-action="Index">
+                    <i class="bi bi-info-circle me-3"></i> EstadoHabitacion
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Room" asp-action="InfoHabitaciones">
+                    <i class="bi bi-info-circle me-3"></i> Info Habitaciones
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Overlay -->
+<div class="overlay"></div>
+
+<!-- Page Content -->
+<div id="content">
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
+            <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                <i class="bi bi-list"></i>
+            </button>
+            <a class="navbar-brand ms-3" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-buildings me-2"></i>HRMS.Web
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-bell"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-person-circle"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <main role="main" class="pb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    @RenderBody()
+                </div>
+            </div>
+        </main>
+    </div>
+    
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+
+<script>
+    $(document).ready(function () {
+        // Toggle sidebar
+        $('#sidebarCollapse').on('click', function () {
+            $('.sidebar').toggleClass('active');
+            $('.overlay').toggleClass('active');
+            $('#content').toggleClass('active');
+        });
+
+        // Close sidebar when clicking on dismiss button
+        $('.dismiss, .overlay').on('click', function () {
+            $('.sidebar').removeClass('active');
+            $('.overlay').removeClass('active');
+            $('#content').removeClass('active');
+        });
+
+        // Highlight active menu item
+        var path = window.location.pathname;
+        $(".nav-link").each(function() {
+            var href = $(this).attr('href');
+            if (path === href || path.startsWith(href) && href !== '/') {
+                $(this).addClass('active');
+            }
+        });
+    });
+</script>
+>>>>>>> b82a567a20ef6673138d4ce412e019b2d946db6d
 </body>
 </html>

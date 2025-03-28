@@ -1,4 +1,6 @@
-﻿namespace HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs
+using HRMS.Application.DTOs.BaseDTO;
+
+namespace HRMS.Application.DTOs.UserRoleDTOs
 {
     public class UserRoleDTO : DTOBase
     {

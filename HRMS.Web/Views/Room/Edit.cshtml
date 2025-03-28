@@ -1,0 +1,73 @@
+﻿@model HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos.UpdateHabitacionDto
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-12">
+            <div class="card shadow-lg">
+                <div class="card-header bg-warning text-dark text-center">
+                    <h3><i class="bi bi-pencil-square"></i> Edit Room</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdHabitacion" class="form-label fw-bold"></label>
+                            <input asp-for="IdHabitacion" class="form-control" readonly />
+                            <span asp-validation-for="IdHabitacion" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Numero" class="form-label fw-bold"></label>
+                            <input asp-for="Numero" class="form-control" type="number" placeholder="Ingrese número de habitación" />
+                            <span asp-validation-for="Numero" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Detalle" class="form-label fw-bold"></label>
+                            <input asp-for="Detalle" class="form-control" placeholder="Ingrese detalles de la habitación" />
+                            <span asp-validation-for="Detalle" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Precio" class="form-label fw-bold"></label>
+                            <input asp-for="Precio" type="number" class="form-control" step="0.01" placeholder="Ingrese precio" />
+                            <span asp-validation-for="Precio" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdEstadoHabitacion" class="form-label fw-bold"></label>
+                            <input asp-for="IdEstadoHabitacion" type="number" class="form-control" placeholder="Ingrese estado de habitación (ej: 1, 2, 3)" />
+                            <span asp-validation-for="IdEstadoHabitacion" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdPiso" class="form-label fw-bold"></label>
+                            <input asp-for="IdPiso" type="number" class="form-control" placeholder="Ingrese número de piso" />
+                            <span asp-validation-for="IdPiso" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="IdCategoria" class="form-label fw-bold"></label>
+                            <input asp-for="IdCategoria" type="number" class="form-control" placeholder="Ingrese categoría (ej: 1, 2, 3)" />
+                            <span asp-validation-for="IdCategoria" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,6 @@
-﻿namespace HRMS.Application.DTOs.BaseDTO
+using HRMS.Application.DTOs.BaseDTO;
+
+namespace HRMS.Application.DTOs.UserDTOs
 {
     public class BaseUsersDTO : DTOBase
     {
