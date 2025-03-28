@@ -1,7 +1,7 @@
 ﻿using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 using HRMS.Application.Interfaces.IUsersServices;
-using HRMS.Application.DTOs.UserRoleDTOs;
+using HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs;
 
 namespace HRMS.APIs.Controllers.UsersControllers
 {

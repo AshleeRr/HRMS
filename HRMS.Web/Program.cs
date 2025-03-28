@@ -1,3 +1,4 @@
+using HRMS.IOC.UsersDependencies;
 using HRMS.IOC.ReservationDepedencies;
 using HRMS.IOC.RoomDependencies;
 using HRMS.IOC.ServicesDependency;
@@ -16,7 +17,6 @@ namespace HRMS.Web
             builder.Services.AddDbContext<HRMSContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DBHotel")));
             // Add services to the container.
-
             builder.Services.AddControllersWithViews();
             builder.Services.AddPisoDependency();
             builder.Services.AddCategoryDependency();
@@ -25,6 +25,9 @@ namespace HRMS.Web
             builder.Services.AddTarifaDependecy();
             builder.Services.AddServicioDependencies();
             builder.Services.AddReceptionDependencies();
+            builder.Services.AddClientDependencies();
+            builder.Services.AddUserDependencies();
+            builder.Services.AddUserRoleDependencies();
             var app = builder.Build();
             
             // Configure the HTTP request pipeline.

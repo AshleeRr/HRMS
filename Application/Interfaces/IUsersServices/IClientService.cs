@@ -1,6 +1,6 @@
 ﻿using HRMS.Application.Base;
-using HRMS.Application.DTOs.ClientDTOs;
-using HRMS.Application.DTOs.UserDTOs;
+using HRMS.Application.DTOs.UsersDTOs.ClientDTOs;
+using HRMS.Application.DTOs.UsersDTOs.UserDTOs;
 using HRMS.Domain.Base;
 using HRMS.Domain.Entities.Users;
 

@@ -86,6 +86,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             if (entity == null)
             {
                 await _loggerServices.LogWarning("No se encontró un cliente con ese id", this, nameof(GetEntityByIdAsync));
+                return null;
             }
             return entity;
         }
@@ -100,13 +101,13 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             try
             {
                 var validClient = _validClient(entity);
-                if (!validClient.IsSuccess)
+                if (!validClient.IsSuccess || validClient == null)
                 {
                     result.IsSuccess = false;
                     result.Message = "Error validando los campos del cliente para actualizar";
-                    return result; ;
+                    return result; 
                 }
-                var cliente = await _context.Clients.FindAsync(entity.IdUsuario);
+                var cliente = await _context.Clients.FindAsync(entity.IdCliente);
                 if (cliente == null)
                 {
                     result.IsSuccess = false;
@@ -144,9 +145,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 }
                 entity.Estado = true;
                 entity.FechaCreacion = DateTime.Now;
-                result.IsSuccess = true;
                 await _context.Clients.AddAsync(entity);
                 await _context.SaveChangesAsync();
+                result.IsSuccess = true;
                 result.Message = "Cliente guardado correctamente";
                 result.Data = entity;
             }
@@ -160,7 +161,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         {
             if (id <= 0)
             {
-                throw new ArgumentNullException("El id debe ser mayor que 0");
+                throw new ArgumentException("El id debe ser mayor que 0");
             }
             return id;
         }
@@ -169,6 +170,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             if (string.IsNullOrEmpty(x))
             {
                 _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
+                throw new ArgumentException($"El campo: {message} no puede estar vacío.");
             }
         }
     }

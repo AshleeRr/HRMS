@@ -1,4 +1,4 @@
-﻿using HRMS.Application.DTOs.BaseDTO;
+using HRMS.Application.DTOs.BaseDTO;
 
 namespace HRMS.Application.DTOs.UserRoleDTOs
 {
