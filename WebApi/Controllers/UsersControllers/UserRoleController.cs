@@ -8,6 +8,10 @@ namespace WebApi.Controllers.UsersControllers
         // GET: UserRoleController
         public ActionResult Index()
         {
+            using (var client = new HttpClient())
+            {
+
+            }
             return View();
         }
 
