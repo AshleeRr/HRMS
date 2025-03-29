@@ -1,4 +1,6 @@
-﻿using HRMS.Application.Interfaces.IUsersServices;
+﻿using HRMS.Application.DTOs.UsersDTOs.ClientDTOs;
+using HRMS.Application.DTOs.UsersDTOs.ValidationsForSaveDTOs;
+using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Application.Services.UsersServices;
 using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.UsersValidations;
@@ -18,6 +20,8 @@ namespace HRMS.IOC.UsersDependencies
             services.AddScoped<IValidator<Client>, ClientValidator>();
             services.AddScoped<IClientService, ClientService>();
             services.AddScoped<ILoggingServices, LoggingServices>();
+            services.AddScoped<IValidator<SaveClientDTO>, ClientServiceValidator>();
+
             return services;
         }
     }

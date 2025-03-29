@@ -53,7 +53,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var usuarios = await _context.Users.Where(u => u.Estado == true).ToListAsync();
                 if (!usuarios.Any())
                 {
-                    await _loggerServices.LogWarning("No se encontraron un usuarios activos", this, nameof(GetAllAsync));
+                    await _loggerServices.LogWarning("No se encontraron usuarios activos", this, nameof(GetAllAsync));
                 }
                 result.Data = usuarios;
                 result.IsSuccess = true;
@@ -112,7 +112,9 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 var validUser = _validUser(entity);
                 if (!validUser.IsSuccess)
                 {
-                    return validUser;
+                    result.IsSuccess = false;
+                    result.Message = "Error validando los campos para actualizar";
+                    return result;
                 }
                 var userExistente = await _context.Users.FindAsync(entity.IdUsuario);
                 if (userExistente == null)
@@ -164,6 +166,7 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             if (string.IsNullOrEmpty(x))
             {
                 _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
+                throw new ArgumentException($"El campo: {message} no puede estar vacío.");
             }
         }
 

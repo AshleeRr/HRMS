@@ -1,4 +1,4 @@
-﻿namespace HRMS.Application.DTOs.UserDTOs
+﻿namespace HRMS.Application.DTOs.UsersDTOs.UserDTOs
 {
     public class UpdateUserClientDTO : UserDTO
     {

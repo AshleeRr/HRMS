@@ -1,10 +1,7 @@
-﻿using HRMS.Application.DTOs.BaseDTO;
-
-namespace HRMS.Application.DTOs.UserDTOs
+namespace HRMS.Application.DTOs.BaseDTO
 {
-    public class UserDTO : DTOBase
+    public class BaseUsersDTO : DTOBase
     {
-        public int IdUserRole { get; set; }
         public string NombreCompleto { get; set; }
         public string Correo { get; set; }
         public string Clave { get; set; }
