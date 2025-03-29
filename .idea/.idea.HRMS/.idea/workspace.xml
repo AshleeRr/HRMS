@@ -17,13 +17,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ApiTest/RoomControllersTest/CategoriaControllerTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ApiTest/RoomControllersTest/EstadoHabitacionControllerTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ApiTest/RoomControllersTest/HabitacionControllerTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ApiTest/RoomControllersTest/PisoControllerTest.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ApiTest/RoomControllersTest/TarifaControllerTest.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/HabitacionServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ApiTest/ApiTest.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/ApiTest/ApiTest.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/TarifaRepositoryTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/TarifaRepositoryTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/EstadoHabitacionRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/TarifaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/ServiciosRepository/ServicioRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/ServiciosRepository/ServicioRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Web/HRMS.Web.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/HRMS.Web.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +85,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.HRMS.APIs: http.executor&quot;: &quot;Run&quot;,
+    &quot;.NET Launch Settings Profile.HRMS.APIs: http.executor&quot;: &quot;Debug&quot;,
     &quot;.NET Launch Settings Profile.HRMS.Web: http.executor&quot;: &quot;Run&quot;,
     &quot;.NET Launch Settings Profile.WebApplication1: http.executor&quot;: &quot;Run&quot;,
     &quot;17f863f2-0756-4004-8cec-c4fe455a4b00.executor&quot;: &quot;Debug&quot;,
@@ -358,6 +361,7 @@
       <workItem from="1742679878861" duration="6594000" />
       <workItem from="1742855409493" duration="126000" />
       <workItem from="1742921608795" duration="4342000" />
+      <workItem from="1743022138421" duration="13356000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
