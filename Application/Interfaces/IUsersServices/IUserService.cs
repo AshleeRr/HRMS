@@ -1,10 +1,10 @@
 ﻿using HRMS.Application.Base;
-using HRMS.Application.DTOs.UserDTOs;
+using HRMS.Application.DTOs.UsersDTOs.UserDTOs;
 using HRMS.Domain.Base;
 
 namespace HRMS.Application.Interfaces.IUsersServices
 {
-    public interface IUserService : IBaseServices<SaveUserClientDTO, UpdateUserClientDTO, RemoveUserClientDTO>
+    public interface IUserService : IBaseServices<SaveUserDTO, UpdateUserClientDTO, RemoveUserClientDTO>
     {
         Task<OperationResult> UpdatePasswordAsync(int idUsuario, string nuevaClave);
         Task<OperationResult> UpdateCorreoAsync(int idUsuario, string nuevoCorreo);

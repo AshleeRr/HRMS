@@ -1,5 +1,5 @@
-﻿using HRMS.Application.DTOs.ClientDTOs;
-using HRMS.Application.DTOs.UserDTOs;
+﻿using HRMS.Application.DTOs.UsersDTOs.ClientDTOs;
+using HRMS.Application.DTOs.UsersDTOs.UserDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Interfaces.IUsersRepository;
@@ -30,7 +30,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
 
         // POST api/<UserController>
         [HttpPost("/user")]
-        public async Task<IActionResult> SaveUser([FromBody] SaveUserClientDTO user)
+        public async Task<IActionResult> SaveUser([FromBody] SaveUserDTO user)
         {
             var u = await _userService.Save(user);
             if (!u.IsSuccess)
@@ -51,7 +51,6 @@ namespace HRMS.APIs.Controllers.UsersControllers
                     Clave = user.Clave,
                     Documento = user.Documento,
                     TipoDocumento = user.TipoDocumento,
-                    IdUserRole = user.IdUserRole,
                     IdUsuario = userId 
                 };
                 var client = await _clientService.Save(clientDto);
@@ -208,13 +207,6 @@ namespace HRMS.APIs.Controllers.UsersControllers
             ValidateId(id);
             ValidateNull(documento, "documento");
             ValidateNull(tipoDocumento, "tipo documento");
-
-            var existingDocument = await _userRepository.GetUserByDocumentAsync(documento);
-            if (existingDocument != null || existingDocument.IdUsuario != id)
-            {
-                return BadRequest("Este documento ya esta registrado por otro usuario");
-            }
-
             var user = await _userService.UpdateTipoDocumentoAndDocumentoAsync(id, tipoDocumento, documento);
             if (!user.IsSuccess)
             {
@@ -267,12 +259,6 @@ namespace HRMS.APIs.Controllers.UsersControllers
         {
             ValidateId(id);
             ValidateNull(email, "email");
-
-            var existingDocument = await _userRepository.GetUserByEmailAsync(email);
-            if (existingDocument != null || existingDocument.IdUsuario != id)
-            {
-                return BadRequest("Este correo ya esta registrado por otro usuario");
-            }
             var user = await _userService.UpdateCorreoAsync(id, email);
             if (!user.IsSuccess)
             {
