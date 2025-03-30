@@ -362,4 +362,3 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /HRMS.APIs/appsettings.json
-/HRMS.Persistence.Test/UsersTests
