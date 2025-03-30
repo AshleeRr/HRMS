@@ -62,7 +62,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         [ProducesResponseType(typeof(IEnumerable<EstadoHabitacionDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByDescripcion([FromQuery] string descripcion)
+        public async Task<IActionResult> GetByDescripcion(string descripcion)
         {
             _logger.LogInformation("Buscando estados de habitación con descripción: {Descripcion}", descripcion);
             

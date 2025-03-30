@@ -71,12 +71,9 @@ public class ServicioRepository : BaseRepository<Servicios, short>, IServicioRep
     
     public override async Task<Servicios> GetEntityByIdAsync(short id)
     {
-        if (id <= 0)
-        {
-            return null;
-        }
-
-        return await _context.Set<Servicios>().FindAsync(id);
+        _logger.LogInformation("Obteniendo servicio por ID {Id}", id);
+        return await _context.Set<Servicios>()
+            .FirstOrDefaultAsync(s => s.IdServicio == id && s.Estado == true);
     }
 
     public override async Task<OperationResult> UpdateEntityAsync(Servicios servicios)
@@ -176,6 +173,17 @@ public class ServicioRepository : BaseRepository<Servicios, short>, IServicioRep
             _logger?.LogError(ex, "Error buscando servicios por nombre {Nombre}", nombre);
         }
 
+        return result;
+    }
+    
+    private static OperationResult ValidateInt(int value, string fieldName)
+    {
+        var result = new OperationResult();
+        if (value <= 0)
+        {
+            result.IsSuccess = false;
+            result.Message = $"El campo {fieldName} debe ser mayor que cero.";
+        }
         return result;
     }
 }
