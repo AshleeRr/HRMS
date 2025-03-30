@@ -1,0 +1,166 @@
+﻿@model WebApi.Models.RoomModels.HabitacionModel
+
+@{
+    ViewData["Title"] = "Eliminar Habitación";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container mt-4">
+    <div class="card shadow border-danger">
+        <div class="card-header bg-danger text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-trash"></i> Eliminar Habitación
+                </h5>
+                <a asp-action="Index" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver al Listado
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>¡Advertencia!</strong> Esta acción eliminará permanentemente la habitación.
+                Esta operación no se puede deshacer.
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">Detalles de la Habitación</h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Número</dt>
+                                <dd class="col-sm-8 fw-bold">@Model.numero</dd>
+
+                                <dt class="col-sm-4">Detalle</dt>
+                                <dd class="col-sm-8">
+                                    @if (string.IsNullOrEmpty(Model.detalle))
+                                    {
+                                        <span class="text-muted fst-italic">Sin descripción</span>
+                                    }
+                                    else
+                                    {
+                                        @Model.detalle
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4">Precio</dt>
+                                <dd class="col-sm-8 text-success fw-bold">$@Model.precio</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">Clasificación</h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Estado</dt>
+                                <dd class="col-sm-8">
+                                    @{
+                                        string estadoClass = "secondary";
+                                        string estadoTexto = "No definido";
+
+                                        switch (Model.idEstadoHabitacion)
+                                        {
+                                            case 1:
+                                                estadoClass = "success";
+                                                estadoTexto = "Disponible";
+                                                break;
+                                            case 2:
+                                                estadoClass = "danger";
+                                                estadoTexto = "Ocupada";
+                                                break;
+                                            case 3:
+                                                estadoClass = "warning";
+                                                estadoTexto = "En Mantenimiento";
+                                                break;
+                                            case 4:
+                                                estadoClass = "info";
+                                                estadoTexto = "Reservada";
+                                                break;
+                                        }
+                                    }
+                                    <span class="badge bg-@estadoClass">@estadoTexto</span>
+                                </dd>
+
+                                <dt class="col-sm-4">Piso</dt>
+                                <dd class="col-sm-8">@Model.idPiso</dd>
+
+                                <dt class="col-sm-4">Categoría</dt>
+                                <dd class="col-sm-8">@Model.idCategoria</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post" id="deleteForm">
+                <input type="hidden" asp-for="idHabitacion" />
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
+                        <i class="bi bi-trash"></i> Eliminar Habitación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="fs-5">¿Está completamente seguro que desea eliminar esta habitación?</p>
+                <p><strong>Habitación:</strong> #@Model.numero</p>
+                <p class="text-danger">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnSubmitForm">
+                    <i class="bi bi-exclamation-triangle"></i> Sí, eliminar definitivamente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Mostrar modal de confirmación
+            $("#btnConfirmarEliminar").click(function() {
+                var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                confirmModal.show();
+            });
+
+            // Enviar formulario desde el modal
+            $("#btnSubmitForm").click(function() {
+                $("#deleteForm").submit();
+            });
+        });
+    </script>
+}

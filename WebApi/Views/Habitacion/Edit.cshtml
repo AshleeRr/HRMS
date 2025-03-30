@@ -1,0 +1,151 @@
+﻿@model WebApi.Models.RoomModels.HabitacionModel
+
+@{
+    ViewData["Title"] = "Editar Habitación";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container mt-4">
+    <div class="card shadow mb-4">
+        <div class="card-header bg-warning text-dark py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil-square"></i> Editar Habitación #@Model.numero
+                </h5>
+                <a asp-action="Index" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver al Listado
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" id="editForm">
+                <!-- Asegúrate de que el ID está presente en el formulario -->
+                <input type="hidden" asp-for="idHabitacion" value="@Model.idHabitacion" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="numero" class="form-label">Número <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                                <input asp-for="numero" class="form-control" placeholder="Ej. 101" required />
+                            </div>
+                            <span asp-validation-for="numero" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="precio" class="form-label">Precio <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                                <input asp-for="precio" class="form-control" type="number" step="0.01" min="0" required />
+                            </div>
+                            <span asp-validation-for="precio" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="detalle" class="form-label">Detalle / Descripción</label>
+                    <textarea asp-for="detalle" class="form-control" rows="3" placeholder="Descripción de la habitación..."></textarea>
+                    <span asp-validation-for="detalle" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label asp-for="idEstadoHabitacion" class="form-label">Estado <span class="text-danger">*</span></label>
+                            <select asp-for="idEstadoHabitacion" class="form-select" required>
+                                <option value="">-- Seleccione un estado --</option>
+                                @if (ViewBag.EstadosHabitacion != null)
+                                {
+                                    @foreach (SelectListItem item in ViewBag.EstadosHabitacion)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="1">Disponible</option>
+                                    <option value="2">Ocupada</option>
+                                    <option value="3">Mantenimiento</option>
+                                    <option value="4">Reservada</option>
+                                }
+                            </select>
+                            <span asp-validation-for="idEstadoHabitacion" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label asp-for="idPiso" class="form-label">Piso <span class="text-danger">*</span></label>
+                            @if (ViewBag.Pisos != null)
+                            {
+                                <select asp-for="idPiso" class="form-select" asp-items="ViewBag.Pisos" required>
+                                    <option value="">-- Seleccione un piso --</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <select asp-for="idPiso" class="form-select" required>
+                                    <option value="">-- Seleccione un piso --</option>
+                                    <option value="1">Piso 1</option>
+                                    <option value="2">Piso 2</option>
+                                </select>
+                            }
+                            <span asp-validation-for="idPiso" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mb-3">
+                            <label asp-for="idCategoria" class="form-label">Categoría <span class="text-danger">*</span></label>
+                            @if (ViewBag.Categorias != null)
+                            {
+                                <select asp-for="idCategoria" class="form-select" asp-items="ViewBag.Categorias" required>
+                                    <option value="">-- Seleccione una categoría --</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <select asp-for="idCategoria" class="form-select" required>
+                                    <option value="">-- Seleccione una categoría --</option>
+                                    <option value="1">Estándar</option>
+                                    <option value="2">Suite</option>
+                                </select>
+                            }
+                            <span asp-validation-for="idCategoria" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campos ocultos -->
+                <input type="hidden" asp-for="changeTime" value="@DateTime.Now" />
+                <input type="hidden" asp-for="userID" value="@Model.userID" />
+
+                <div class="form-group mt-4 d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+        });
+    </script>
+}
