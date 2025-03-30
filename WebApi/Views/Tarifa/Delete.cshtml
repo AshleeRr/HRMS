@@ -1,0 +1,140 @@
+﻿@model WebApi.Models.RoomModels.TarifaModel
+
+@{
+    ViewData["Title"] = "Eliminar Tarifa";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container mt-4">
+    <div class="card shadow border-danger">
+        <div class="card-header bg-danger text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-trash"></i> Eliminar Tarifa
+                </h5>
+                <a asp-action="Index" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver al Listado
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>¡Advertencia!</strong> Esta acción eliminará permanentemente la tarifa.
+                Esta operación no se puede deshacer.
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">Detalles de la Tarifa</h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">ID</dt>
+                                <dd class="col-sm-8 fw-bold">@Model.IdTarifa</dd>
+
+                                <dt class="col-sm-4">Descripción</dt>
+                                <dd class="col-sm-8">@Model.Descripcion</dd>
+
+                                <dt class="col-sm-4">Vigencia</dt>
+                                <dd class="col-sm-8">@Model.FechaInicio.ToString("dd/MM/yyyy") al @Model.FechaFin.ToString("dd/MM/yyyy")</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">Información de Precio</h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Precio Base</dt>
+                                <dd class="col-sm-8 text-success fw-bold">$@Model.PrecioPorNoche</dd>
+
+                                <dt class="col-sm-4">Descuento</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.Descuento > 0)
+                                    {
+                                        <span class="badge bg-danger">@Model.Descuento%</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Sin descuento</span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4">Categoría</dt>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post" id="deleteForm">
+                <input type="hidden" asp-for="IdTarifa" />
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
+                        <i class="bi bi-trash"></i> Eliminar Tarifa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="fs-5">¿Está completamente seguro que desea eliminar esta tarifa?</p>
+                <p><strong>Tarifa:</strong> @Model.Descripcion</p>
+                <p><strong>Precio:</strong> $@Model.PrecioPorNoche</p>
+                <p class="text-danger">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnSubmitForm">
+                    <i class="bi bi-exclamation-triangle"></i> Sí, eliminar definitivamente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Mostrar modal de confirmación
+            $("#btnConfirmarEliminar").click(function() {
+                var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                confirmModal.show();
+            });
+
+            // Enviar formulario desde el modal
+            $("#btnSubmitForm").click(function() {
+                $("#deleteForm").submit();
+            });
+        });
+    </script>
+}

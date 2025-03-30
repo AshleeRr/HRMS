@@ -38,7 +38,7 @@ namespace HRMS.APIs.Controllers.RoomManagementControllers
         /// </summary>
         /// <param name="id">ID de la habitación</param>
         /// <returns>Datos de la habitación</returns>
-        [HttpGet("GetByHabitacion{id}")]
+        [HttpGet("GetByHabitacionById{id}")]
         [ProducesResponseType(typeof(HabitacionDto), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
