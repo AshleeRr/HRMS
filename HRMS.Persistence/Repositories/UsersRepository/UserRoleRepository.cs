@@ -158,14 +158,10 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                                        TipoDocumento = users.TipoDocumento,
                                        Documento = users.Documento,
                                    }).ToListAsync();
-                result.Data = query;
-                result.IsSuccess = true;
-                if (!query.Any())
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se encontraron usuarios con este rol";
-                    return result;
-                }
+                    result.Data = query ?? new List<UserModel>();
+                    result.IsSuccess = query.Any();
+                    result.Message = query.Any() ? "Usuarios encontrados." : "No se encontraron usuarios con este rol.";
+ 
             }
             catch (Exception ex)
             {

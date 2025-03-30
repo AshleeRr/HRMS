@@ -140,15 +140,23 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         [HttpDelete("/role/{id}")]
-        public async Task<IActionResult> Delete([FromBody] RemoveUserRoleDTO userRole)
+        public async Task<IActionResult> Delete([FromBody] RemoveUserRoleDTO dto )
         {
-            var rol = await _userRoleService.Remove(userRole);
-            if (!rol.IsSuccess)
-            {
-                return BadRequest("Error eliminando el rol");
+            if(dto.IdUserRole > 0){
+                var rol = await _userRoleService.Remove(dto);
+                if (!rol.IsSuccess)
+                {
+                    return BadRequest($"Error eliminando el rol: {rol.Message}");
+                }
+                _logger.LogInformation("Rol eliminado correctamente");
+                return Ok(rol);
+
             }
-            _logger.LogInformation("Rol eliminado correctamente");
-            return Ok(rol);
+            else
+            {
+                return BadRequest("El id debe ser mayor que 0");
+            }
+            
         }
         private IActionResult ValidateId(int id)
         {
