@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace HRMS.Domain.Entities.RoomManagement;
 
 [Table("EstadoHabitacion")]
-public sealed class EstadoHabitacion : AuditEntity
+public  class EstadoHabitacion : AuditEntity
 {
     [Key]
     public int IdEstadoHabitacion { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace HRMS.Application.DTOs
+﻿namespace HRMS.Application.DTOs.BaseDTO
 {
     public abstract class DTOBase
     {
