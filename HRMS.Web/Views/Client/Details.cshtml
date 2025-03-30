@@ -1,0 +1,73 @@
+﻿@model HRMS.Application.DTOs.UsersDTOs.ClientDTOs.ClientViewDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>ClientViewDTO</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            <span>IdUser</span>
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.IdUsuario</span>
+        </dd>
+        <dt class="col-sm-2">
+            <span>IdClient</span>
+        </dt>
+        <dd class="col-sm-10">
+            
+            <span>@Model.IdClient</span>
+        </dd>
+        <dt class="col-sm-2">
+            <span>NombreCompleto</span>
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.NombreCompleto</span>
+        </dd>
+        <dt class="col-sm-2">
+            <span>Correo</span>
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.Correo</span>
+        </dd>
+        <dt class="col-sm-2">
+            <span>Clave</span>
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.Clave</span>
+        </dd>
+        <dt class="col-sm-2">
+            <span>TipoDocumento</span>
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.TipoDocumento</span>
+        </dd>
+        <dt class="col-sm-2">
+            <span>Documento</span>
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.Documento</span>
+        </dd>
+        <dt class="col-sm-2">
+            <span>ChangeTime</span>
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.ChangeTime</span>
+        </dd>
+        <dt class="col-sm-2">
+            <span>UserID</span>
+        </dt>
+        <dd class="col-sm-10">
+            <span>@Model.UserID</span>
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.IdClient }) |
+    <a asp-action="Index">Back to List</a>
+</div>

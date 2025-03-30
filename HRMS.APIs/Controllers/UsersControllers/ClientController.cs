@@ -1,9 +1,5 @@
-﻿using HRMS.Domain.Base;
-using HRMS.Domain.Entities.Users;
-using HRMS.Persistence.Interfaces.IUsersRepository;
+﻿using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace HRMS.APIs.Controllers.UsersControllers
 {
@@ -12,37 +8,26 @@ namespace HRMS.APIs.Controllers.UsersControllers
     public class ClientController : ControllerBase
     {
         private readonly IClientRepository _clientRepository;
-        private readonly ILogger<ClientController> _logger;
-
-        public ClientController(IClientRepository clientRepository, ILogger<ClientController> logger)
+        public ClientController(IClientRepository clientRepository)
         {
             _clientRepository = clientRepository;
-            _logger = logger;
         }
 
-        [HttpGet("GetClients")]
+        [HttpGet("/clients")]
         public async Task<IActionResult> GetAllClients()
         {
-            try
+            var clients = await _clientRepository.GetAllAsync();
+            if(clients == null || !clients.Any())
             {
-                var clients = await _clientRepository.GetAllAsync();
-                if(clients == null || !clients.Any())
-                {
-                    return NotFound("No hay cLientes guardados");
-                }
-                return Ok(clients);
-            } catch(Exception e)
-            {
-                _logger.LogError(e, "Error obteniendo los clientes");
-                return StatusCode(500, "Error interno del servidor");
+                return NotFound("No hay cLientes guardados");
             }
-            
+            return Ok(clients);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("/client/{id}")]
         public async Task<IActionResult> GetClientById(int id)
         {
-            try
+            if(id > 0)
             {
                 var existingClient = await _clientRepository.GetEntityByIdAsync(id);
                 if(existingClient == null)
@@ -51,117 +36,54 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 }
                 return Ok(existingClient);
             }
-            catch (Exception e)
+            else
             {
-                _logger.LogError(e, $"Error obteniendo cliente con id: {id}");
-                return StatusCode(500, "Error interno del servidor");
-            }
-        }
-        /*
-        [HttpPost("SaveClient")]
-        public async Task<IActionResult> SaveCLient([FromBody] Client client)
-        {
-            try
-            {
-                var createdClient = await _clientRepository.SaveEntityAsync(client);
-                return Ok(client);
-            }catch(Exception e)
-            {
-                _logger.LogError(e, "Error guardando cliente");
-                return StatusCode(500, "Error interno del servidor");
-            }
-        }*/
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateClient(int id, [FromBody] Client client)
-        {
-            try
-            {
-                var existingClient = await _clientRepository.GetEntityByIdAsync(id);
-                if (existingClient == null)
-                {
-                    return NotFound("Cliente no encontrado");
-                }
-                var updatedClient = await _clientRepository.UpdateEntityAsync(client);
-                return Ok(updatedClient);
-            } catch(Exception e)
-            {
-                _logger.LogError(e, "Error actualizando el cliente");
-                return StatusCode(500, "Error interno del servidor");
+                return BadRequest("El id debe ser mayor que 0");
             }
         }
 
-        [HttpGet("ByEmail")]
+        [HttpGet("/client/email")]
         public async Task<IActionResult> GetClientByEmail(string email) 
         {
-            try
+            ValidateNull(email, "email");
+            var clientEmail = await _clientRepository.GetClientByEmailAsync(email);
+            if(clientEmail == null)
             {
-                if (string.IsNullOrEmpty(email))
-                {
-                    return BadRequest("El email no puede estar vacio. Asegurese de escribirlo correctaente");
-                }
-                var clientEmail = await _clientRepository.GetClientByEmailAsync(email);
-                if (clientEmail == null)
-                {
-                    return NotFound($"No se ha encontrado un cliente con este email: {email}");
-                }
-                return Ok(clientEmail);
-            } catch(Exception e)
-            {
-                _logger.LogError(e, "Error obteniendo el cliente por su email");
-                return StatusCode(500, "Error interno del servidor");
+                return NotFound($"No se ha encontrado un cliente con este email: {email}");
             }
+            return Ok(clientEmail);
         }
 
-        [HttpGet("ByDocument")]
+        [HttpGet("/client/document")]
         public async Task<IActionResult> GetClientByDocument(string document)
         {
-            try
+            ValidateNull(document, "documento");
+            var cliente = await _clientRepository.GetClientByDocumentAsync(document);
+            if (cliente == null)
             {
-                if (string.IsNullOrEmpty(document))
-                {
-                    return BadRequest("El documento no puede ser nulo");
-                }
-                var cliente = await _clientRepository.GetClientByDocumentAsync(document);
-                if (cliente == null)
-                {
-                    return NotFound($"No se encontro un cliente con este documento: {document}");
-                }
-                return Ok(cliente);
-                
-            } catch(Exception e)
-            {
-                _logger.LogError(e, "Error obteniendo el cliente por su documento");
-                return StatusCode(500, "Error interno del servidor");
+                return NotFound($"No se encontro un cliente con este documento: {document}");
             }
+            return Ok(cliente);
         }
 
-        [HttpGet("ByDocumentType")]
-        public async Task<IActionResult> GetClientByDocumentType(string tipoDocumento)
+        [HttpGet("/client/document-type")]
+        public async Task<IActionResult> GetClientsByDocumentType(string tipoDocumento)
         {
-            try
+            ValidateNull(tipoDocumento, "tipo documento");
+            var clientes = await _clientRepository.GetClientsByTypeDocumentAsync(tipoDocumento);
+            if(!clientes.Any())
             {
-                if (string.IsNullOrEmpty(tipoDocumento))
-                {
-                    return BadRequest("El tipo de documento no puede estar vacio");
-                }
-                var clientes = await _clientRepository.GetClientsByTypeDocumentAsync(tipoDocumento);
-                if(clientes == null || !clientes.Any())
-                {
-                    return NotFound("No se han encontrado clientes con este tipo de documento");
-                }
-                return Ok(clientes);
+               return NotFound("No se han encontrado clientes con este tipo de documento");
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error obteniendo el cliente por su documento");
-                return StatusCode(500, "Error interno del servidor");
-            }
+            return Ok(clientes);
         }
-        // DELETE api/<ClientController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        private IActionResult ValidateNull(string x, string comment)
         {
+            if (string.IsNullOrEmpty(x))
+            {
+                return BadRequest($"El campo {comment}, no puede estar vacio. Asegurese de escribirlo correctamente");
+            }
+            return Ok();
         }
     }
 }

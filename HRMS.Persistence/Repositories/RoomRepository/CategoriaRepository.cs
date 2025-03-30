@@ -1,217 +1,173 @@
 ﻿using HRMS.Domain.Base;
-using HRMS.Domain.Base.Validator.RoomValidations;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Persistence.Base;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
-namespace HRMS.Persistence.Repositories.RoomRepository;
-
-public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepository
+namespace HRMS.Persistence.Repositories.RoomRepository
 {
-    
-    public CategoriaRepository(HRMSContext context) : base(context) { }
-    
-    public override async Task<List<Categoria>> GetAllAsync()
+    public class CategoriaRepository : BaseRepository<Categoria, int>, ICategoryRepository
     {
-        return await _context.Categorias
-            .Where(c => c.Estado == true)
-            .ToListAsync();
-    }
+        private readonly IConfiguration _configuration;
+        private readonly IValidator<Categoria> _validator;
+        private readonly ILogger<CategoriaRepository> _logger;
 
-    public override async Task<OperationResult> SaveEntityAsync(Categoria categoria)
-    {
-        var result = new OperationResult();
-        try
+        public CategoriaRepository(HRMSContext context, IConfiguration configuration, IValidator<Categoria> validator, ILogger<CategoriaRepository> logger) 
+            : base(context)
         {
-            var validator = new CategoriaValidator();
-            var validation = validator.Validate(categoria);
-            if (!validation.IsSuccess)
-            {
-                return validation; 
-            }
-
-            bool exists = await ExistsAsync(c => c.Descripcion == categoria.Descripcion);
-            if (exists)
-            {
-                result.IsSuccess = false;
-                result.Message = $"Ya existe una categoría con la descripción '{categoria.Descripcion}'.";
-                return result;
-            }
-
-
-            await _context.Categorias.AddAsync(categoria);
-            await _context.SaveChangesAsync();
-
-            result.IsSuccess = true;
-            result.Message = "Categoría guardada correctamente.";
-            result.Data = categoria; 
-        }
-        catch (Exception ex)
-        {
-            result.IsSuccess = false;
-            result.Message = $"Ocurrió un error guardando la categoría: {ex.Message}";
-        }
-        return result;
-    }
-
-    public override async Task<OperationResult> UpdateEntityAsync(Categoria categoria)
-    {
-        var result = new OperationResult();
-        try
-        {
-            // Validar la entidad
-            var validator = new CategoriaValidator();
-            var validation = validator.Validate(categoria);
-            if (!validation.IsSuccess)
-            {
-                return validation;
-            }
-
-            var existingCategoria = await _context.Categorias.FindAsync(categoria.IdCategoria);
-            if (existingCategoria == null)
-            {
-                result.IsSuccess = false;
-                result.Message = "La categoría no existe.";
-                return result;
-            }
-
-            bool exists = await _context.Categorias
-                .AnyAsync(c => c.Descripcion == categoria.Descripcion && c.IdCategoria != categoria.IdCategoria);
-            if (exists)
-            {
-                result.IsSuccess = false;
-                result.Message = $"Ya existe otra categoría con la descripción '{categoria.Descripcion}'.";
-                return result;
-            }
-
-            existingCategoria.Descripcion = categoria.Descripcion;
-            existingCategoria.IdServicio = categoria.IdServicio;
-            existingCategoria.Capacidad = categoria.Capacidad;
-            existingCategoria.Estado = categoria.Estado;
-
-            await _context.SaveChangesAsync();
-
-            result.IsSuccess = true;
-            result.Message = "Categoría actualizada correctamente.";
-            result.Data = existingCategoria;
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            result.IsSuccess = false;
-            result.Message = "La categoría fue modificada por otro usuario. Intente nuevamente.";
-        }
-        catch (Exception ex)
-        {
-            result.IsSuccess = false;
-            result.Message = $"Ocurrió un error actualizando la categoría: {ex.Message}";
+            _configuration = configuration;
+            _validator = validator;
+            _logger = logger;
         }
 
-        return result;
-    }
-
-    public async Task<OperationResult> GetCategoriaByServiciosAsync(string nombre)
-    {
-        var result = new OperationResult();
-    
-        try
+        public override async Task<List<Categoria>> GetAllAsync()
         {
-            if (string.IsNullOrWhiteSpace(nombre))
-            {
-                result.IsSuccess = false;
-                result.Message = "El nombre del servicio no puede estar vacío.";
-                return result;
-            }
-
-            var query = from c in _context.Categorias
-                join s in _context.Servicios on c.IdServicio equals s.IdSercicio
-                where s.Descripcion.Contains(nombre)
-                select c;
+            _logger.LogInformation("Obteniendo todas las categorías activas");
+            return await _context.Categorias
+                .Where(c => c.Estado == true)
+                .ToListAsync();
+        }
         
-            var categorias = await query.ToListAsync();
-        
-            result.Data = categorias;
-            result.IsSuccess = true;
-        
-            if (!categorias.Any())
-            {
-                result.Message = $"No se encontraron categorías para el servicio '{nombre}'.";
-            }
-        }
-        catch (Exception ex)
+        public override async Task<Categoria> GetEntityByIdAsync(int id)
         {
-            result.IsSuccess = false;
-            result.Message = $"Ocurrió un error obteniendo las categorías por servicio: {ex.Message}";
-        }
-    
-        return result;
-    }
-
-    public async Task<OperationResult> GetServiciosByDescripcionAsync(string descripcion)
-    {
-        OperationResult result = new OperationResult();
-        try
-        {
-            if (string.IsNullOrWhiteSpace(descripcion))
-            {
-                result.IsSuccess = false;
-                result.Message = "La descripción del servicio no puede estar vacía.";
-                return result;
-            }
+            _logger.LogInformation($"Obteniendo categoría por id {id}");
             
-            var query = from c in _context.Categorias
-                join s in _context.Servicios on c.IdServicio equals s.IdSercicio
-                where s.Descripcion.Contains(descripcion)
-                select s;
-            
-            var servicios = await query.ToListAsync();
-            result.Data = servicios;
-            result.IsSuccess = true;
-            
+            return (id == 0 ? null : await _context.Categorias
+                .FirstOrDefaultAsync(c => c.IdCategoria == id && c.Estado == true))!;
         }
-        catch (Exception)
-        {
-            result.IsSuccess = false;
-            result.Message = "Ocurrió un error obteniendo los servicios por descripción.";
-        }
-
-        return result;
-    }
-    
-    public async Task<OperationResult> GetHabitacionByCapacidad(int capacidad)
-    {
-        var result = new OperationResult();
-        try
-        {
-            if (capacidad <= 0)
-            {
-                result.IsSuccess = false;
-                result.Message = "La capacidad debe ser mayor que cero.";
-                return result;
-            }
-
-            var query = from c in _context.Categorias
-                join h in _context.Habitaciones on c.IdCategoria equals h.IdCategoria
-                where c.Capacidad == capacidad && h.Estado == true
-                select h;
-            
-            var habitaciones = await query.ToListAsync();
         
-            result.Data = habitaciones;
-            result.IsSuccess = true;
-        
-            if (!habitaciones.Any())
+        public override async Task<OperationResult> SaveEntityAsync(Categoria categoria) =>
+            await OperationResult.ExecuteOperationAsync(async () =>
             {
-                result.Message = $"No se encontraron habitaciones con capacidad para {capacidad} personas.";
-            }
-        }
-        catch (Exception ex)
-        {
-            result.IsSuccess = false;
-            result.Message = $"Ocurrió un error obteniendo las habitaciones por capacidad: {ex.Message}";
-        }
+                _logger.LogInformation("Guardando nueva categoría");
+                
+                var validationResult = _validator.Validate(categoria);
+                if (!validationResult.IsSuccess)
+                {
+                    _logger.LogWarning("Error de validación al crear categorias: {Error}", validationResult.Message);
+                    return OperationResult.Failure(validationResult.Message);
+                }
+                
+                await _context.Categorias.AddAsync(categoria);
+                await _context.SaveChangesAsync();
+                return OperationResult.Success(categoria, "Categoría guardada correctamente.");
+            });
+        
+        public override async Task<OperationResult> UpdateEntityAsync(Categoria categoria) =>
+            await OperationResult.ExecuteOperationAsync(async () =>
+            {
+                _logger.LogInformation($"Actualizando categoría con id {categoria.IdCategoria}");
+                
+            
+                var validationResult = _validator.Validate(categoria);
+                if (!validationResult.IsSuccess)
+                {
+                    _logger.LogWarning("Error de validación al actualizar categorias: {Error}", validationResult.Message);
+                    return OperationResult.Failure(validationResult.Message);
+                }
+                
+                var existingCategoria = await _context.Categorias.FindAsync(categoria.IdCategoria);
+                if (existingCategoria == null) return OperationResult.Failure("La categoría no existe.");
+                UpdateCategoria(existingCategoria, categoria);
+                await _context.SaveChangesAsync();
+                return OperationResult.Success(existingCategoria);
+            });
+        
+        public async Task<OperationResult> GetCategoriaByServiciosAsync(string nombre) =>
+            await OperationResult.ExecuteOperationAsync(async () =>
+            {
+                var validation = await ValidateString(nombre, "El nombre del servicio no puede ser nulo o vacío.");
+                if (!validation.IsSuccess)
+                    return validation;
+                _logger.LogInformation($"Obteniendo categorías por servicio '{nombre}'");
+                
+                var categoriasYServicios = await _context.Categorias
+                    .Join(_context.Servicios,
+                        c => c.IdServicio,
+                        s => s.IdServicio,
+                        (c, s) => new { Categoria = c, Servicio = s })
+                    .Where(cs => cs.Categoria.Estado == true && cs.Servicio.Estado == true)
+                    .ToListAsync();
+ 
+                var categorias = categoriasYServicios
+                    .Where(cs => cs.Servicio.Nombre.Contains(nombre, StringComparison.OrdinalIgnoreCase))
+                    .Select(cs => cs.Categoria)
+                    .ToList();
+ 
+                return OperationResult.Success(categorias, 
+                    categorias.Any() ? null : $"No se encontraron categorías para el servicio '{nombre}'.");
+            });        
+        public async Task<OperationResult> GetCategoriaByDescripcionAsync(string descripcion) =>
+            await OperationResult.ExecuteOperationAsync(async () =>
+            {
+                var validation = await ValidateString(descripcion, "La descripción no puede ser nula o vacía.");
+                if (!validation.IsSuccess)
+                    return validation;
+                
+                _logger.LogInformation($"Obteniendo categorías por descripción '{descripcion}'");
+                
+                var categorias = await _context.Categorias
+                    .Where(c => c.Descripcion != null && 
+                                EF.Functions.Like(c.Descripcion, $"%{descripcion}%") && 
+                                c.Estado == true)
+                    .ToListAsync();
 
-        return result;
+                return categorias.Any() 
+                    ? OperationResult.Success(categorias) 
+                    : OperationResult.Failure($"No se encontraron categorias con esa descripción: '{descripcion}'");
+            });
+        
+        public async Task<OperationResult> GetHabitacionByCapacidad(int capacidad) =>
+            await OperationResult.ExecuteOperationAsync(async () =>
+            {
+                
+                var validation = await ValidateInt(capacidad, "La capacidad debe ser mayor a 0.");
+                if (!validation.IsSuccess)
+                    return validation;
+                
+                _logger.LogInformation("Obteniendo habitaciones con capacidad para {Capacidad} personas", capacidad);
+                
+                var categoriasIds = await _context.Categorias
+                    .Where(c => c.Capacidad == capacidad && c.Estado == true)
+                    .Select(c => c.IdCategoria)
+                    .ToListAsync();
+
+                if (!categoriasIds.Any())
+                    return OperationResult.Failure($"No se encontraron categorías con capacidad para {capacidad} personas.");
+
+                var habitaciones = await _context.Habitaciones
+                    .Where(h => h.IdCategoria.HasValue && categoriasIds.Contains(h.IdCategoria.Value))
+                    .ToListAsync();
+
+                if (!habitaciones.Any())
+                    return OperationResult.Failure($"Se encontraron categorías con capacidad para {capacidad} personas, pero no tienen habitaciones asociadas.");
+
+                return OperationResult.Success(habitaciones, "Habitaciones obtenidas correctamente.");
+            });
+        
+        private async Task<OperationResult> ValidateInt(int id , string message)
+        {
+            if (id <= 0)
+                return OperationResult.Failure(message);
+            return OperationResult.Success();
+        }
+        
+        private async Task<OperationResult> ValidateString(string message , string error)
+        {
+            if (string.IsNullOrEmpty(message))
+                return OperationResult.Failure(error);
+            return OperationResult.Success();
+        }
+        
+        private static void UpdateCategoria(Categoria existing, Categoria updated)
+        {
+            existing.Descripcion = updated.Descripcion;
+            existing.IdServicio = updated.IdServicio;
+            existing.Capacidad = updated.Capacidad;
+        }
     }
 }

@@ -1,0 +1,89 @@
+﻿@model HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos.CreateHabitacionDTo
+@{
+    ViewData["Title"] = "Crear Habitación";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Nueva Habitación</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" class="needs-validation" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="row">
+                    <!-- Información Básica -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Información Básica</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label asp-for="Numero" class="form-label fw-bold">Número de Habitación</label>
+                                    <input asp-for="Numero" class="form-control" placeholder="Ej: 101" />
+                                    <span asp-validation-for="Numero" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Detalle" class="form-label fw-bold">Detalles</label>
+                                    <textarea asp-for="Detalle" class="form-control" rows="3" placeholder="Descripción de la habitación"></textarea>
+                                    <span asp-validation-for="Detalle" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Precio" class="form-label fw-bold">Precio por Noche</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input asp-for="Precio" class="form-control" placeholder="0.00" />
+                                    </div>
+                                    <span asp-validation-for="Precio" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Clasificación y Estado</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label asp-for="IdPiso" class="form-label fw-bold">ID Piso</label>
+                                    <input asp-for="IdPiso" type="number" min="1" class="form-control" placeholder="Ingrese ID del piso" />
+                                    <span asp-validation-for="IdPiso" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="IdCategoria" class="form-label fw-bold">ID Categoría</label>
+                                    <input asp-for="IdCategoria" type="number" min="1" class="form-control" placeholder="Ingrese ID de categoría" />
+                                    <span asp-validation-for="IdCategoria" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="IdEstadoHabitacion" class="form-label fw-bold">ID Estado</label>
+                                    <input asp-for="IdEstadoHabitacion" type="number" min="1" class="form-control" placeholder="Ingrese ID del estado" />
+                                    <span asp-validation-for="IdEstadoHabitacion" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <input asp-for="ChangeTime" type="hidden" />
+                <input asp-for="UserID" type="hidden" />
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver al Listado
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-save"></i> Guardar Habitación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

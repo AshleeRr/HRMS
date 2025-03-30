@@ -1,0 +1,76 @@
+﻿@model IEnumerable<HRMS.Application.DTOs.UsersDTOs.UserDTOs.UserViewDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Usuarios</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <span>ID</span>
+            </th>
+            <th>
+                <span>Role ID</span>
+            </th>
+            <th>
+                <span>Nombre Completo</span>
+            </th>
+            <th>
+                <span>Correo</span>
+            </th>
+            <th>
+                <span>Tipo de Documento</span>
+            </th>
+            <th>
+                <span>Documento</span>
+            </th>
+            <th>
+                <span>Change Time</span>
+            </th>
+            <th>
+                <span>User ID</span>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdUsuario)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdUserRole)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NombreCompleto)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Correo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TipoDocumento)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Documento)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ChangeTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserID)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id=item.IdUsuario }) |
+                @Html.ActionLink("Details", "Details", new { id=item.IdUsuario }) |
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

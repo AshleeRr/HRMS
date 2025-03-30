@@ -6,6 +6,6 @@ namespace HRMS.Persistence.Interfaces.IRoomRepository;
 
 public interface ITarifaRepository : IBaseRepository<Tarifas, int>
 { 
-    Task<OperationResult> GetTarifasVigentesAsync(DateTime fecha);
+    Task<OperationResult> GetTarifasVigentesAsync(String fechaInput);
     Task<OperationResult>GetHabitacionByPrecioAsync(decimal precio);
 }

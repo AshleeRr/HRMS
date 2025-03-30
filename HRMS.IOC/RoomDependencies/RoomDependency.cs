@@ -1,28 +1,27 @@
-﻿using HRMS.Domain.Base.Validator;
+﻿using HRMS.Application.DTOs.RoomManagementDto.HabitacionDtos;
+using HRMS.Application.DTOs.RoomManagementDto.Validations;
+using HRMS.Application.Interfaces.RoomManagementService;
+using HRMS.Application.Services.RoomServices;
+using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Base.Validator.RoomValidations;
-using HRMS.Domain.Base.Validator.ServiceValidations;
 using HRMS.Domain.Entities.RoomManagement;
+using HRMS.Domain.InfraestructureInterfaces.Logging;
+using HRMS.Infraestructure.Logging;
 using HRMS.Persistence.Interfaces.IRoomRepository;
 using HRMS.Persistence.Repositories.RoomRepository;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HRMS.IOC.RoomDependencies;
 
-public static class CategoriaDependency
+public static class RoomDependency
 {
-    public static IServiceCollection AddRoomCollection(this IServiceCollection services)
+    public static IServiceCollection AddRoomDependency(this IServiceCollection services)
     {
-        services.AddScoped<ICategoryRepository, CategoriaRepository>();
-        services.AddScoped<IValidator<Categoria>, CategoriaValidator>();
-        
         services.AddScoped<IHabitacionRepository, HabitacionRepository>();
         services.AddScoped<IValidator<Habitacion>, HabitacionValidator>();
-        
-        services.AddScoped<IPisoRepository, PisoRepository>();
-        services.AddScoped<IValidator<Piso>, PisoValidator>();
-        
-        services.AddScoped<ITarifaRepository, TarifaRepository>();
-        services.AddScoped<IValidator<Tarifas>, TarifasValidator>();
+        services.AddScoped<IHabitacionService, HabitacionServices>();
+        services.AddScoped<IValidator<CreateHabitacionDTo>, HabitacionServiceValidation>();
+        services.AddScoped<ILoggingServices, LoggingServices>();
         return services;
     }
 }

@@ -11,8 +11,8 @@ public static class ServicioDependency
 {
     public static IServiceCollection AddServicioDependencies(this IServiceCollection services)
     {
-        services.AddScoped<IServicioRepository, ServicioRepository>();
         services.AddScoped<IValidator<Servicios>, ServiciosValidator>();
+        services.AddScoped<IServicioRepository, ServicioRepository>();
         return services;
     }
 }

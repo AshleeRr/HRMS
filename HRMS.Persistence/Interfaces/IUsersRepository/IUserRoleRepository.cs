@@ -1,4 +1,5 @@
-﻿using HRMS.Domain.Entities.Users;
+﻿using HRMS.Domain.Base;
+using HRMS.Domain.Entities.Users;
 using HRMS.Domain.Repository;
 
 namespace HRMS.Persistence.Interfaces.IUsersRepository
@@ -7,5 +8,6 @@ namespace HRMS.Persistence.Interfaces.IUsersRepository
     {
         Task<UserRole> GetRoleByDescriptionAsync(string descripcion);
         Task<UserRole> GetRoleByNameAsync(string rolNombre);
+        Task<OperationResult> GetUsersByUserRoleIdAsync(int id);
     }
 }
