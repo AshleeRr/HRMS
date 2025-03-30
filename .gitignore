@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /HRMS.APIs/appsettings.json
 /HRMS.Persistence.Test/UsersTests
+/HRMS.Web/appsettings.json
+/.idea/.idea.HRMS/.idea/workspace.xml
