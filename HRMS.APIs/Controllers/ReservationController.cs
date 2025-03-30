@@ -42,8 +42,12 @@ namespace HRMS.APIs.Controllers
         {
             if (id != 0)
             {
-                var res = await _reservationRepository.GetEntityByIdAsync(id);
-                return Ok(res);
+                var res = await _reservationServices.GetById(id);
+                if(!res.IsSuccess)
+                {
+                    return BadRequest(res.Message);
+                }
+                return Ok(res.Data as ReservationDTO);
             }
             else
             {

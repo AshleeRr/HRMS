@@ -1,4 +1,5 @@
-﻿using HRMS.WebApi.Models.Reservation_2023_0731;
+﻿using HRMS.WebApi.Models;
+using HRMS.WebApi.Models.Reservation_2023_0731;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,8 @@ namespace HRMS.Web.Controllers.ReservationControllers
                 }
                 else
                 {
-                    ViewBag.Message = "Error al cargar las reservas";
+                    string errors = await response.Content.ReadAsStringAsync();
+                    ViewBag.Message = "Error al cargar la reserva" + errors;
                     return View();
                 }
             }
@@ -28,9 +30,26 @@ namespace HRMS.Web.Controllers.ReservationControllers
         }
 
         // GET: ReservationController/Details/5
-        public ActionResult Details(int id)
+        public async Task<IActionResult> Details(int ReservationId)
         {
-            return View();
+            ReservationDTO dto = null;
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://localhost:7175/api/");
+                var response = await client.GetAsync($"Reservations/GetByID/{ReservationId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    dto = await response.Content.ReadFromJsonAsync<ReservationDTO>();
+                    
+                }
+                else
+                {
+                    string errors = await response.Content.ReadAsStringAsync();
+                    ViewBag.Message = "Error al cargar la reserva" + errors;
+                    return View();
+                }
+            }
+            return View(dto);
         }
 
         // GET: ReservationController/Create

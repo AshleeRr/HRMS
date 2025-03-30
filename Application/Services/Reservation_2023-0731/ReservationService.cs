@@ -135,7 +135,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                 else
                 {
                     var resv = await _reservationRepository.GetEntityByIdAsync(id);
-                    result.Data = resv;
+                    result.Data = MapToDto(resv);
                 }
 
             }
