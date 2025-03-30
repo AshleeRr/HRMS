@@ -233,7 +233,7 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _clientRepository.UpdateEntityAsync(client);
                 if(!result.IsSuccess)
                 {
-                    result.Message = "Error actualizando la clave cliente";
+                    result.Message = "Error actualizando la clave del cliente";
                 }
                 else
                 {
