@@ -1,5 +1,6 @@
 ﻿using HRMS.WebApi.Models;
 using HRMS.WebApi.Models.Reservation_2023_0731;
+using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -74,18 +75,59 @@ namespace HRMS.Web.Controllers.ReservationControllers
         }
 
         // GET: ReservationController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int ReservationId)
         {
-            return View();
+            ReservationUpdateDTO updateDTO = null;
+            using (var client =  new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://localhost:7175/api/");
+                var response = await client.GetAsync($"Reservations/GetByID/{ReservationId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var reservationDTO = await response.Content.ReadFromJsonAsync<ReservationDTO>();
+                    updateDTO = new ReservationUpdateDTO
+                    {
+                        UserID = reservationDTO.UserID,
+                        ID = reservationDTO.ReservationId,
+                        In = reservationDTO.EntryDate.Value,
+                        Out = reservationDTO.DepartureDate.Value,
+                        Observations = reservationDTO.Observation,
+                        AbonoPenalidad = reservationDTO.PenaltyCost.Value,
+                        ChangeTime = DateTime.Now
+                    };
+                }
+                else
+                {
+                    string errors = await response.Content.ReadAsStringAsync();
+                    ViewBag.Message = "Error al cargar la reserva" + errors;
+                    return View();
+                }
+            }
+            return View(updateDTO);
         }
 
         // POST: ReservationController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(ReservationUpdateDTO updateDTO)
         {
             try
             {
+                using(var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("https://localhost:7175/api/");
+                    var response = await client.PutAsJsonAsync("Reservations/UpdateReservation", updateDTO);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        string errors = await response.Content.ReadAsStringAsync();
+                        ViewBag.Message = "Error al cargar la reserva" + errors;
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
             catch

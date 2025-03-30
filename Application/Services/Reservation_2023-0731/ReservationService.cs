@@ -359,6 +359,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                             }
                             else
                             {
+                                reservation.Observacion = dto.Observations;
                                 int days = (dto.Out - dto.In).Days;
                                 decimal totalForRoom = tarifInfo.Data.PricePerNight * days;
                                 reservation.IdHabitacion = (int)newRoom.Data;
