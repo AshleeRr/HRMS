@@ -226,7 +226,7 @@ namespace WebApi.Controllers.RoomControllers
                         habitacion.idHabitacion = id;
                     }
                     
-                    habitacion.changeTime = DateTime.Now;
+                    habitacion.ChangeTime = DateTime.Now;
                     
                     var client = _httpClientFactory.CreateClient();
                     var json = JsonConvert.SerializeObject(habitacion);
