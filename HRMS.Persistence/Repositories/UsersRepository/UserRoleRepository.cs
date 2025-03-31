@@ -106,16 +106,19 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 rolUsuario.Descripcion = entity.Descripcion;
                 rolUsuario.RolNombre = entity.RolNombre;
                 rolUsuario.FechaCreacion = entity.FechaCreacion;
-
                 _context.UserRoles.Update(rolUsuario);
-                await _context.SaveChangesAsync();
                 result.IsSuccess = true;
                 result.Message = "Rol de usuario actualizado correctamente.";
+                result.Data = rolUsuario;
+                await _context.SaveChangesAsync();
+                
+                
             }
             catch (Exception ex)
             {
                 result = await _loggerServices.LogError(ex.Message, this);
             }
+
             return result;
         }
         public async Task<UserRole> GetRoleByNameAsync(string rolNombre)

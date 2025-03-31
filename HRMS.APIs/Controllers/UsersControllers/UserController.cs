@@ -29,7 +29,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         // POST api/<UserController>
-        [HttpPost("/user")]
+        [HttpPost("user")]
         public async Task<IActionResult> SaveUser([FromBody] SaveUserDTO user)
         {
             var u = await _userService.Save(user);
@@ -64,7 +64,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         // GET: api/<UserController>
-        [HttpGet("/users")]
+        [HttpGet("users")]
         public async Task<IActionResult> GetAllUsers()
         {
             var usuarios = await _userService.GetAll();
@@ -77,7 +77,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         // GET api/<UserController>/5
-        [HttpGet("/user/{id}")]
+        [HttpGet("user/{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
             ValidateId(id);
@@ -89,7 +89,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(usuario);
         }
 
-        [HttpGet("/user/complete-name")]
+        [HttpGet("user/complete-name")]
         public async Task<IActionResult> GetUsersByName(string nombreCompleto)
         {
             ValidateNull(nombreCompleto, "nombre completo");
@@ -101,7 +101,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(usuario);
         }
 
-        [HttpGet("/user/email")]
+        [HttpGet("user/email")]
         public async Task<IActionResult> GetUserByEmailAsync(string correo)
         {
             ValidateNull(correo, "correo");
@@ -114,7 +114,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             
         }
 
-        [HttpGet("/user/document")]
+        [HttpGet("user/document")]
         public async Task<IActionResult> GetUserByDocumentAsync(string documento)
         {
             ValidateNull(documento, "documento");
@@ -126,7 +126,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(usuario);
         }
 
-        [HttpGet("/user/type-document")]
+        [HttpGet("user/type-document")]
         public async Task<IActionResult> GetUsersByTypeDocumentAsync(string tipoDocumento)
         {
             ValidateNull(tipoDocumento, "tipo documento");
@@ -139,7 +139,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         // PUT api/<UserController>/5
-        [HttpPut("/user/{id}")]
+        [HttpPut("user/{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserClientDTO user)
         {
             ValidateId(id);
@@ -162,7 +162,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(updatedUser);
         }
 
-        [HttpPatch("/user/{id}/nombre-completo")]
+        [HttpPatch("user/{id}/nombre-completo")]
         public async Task<IActionResult> UpdateNombreCompletoAsync(int id, string nuevoNombre)
         {
             ValidateId(id);
@@ -188,7 +188,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(user);
         }
 
-        [HttpPatch("/user/{id}/role")]
+        [HttpPatch("user/{id}/role")]
         public async Task<IActionResult> UpdateUserRoleToUserAsync(int id, int idUserRole)
         {
             ValidateId(id);
@@ -201,7 +201,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return BadRequest("Error actualizando el rol del usuario");
         }
 
-        [HttpPatch("/user/{id}/type-document-and-document")]
+        [HttpPatch("user/{id}/type-document-and-document")]
         public async Task<IActionResult> UpdateTipoDocumentoAndDocumentoAsync(int id, string tipoDocumento, string documento)
         {
             ValidateId(id);
@@ -228,7 +228,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(user);
         }
 
-        [HttpPatch("/users/{id}/password")]
+        [HttpPatch("users/{id}/password")]
         public async Task<IActionResult> UpdatePasswordAsync(int id, string nuevaClave)
         {
             ValidateId(id);
@@ -254,7 +254,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(user);
         }
 
-        [HttpPatch("/users/{id}/email")]
+        [HttpPatch("users/{id}/email")]
         public async Task<IActionResult> UpdateEmailAsync(int id, string email)
         {
             ValidateId(id);
@@ -280,7 +280,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         // DELETE api/<UserController>/5
-        [HttpDelete("/user/{id}")]
+        [HttpDelete("user/{id}")]
         public async Task<IActionResult> Delete([FromBody] RemoveUserClientDTO user)
         {
             var userDeleted = await _userService.Remove(user);
