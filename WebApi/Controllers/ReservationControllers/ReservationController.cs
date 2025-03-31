@@ -62,11 +62,26 @@ namespace HRMS.Web.Controllers.ReservationControllers
         // POST: ReservationController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(ReservationAddDTO reserv)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("https://localhost:7175/api/");
+                    var response = await client.PostAsJsonAsync("Reservations/CreateReservation", reserv);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        string errors = await response.Content.ReadAsStringAsync();
+                        ViewBag.Message = "Error al cargar la reserva" + errors;
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                
             }
             catch
             {
@@ -128,7 +143,6 @@ namespace HRMS.Web.Controllers.ReservationControllers
                         return RedirectToAction(nameof(Index));
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
             catch
             {
@@ -136,25 +150,7 @@ namespace HRMS.Web.Controllers.ReservationControllers
             }
         }
 
-        // GET: ReservationController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
 
-        // POST: ReservationController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+}
     }
 }

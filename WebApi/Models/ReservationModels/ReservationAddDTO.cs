@@ -10,6 +10,6 @@ namespace HRMS.WebApi.Models.Reservation_2023_0731
         public DateTime In { get; set; }
         public DateTime Out { get; set; }
         public string Observations { get; set; }
-        public IEnumerable<int> Services { get; set; }
+        public List<int> Services { get; set; } = new List<int>();
     }
 }
