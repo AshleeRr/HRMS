@@ -1,7 +1,5 @@
 ﻿using HRMS.WebApi.Models;
 using HRMS.WebApi.Models.Reservation_2023_0731;
-using Humanizer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRMS.Web.Controllers.ReservationControllers
