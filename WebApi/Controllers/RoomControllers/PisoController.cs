@@ -211,7 +211,7 @@ namespace WebApi.Controllers.RoomControllers
                     var json = JsonConvert.SerializeObject(piso);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                    HttpResponseMessage response = await client.PutAsync($"{_apiBaseUrl}/Piso/UpdatePiso{id}", content);
+                    HttpResponseMessage response = await client.PatchAsync($"{_apiBaseUrl}/Piso/UpdatePiso{id}", content);
 
                     if (response.IsSuccessStatusCode)
                     {
