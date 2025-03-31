@@ -23,24 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/ErrorResponse.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/OperationResult.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/CategoriaModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/EstadoHabitacionModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/HabitacionInfoModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/HabitacionModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/PisoModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/TarifaModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Views/Habitacion/HabitacionFiltradas.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Views/Habitacion/InfoHabitaciones.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Views/Piso/Delete.cshtml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WebApi/Models/Servicios/ServicioModel.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/BaseCategoryDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/BaseCategoryDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/appsettings.Development.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WebApi/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/Shared/_Layout.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/WebApi.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/WebApi.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
