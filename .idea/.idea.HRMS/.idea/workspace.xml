@@ -23,24 +23,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/ErrorResponse.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/OperationResult.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/CategoriaModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/EstadoHabitacionModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/HabitacionInfoModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/HabitacionModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/PisoModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/TarifaModel.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Views/Habitacion/HabitacionFiltradas.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Views/Habitacion/InfoHabitaciones.cshtml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Views/Piso/Delete.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/BaseCategoryDto.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/DTOs/RoomManagementDto/CategoriaDTOS/BaseCategoryDto.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/EstadoHabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/RoomManagementControllers/HabitacionController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/UsersServices/ClientService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/UsersServices/ClientService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/ClientController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/ClientController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserRoleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserRoleController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/ClientController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/ClientController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/UserController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/UserRoleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/UserRoleController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/OperationResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/OperationResult.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WebApi/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/Shared/_Layout.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/WebApi.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/WebApi.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,12 +55,12 @@
     &quot;assignee&quot;: &quot;AshleeRr&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/AshleeRr/HRMS.git&quot;,
-    &quot;accountId&quot;: &quot;8765d5b0-4ae0-45eb-bd7e-646c0152af17&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/AshleeRr/HRMS.git",
+    "accountId": "76dfa0fa-1d5e-4a4c-a6d0-03d055ee9b39"
   }
-}</component>
+}]]></component>
   <component name="HighlightingSettingsPerFile">
     <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
@@ -91,7 +82,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="Toolset" />
+    <option name="selectedTabId" value="SWEA" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -115,7 +106,7 @@
     "HTTP Request.HRMS.APIs | #1.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "HabitFloors-20240045",
+    "git-widget-placeholder": "ClientHistory-20240007",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -495,6 +486,7 @@
       <workItem from="1742855409493" duration="126000" />
       <workItem from="1742921608795" duration="4342000" />
       <workItem from="1743022138421" duration="16384000" />
+      <workItem from="1743382960520" duration="293000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
@@ -715,10 +707,10 @@
           <line>168</line>
           <properties documentPath="C:\HRMS\HRMS.Persistence.Test\RoomManagementTest\CategoriaRepositoryTest.cs" containingFunctionPresentation="Method 'GetCategoriaByServiciosAsync_ValidNombre_ReturnsCategorias'">
             <startOffsets>
-              <option value="6167" />
+              <option value="6444" />
             </startOffsets>
             <endOffsets>
-              <option value="6256" />
+              <option value="6551" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="5" />

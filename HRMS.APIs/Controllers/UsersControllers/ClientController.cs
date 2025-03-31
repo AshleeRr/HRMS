@@ -13,7 +13,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             _clientRepository = clientRepository;
         }
 
-        [HttpGet("/clients")]
+        [HttpGet("clients")]
         public async Task<IActionResult> GetAllClients()
         {
             var clients = await _clientRepository.GetAllAsync();
@@ -24,7 +24,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(clients);
         }
 
-        [HttpGet("/client/{id}")]
+        [HttpGet("client/{id}")]
         public async Task<IActionResult> GetClientById(int id)
         {
             if(id > 0)
@@ -42,7 +42,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
         }
 
-        [HttpGet("/client/email")]
+        [HttpGet("client/email")]
         public async Task<IActionResult> GetClientByEmail(string email) 
         {
             ValidateNull(email, "email");
@@ -54,7 +54,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(clientEmail);
         }
 
-        [HttpGet("/client/document")]
+        [HttpGet("client/document")]
         public async Task<IActionResult> GetClientByDocument(string document)
         {
             ValidateNull(document, "documento");
@@ -66,7 +66,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(cliente);
         }
 
-        [HttpGet("/client/document-type")]
+        [HttpGet("client/document-type")]
         public async Task<IActionResult> GetClientsByDocumentType(string tipoDocumento)
         {
             ValidateNull(tipoDocumento, "tipo documento");

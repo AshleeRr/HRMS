@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs;
+using Newtonsoft.Json;
 
 namespace HRMS.APIs.Controllers.UsersControllers
 {
@@ -21,7 +22,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             _userRoleService = userRoleService;
         }
 
-        [HttpPost("/role")]
+        [HttpPost("role")]
         public async Task<IActionResult> SaveUserRole([FromBody] SaveUserRoleDTO userRole)
         {
             var createdUserRole = await _userRoleService.Save(userRole);
@@ -34,7 +35,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return BadRequest("Error al crear un nuevo rol");
         }
 
-        [HttpGet("/roles")]
+        [HttpGet("roles")]
         public async Task<IActionResult> GetAllUserRoles()
         {
             var userRoles = await _userRoleService.GetAll();
@@ -45,7 +46,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(userRoles);
         }
 
-        [HttpGet("/role/{id}")]
+        [HttpGet("role/{id}")]
         public async Task<IActionResult> GetUserRoleById(int id)
         {
             ValidateId(id);
@@ -57,7 +58,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(existingUserRole);
         }
 
-        [HttpGet("/role/description")]
+        [HttpGet("role/description")]
         public async Task<IActionResult> GetRoleByDescription(string descripcion)
         {
             ValidateNull(descripcion, "descripcion");
@@ -139,7 +140,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(rolNewName);
         }
 
-        [HttpDelete("/role/{id}")]
+        [HttpDelete("role/{id}")]
         public async Task<IActionResult> Delete([FromBody] RemoveUserRoleDTO dto )
         {
             if(dto.IdUserRole > 0){
