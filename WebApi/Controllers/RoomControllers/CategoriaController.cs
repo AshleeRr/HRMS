@@ -103,9 +103,6 @@ namespace WebApi.Controllers.RoomControllers
             await CargarServicios();
             return View(new CategoriaModel
             {
-                Capacidad = 1,
-                ChangeTime = DateTime.Now,
-                UserID = 1 // Esto debería venir del usuario autenticado
             });
         }
 
@@ -171,7 +168,6 @@ namespace WebApi.Controllers.RoomControllers
                     var content = await response.Content.ReadAsStringAsync();
                     var categoria = JsonConvert.DeserializeObject<CategoriaModel>(content);
                     
-                    // Verificar que el ID coincida con el ID de la URL
                     if (categoria != null && categoria.IdCategoria != id)
                     {
                         categoria.IdCategoria = id;
@@ -211,7 +207,6 @@ namespace WebApi.Controllers.RoomControllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Asegurar que el ID en la URL coincida con el ID en el modelo
                     if (categoria.IdCategoria != id)
                     {
                         categoria.IdCategoria = id;
@@ -319,7 +314,6 @@ namespace WebApi.Controllers.RoomControllers
                     {
                         var errorObj = JsonConvert.DeserializeObject<ErrorResponse>(errorContent);
                         
-                        // Verificar si tiene habitaciones asociadas
                         if (errorObj?.detail?.Contains("habitaciones asociadas") == true)
                         {
                             TempData["Error"] = "No se puede eliminar la categoría porque tiene habitaciones asociadas.";
@@ -334,7 +328,6 @@ namespace WebApi.Controllers.RoomControllers
                         TempData["Error"] = "No se puede eliminar la categoría en este momento.";
                     }
                     
-                    // Si estamos en la vista Delete, regresar a la vista con el objeto
                     if (Request.Path.Value?.Contains("/Delete/") == true)
                     {
                         return RedirectToAction(nameof(Delete), new { id });
@@ -415,8 +408,7 @@ namespace WebApi.Controllers.RoomControllers
             try
             {
                 var client = _httpClientFactory.CreateClient();
-                // Asumo que existe un endpoint para obtener servicios. 
-                // Si no existe, usa un listado predeterminado
+              
                 HttpResponseMessage responseServicios = await client.GetAsync($"{_apiBaseUrl}/Servicio/GetAllServicios");
                 
                 if (responseServicios.IsSuccessStatusCode)
@@ -432,7 +424,6 @@ namespace WebApi.Controllers.RoomControllers
                 }
                 else
                 {
-                    // Si falla, usar valores predeterminados
                     ViewBag.Servicios = new List<SelectListItem>
                     {
                         new SelectListItem { Value = "", Text = "-- Sin servicio --" },

@@ -162,7 +162,6 @@ namespace WebApi.Controllers.RoomControllers
                     var content = await response.Content.ReadAsStringAsync();
                     var piso = JsonConvert.DeserializeObject<PisoModel>(content);
                     
-                    // Verificar que el ID coincida con el ID de la URL
                     if (piso != null && piso.IdPiso != id)
                     {
                         piso.IdPiso = id;
@@ -303,7 +302,6 @@ namespace WebApi.Controllers.RoomControllers
                     {
                         var errorObj = JsonConvert.DeserializeObject<ErrorResponse>(errorContent);
                         
-                        // Verificar si tiene habitaciones asociadas
                         if (errorObj?.detail?.Contains("habitaciones asociadas") == true || 
                             errorObj?.detail?.Contains("relacionado con habitaciones") == true)
                         {
@@ -319,7 +317,6 @@ namespace WebApi.Controllers.RoomControllers
                         TempData["Error"] = "No se puede eliminar el piso en este momento.";
                     }
                     
-                    // Si estamos en la vista Delete, regresar a la vista con el objeto
                     if (Request.Path.Value?.Contains("/Delete/") == true)
                     {
                         return RedirectToAction(nameof(Delete), new { id });

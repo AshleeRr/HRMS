@@ -33,7 +33,7 @@ namespace WebApi.Controllers.RoomControllers
                     var content = await response.Content.ReadAsStringAsync();
                     var tarifas = JsonConvert.DeserializeObject<List<TarifaModel>>(content);
                     
-                    TempData["Success"] = TempData["Success"]; // Preservar mensajes
+                    TempData["Success"] = TempData["Success"]; 
                     return View(tarifas);
                 }
                 else
@@ -102,11 +102,7 @@ namespace WebApi.Controllers.RoomControllers
             await CargarCategorias();
             return View(new TarifaModel
             {
-                FechaInicio = DateTime.Today,
-                FechaFin = DateTime.Today.AddDays(30),
-                Descuento = 0,
-                ChangeTime = DateTime.Now,
-                UserID = 1 // Esto debería venir del usuario autenticado
+
             });
         }
 
@@ -179,7 +175,6 @@ namespace WebApi.Controllers.RoomControllers
                     var content = await response.Content.ReadAsStringAsync();
                     var tarifa = JsonConvert.DeserializeObject<TarifaModel>(content);
                     
-                    // Verificar que el ID coincida con el ID de la URL
                     if (tarifa != null && tarifa.IdTarifa != id)
                     {
                         tarifa.IdTarifa = id;
@@ -226,7 +221,6 @@ namespace WebApi.Controllers.RoomControllers
                         return View(tarifa);
                     }
 
-                    // Asegurar que el ID en la URL coincida con el ID en el modelo
                     if (tarifa.IdTarifa != id)
                     {
                         tarifa.IdTarifa = id;
@@ -334,7 +328,6 @@ namespace WebApi.Controllers.RoomControllers
                     {
                         var errorObj = JsonConvert.DeserializeObject<ErrorResponse>(errorContent);
                         
-                        // Verificar si tiene reservas asociadas u otros problemas comunes
                         if (errorObj?.detail?.Contains("reservas asociadas") == true)
                         {
                             TempData["Error"] = "No se puede eliminar la tarifa porque tiene reservas asociadas.";
@@ -349,7 +342,6 @@ namespace WebApi.Controllers.RoomControllers
                         TempData["Error"] = "No se puede eliminar la tarifa en este momento.";
                     }
                     
-                    // Si estamos en la vista Delete, regresar a la vista con el objeto
                     if (Request.Path.Value?.Contains("/Delete/") == true)
                     {
                         return RedirectToAction(nameof(Delete), new { id });
@@ -424,7 +416,6 @@ namespace WebApi.Controllers.RoomControllers
             }
         }
 
-        // Método auxiliar para cargar categorías
         private async Task CargarCategorias()
         {
             try
@@ -445,7 +436,6 @@ namespace WebApi.Controllers.RoomControllers
                 }
                 else
                 {
-                    // Si falla, usar valores predeterminados
                     ViewBag.Categorias = new List<SelectListItem>
                     {
                         new SelectListItem { Value = "1", Text = "Estándar" },
@@ -455,7 +445,6 @@ namespace WebApi.Controllers.RoomControllers
             }
             catch
             {
-                // Si falla completamente, usar valores predeterminados
                 ViewBag.Categorias = new List<SelectListItem>
                 {
                     new SelectListItem { Value = "1", Text = "Estándar" },

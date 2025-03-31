@@ -437,7 +437,6 @@ namespace WebApi.Controllers.RoomControllers
             }
         }
 
-        // Método auxiliar para cargar las listas desplegables
         private async Task CargarListasDesplegables()
         {
             var client = _httpClientFactory.CreateClient();

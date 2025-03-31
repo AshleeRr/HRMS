@@ -99,8 +99,7 @@ namespace WebApi.Controllers.RoomControllers
         {
             return View(new EstadoHabitacionModel
             {
-                ChangeTime = DateTime.Now,
-                UserID = 1 // Esto debería venir del usuario autenticado
+                
             });
         }
 
@@ -162,7 +161,6 @@ namespace WebApi.Controllers.RoomControllers
                     var content = await response.Content.ReadAsStringAsync();
                     var estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(content);
                     
-                    // Verificar que el ID coincida con el ID de la URL
                     if (estado != null && estado.IdEstadoHabitacion != id)
                     {
                         estado.IdEstadoHabitacion = id;
