@@ -22,8 +22,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment=".">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Application/Services/UsersServices/ClientService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/UsersServices/ClientService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/ClientController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/ClientController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserRoleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.APIs/Controllers/UsersControllers/UserRoleController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/ClientController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/ClientController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/UserController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/UserRoleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/UsersControllers/UserRoleController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/OperationResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/OperationResult.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/Shared/_Layout.cshtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,20 +55,21 @@
     &quot;assignee&quot;: &quot;AshleeRr&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/AshleeRr/HRMS.git&quot;,
-    &quot;accountId&quot;: &quot;8765d5b0-4ae0-45eb-bd7e-646c0152af17&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/AshleeRr/HRMS.git",
+    "accountId": "76dfa0fa-1d5e-4a4c-a6d0-03d055ee9b39"
   }
-}</component>
+}]]></component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/BaseEstadoHabitacionDto.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Controllers/ReservationController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/EstadoHabitacionController.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/WebApi/Controllers/RoomControllers/PisoController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0fbc4d3b821e47d7a79878451a0956b944928/d0/f35b51ac/ValidationSummary.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5acc345db3c207bc9d886a36ff14867ef8d65557432172c2a42f19aeac04d1b/Nullable.cs" root0="FORCE_HIGHLIGHTING" />
@@ -73,7 +82,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="Toolset" />
+    <option name="selectedTabId" value="SWEA" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -83,30 +92,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;.NET Launch Settings Profile.HRMS.APIs: IIS Express.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Launch Settings Profile.HRMS.APIs: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Launch Settings Profile.HRMS.Web: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Launch Settings Profile.WebAPI: IIS Express.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Launch Settings Profile.WebApi: http.executor&quot;: &quot;Run&quot;,
-    &quot;.NET Launch Settings Profile.WebApplication1: http.executor&quot;: &quot;Run&quot;,
-    &quot;17f863f2-0756-4004-8cec-c4fe455a4b00.executor&quot;: &quot;Debug&quot;,
-    &quot;1bbbd99b-50bb-45a2-b1bb-ea182635a59a.executor&quot;: &quot;Debug&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;HTTP Request.HRMS.APIs | #1.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;HabitFloors-20240045&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    ".NET Launch Settings Profile.HRMS.APIs: IIS Express.executor": "Run",
+    ".NET Launch Settings Profile.HRMS.APIs: http.executor": "Run",
+    ".NET Launch Settings Profile.HRMS.Web: http.executor": "Run",
+    ".NET Launch Settings Profile.WebAPI: IIS Express.executor": "Run",
+    ".NET Launch Settings Profile.WebApi: http.executor": "Run",
+    ".NET Launch Settings Profile.WebApplication1: http.executor": "Run",
+    "17f863f2-0756-4004-8cec-c4fe455a4b00.executor": "Debug",
+    "1bbbd99b-50bb-45a2-b1bb-ea182635a59a.executor": "Debug",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "HTTP Request.HRMS.APIs | #1.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "ClientHistory-20240007",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.WebApi: http">
     <configuration name="Unnamed (1)" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false" temporary="true">
       <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.Application.Test/HRMS.Application.Test.csproj" />
@@ -477,8 +486,7 @@
       <workItem from="1742855409493" duration="126000" />
       <workItem from="1742921608795" duration="4342000" />
       <workItem from="1743022138421" duration="16384000" />
-      <workItem from="1743459825756" duration="1404000" />
-      <workItem from="1743463060674" duration="1607000" />
+      <workItem from="1743382960520" duration="293000" />
     </task>
     <task id="LOCAL-00001" summary="Todos los metodos de &quot;RoomManagement&quot; agregados">
       <option name="closed" value="true" />
@@ -632,31 +640,7 @@
       <option name="project" value="LOCAL" />
       <updated>1742680142777</updated>
     </task>
-    <task id="LOCAL-00020" summary="Refactorizado">
-      <option name="closed" value="true" />
-      <created>1743459693859</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1743459693860</updated>
-    </task>
-    <task id="LOCAL-00021" summary="Piso actulizacion">
-      <option name="closed" value="true" />
-      <created>1743461113965</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1743461113965</updated>
-    </task>
-    <task id="LOCAL-00022" summary=".">
-      <option name="closed" value="true" />
-      <created>1743463279121</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1743463279121</updated>
-    </task>
-    <option name="localTasksCounter" value="23" />
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -707,10 +691,7 @@
     <MESSAGE value="ApiBaseClass Refactorizado" />
     <MESSAGE value="Metodo agregados para refactory" />
     <MESSAGE value="Enviado para mejora" />
-    <MESSAGE value="Refactorizado" />
-    <MESSAGE value="Piso actulizacion" />
-    <MESSAGE value="." />
-    <option name="LAST_COMMIT_MESSAGE" value="." />
+    <option name="LAST_COMMIT_MESSAGE" value="Enviado para mejora" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

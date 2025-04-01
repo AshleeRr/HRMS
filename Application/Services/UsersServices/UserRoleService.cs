@@ -40,7 +40,7 @@ namespace HRMS.Application.Services.UsersServices
                 ChangeTime = (DateTime)userRole.FechaCreacion,
             };
         }
-        // methods
+        // metodos
 
         public async Task<OperationResult> GetAll()
         {
