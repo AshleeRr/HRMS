@@ -10,84 +10,111 @@ namespace WebApi.Controllers.RoomControllers
 {
     public class CategoriaController : Controller
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _configuration;
-        private readonly string _apiBaseUrl;
-
-        public CategoriaController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
-        {
-            _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
-            _apiBaseUrl = "https://localhost:7175/api";
-        }
+        private const string _apiBaseUrl = "https://localhost:7175/api";
 
         // GET: CategoriaController
         public async Task<ActionResult> Index()
         {
+            List<CategoriaModel> categorias = new List<CategoriaModel>();
             try
             {
-                var client = _httpClientFactory.CreateClient();
-                HttpResponseMessage response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetAllCategorias");
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetAllCategorias");
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var categorias = JsonConvert.DeserializeObject<List<CategoriaModel>>(content);
-                    
-                    TempData["Success"] = TempData["Success"]; // Preservar mensajes
-                    return View(categorias);
-                }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    try
+                    if (response.IsSuccessStatusCode)
                     {
-                        var errorObj = JsonConvert.DeserializeObject<ErrorResponse>(errorContent);
-                        TempData["Error"] = errorObj?.detail ?? $"Error al obtener categorías: {response.ReasonPhrase}";
+                        var content = await response.Content.ReadAsStringAsync();
+                        
+                        try 
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
+                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
+                            {
+                                categorias = JsonConvert.DeserializeObject<List<CategoriaModel>>(
+                                    JsonConvert.SerializeObject(operationResult.Data));
+                            }
+                        }
+                        catch (JsonSerializationException)
+                        {
+                            try
+                            {
+                                categorias = JsonConvert.DeserializeObject<List<CategoriaModel>>(content);
+                            }
+                            catch (Exception ex)
+                            {
+                                TempData["Error"] = $"Error al procesar datos: {ex.Message}";
+                            }
+                        }
                     }
-                    catch
+                    else
                     {
-                        TempData["Error"] = $"Error al obtener categorías: {response.ReasonPhrase}";
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
+                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener categorías: {response.ReasonPhrase}";
+                        }
+                        catch
+                        {
+                            TempData["Error"] = $"Error al obtener categorías: {response.ReasonPhrase}";
+                        }
                     }
-                    return View(new List<CategoriaModel>());
                 }
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error inesperado: {ex.Message}";
-                return View(new List<CategoriaModel>());
             }
+            
+            return View(categorias);
         }
 
         // GET: CategoriaController/Details/5
         public async Task<ActionResult> Details(int id)
         {
+            CategoriaModel categoria = new CategoriaModel();
             try
             {
-                var client = _httpClientFactory.CreateClient();
-                HttpResponseMessage response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetCategoriaById{id}");
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetCategoriaById{id}");
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var categoria = JsonConvert.DeserializeObject<CategoriaModel>(content);
-                    
-                    await CargarServicios();
-                    return View(categoria);
-                }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    try
+                    if (response.IsSuccessStatusCode)
                     {
-                        var errorObj = JsonConvert.DeserializeObject<ErrorResponse>(errorContent);
-                        TempData["Error"] = errorObj?.detail ?? $"Error al obtener los detalles de la categoría: {response.ReasonPhrase}";
+                        var content = await response.Content.ReadAsStringAsync();
+                        
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
+                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
+                            {
+                                categoria = JsonConvert.DeserializeObject<CategoriaModel>(
+                                    JsonConvert.SerializeObject(operationResult.Data));
+                            }
+                        }
+                        catch
+                        {
+                            categoria = JsonConvert.DeserializeObject<CategoriaModel>(content);
+                        }
+                        
+                        await CargarServicios();
+                        return View(categoria);
                     }
-                    catch
+                    else
                     {
-                        TempData["Error"] = $"Error al obtener los detalles de la categoría: {response.ReasonPhrase}";
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
+                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener los detalles de la categoría: {response.ReasonPhrase}";
+                        }
+                        catch
+                        {
+                            TempData["Error"] = $"Error al obtener los detalles de la categoría: {response.ReasonPhrase}";
+                        }
+                        return RedirectToAction(nameof(Index));
                     }
-                    return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
@@ -101,9 +128,7 @@ namespace WebApi.Controllers.RoomControllers
         public async Task<ActionResult> Create()
         {
             await CargarServicios();
-            return View(new CategoriaModel
-            {
-            });
+            return View(new CategoriaModel());
         }
 
         // POST: CategoriaController/Create
@@ -115,32 +140,35 @@ namespace WebApi.Controllers.RoomControllers
             {
                 if (ModelState.IsValid)
                 {
-                    var client = _httpClientFactory.CreateClient();
-                    var json = JsonConvert.SerializeObject(categoria);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                    HttpResponseMessage response = await client.PostAsync($"{_apiBaseUrl}/Categoria/CreateCategoria", content);
-
-                    if (response.IsSuccessStatusCode)
+                    using (var client = new HttpClient())
                     {
-                        TempData["Success"] = "Categoría creada correctamente.";
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
+                        var json = JsonConvert.SerializeObject(categoria);
+                        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                        var response = await client.PostAsync($"{_apiBaseUrl}/Categoria/CreateCategoria", content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseContent = await response.Content.ReadAsStringAsync();
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
+                            
+                            if (operationResult != null && operationResult.IsSuccess)
+                            {
+                                TempData["Success"] = operationResult.Message ?? "Categoría creada correctamente.";
+                                return RedirectToAction(nameof(Index));
+                            }
+                        }
+                        
                         var errorContent = await response.Content.ReadAsStringAsync();
                         try
                         {
-                            var errorObj = JsonConvert.DeserializeObject<ErrorResponse>(errorContent);
-                            TempData["Error"] = errorObj?.detail ?? $"Error al crear la categoría: {errorContent}";
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
+                            TempData["Error"] = operationResult?.Message ?? $"Error al crear la categoría: {errorContent}";
                         }
                         catch
                         {
                             TempData["Error"] = $"Error al crear la categoría: {errorContent}";
                         }
-                        
-                        await CargarServicios();
-                        return View(categoria);
                     }
                 }
                 
@@ -158,37 +186,53 @@ namespace WebApi.Controllers.RoomControllers
         // GET: CategoriaController/Edit/5
         public async Task<ActionResult> Edit(int id)
         {
+            CategoriaModel categoria = new CategoriaModel();
             try
             {
-                var client = _httpClientFactory.CreateClient();
-                HttpResponseMessage response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetCategoriaById{id}");
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetCategoriaById{id}");
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var categoria = JsonConvert.DeserializeObject<CategoriaModel>(content);
-                    
-                    if (categoria != null && categoria.IdCategoria != id)
+                    if (response.IsSuccessStatusCode)
                     {
-                        categoria.IdCategoria = id;
+                        var content = await response.Content.ReadAsStringAsync();
+                        
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
+                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
+                            {
+                                categoria = JsonConvert.DeserializeObject<CategoriaModel>(
+                                    JsonConvert.SerializeObject(operationResult.Data));
+                            }
+                        }
+                        catch
+                        {
+                            categoria = JsonConvert.DeserializeObject<CategoriaModel>(content);
+                        }
+                        
+                        if (categoria != null && categoria.IdCategoria != id)
+                        {
+                            categoria.IdCategoria = id;
+                        }
+                        
+                        await CargarServicios();
+                        return View(categoria);
                     }
-                    
-                    await CargarServicios();
-                    return View(categoria);
-                }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    try
+                    else
                     {
-                        var errorObj = JsonConvert.DeserializeObject<ErrorResponse>(errorContent);
-                        TempData["Error"] = errorObj?.detail ?? $"Error al obtener la categoría: {response.ReasonPhrase}";
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
+                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener la categoría: {response.ReasonPhrase}";
+                        }
+                        catch
+                        {
+                            TempData["Error"] = $"Error al obtener la categoría: {response.ReasonPhrase}";
+                        }
+                        return RedirectToAction(nameof(Index));
                     }
-                    catch
-                    {
-                        TempData["Error"] = $"Error al obtener la categoría: {response.ReasonPhrase}";
-                    }
-                    return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
@@ -214,32 +258,35 @@ namespace WebApi.Controllers.RoomControllers
                     
                     categoria.ChangeTime = DateTime.Now;
                     
-                    var client = _httpClientFactory.CreateClient();
-                    var json = JsonConvert.SerializeObject(categoria);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                    HttpResponseMessage response = await client.PutAsync($"{_apiBaseUrl}/Categoria/UpdateCategoriaById{id}", content);
-
-                    if (response.IsSuccessStatusCode)
+                    using (var client = new HttpClient())
                     {
-                        TempData["Success"] = "Categoría actualizada correctamente.";
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
+                        var json = JsonConvert.SerializeObject(categoria);
+                        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                        var response = await client.PutAsync($"{_apiBaseUrl}/Categoria/UpdateCategoriaById{id}", content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseContent = await response.Content.ReadAsStringAsync();
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
+                            
+                            if (operationResult != null && operationResult.IsSuccess)
+                            {
+                                TempData["Success"] = operationResult.Message ?? "Categoría actualizada correctamente.";
+                                return RedirectToAction(nameof(Index));
+                            }
+                        }
+                        
                         var errorContent = await response.Content.ReadAsStringAsync();
                         try
                         {
-                            var errorObj = JsonConvert.DeserializeObject<ErrorResponse>(errorContent);
-                            TempData["Error"] = errorObj?.detail ?? $"Error al actualizar la categoría: {errorContent}";
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
+                            TempData["Error"] = operationResult?.Message ?? $"Error al actualizar la categoría: {errorContent}";
                         }
                         catch
                         {
                             TempData["Error"] = $"Error al actualizar la categoría: {errorContent}";
                         }
-                        
-                        await CargarServicios();
-                        return View(categoria);
                     }
                 }
                 
@@ -257,32 +304,48 @@ namespace WebApi.Controllers.RoomControllers
         // GET: CategoriaController/Delete/5
         public async Task<ActionResult> Delete(int id)
         {
+            CategoriaModel categoria = new CategoriaModel();
             try
             {
-                var client = _httpClientFactory.CreateClient();
-                HttpResponseMessage response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetCategoriaById{id}");
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetCategoriaById{id}");
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var categoria = JsonConvert.DeserializeObject<CategoriaModel>(content);
-                    
-                    await CargarServicios();
-                    return View(categoria);
-                }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    try
+                    if (response.IsSuccessStatusCode)
                     {
-                        var errorObj = JsonConvert.DeserializeObject<ErrorResponse>(errorContent);
-                        TempData["Error"] = errorObj?.detail ?? $"Error al obtener la categoría: {response.ReasonPhrase}";
+                        var content = await response.Content.ReadAsStringAsync();
+                        
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
+                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
+                            {
+                                categoria = JsonConvert.DeserializeObject<CategoriaModel>(
+                                    JsonConvert.SerializeObject(operationResult.Data));
+                            }
+                        }
+                        catch
+                        {
+                            categoria = JsonConvert.DeserializeObject<CategoriaModel>(content);
+                        }
+                        
+                        await CargarServicios();
+                        return View(categoria);
                     }
-                    catch
+                    else
                     {
-                        TempData["Error"] = $"Error al obtener la categoría: {response.ReasonPhrase}";
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
+                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener la categoría: {response.ReasonPhrase}";
+                        }
+                        catch
+                        {
+                            TempData["Error"] = $"Error al obtener la categoría: {response.ReasonPhrase}";
+                        }
+                        return RedirectToAction(nameof(Index));
                     }
-                    return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
@@ -299,41 +362,46 @@ namespace WebApi.Controllers.RoomControllers
         {
             try
             {
-                var client = _httpClientFactory.CreateClient();
-                HttpResponseMessage response = await client.DeleteAsync($"{_apiBaseUrl}/Categoria/DeleteCategoriaById{id}");
+                using (var client = new HttpClient())
+                {
+                    var response = await client.DeleteAsync($"{_apiBaseUrl}/Categoria/DeleteCategoriaById{id}");
 
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["Success"] = "Categoría eliminada correctamente.";
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    try
+                    if (response.IsSuccessStatusCode)
                     {
-                        var errorObj = JsonConvert.DeserializeObject<ErrorResponse>(errorContent);
+                        var responseContent = await response.Content.ReadAsStringAsync();
+                        var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
                         
-                        if (errorObj?.detail?.Contains("habitaciones asociadas") == true)
-                        {
-                            TempData["Error"] = "No se puede eliminar la categoría porque tiene habitaciones asociadas.";
-                        }
-                        else
-                        {
-                            TempData["Error"] = errorObj?.detail ?? "Error al eliminar la categoría.";
-                        }
+                        TempData["Success"] = operationResult?.Message ?? "Categoría eliminada correctamente.";
+                        return RedirectToAction(nameof(Index));
                     }
-                    catch
+                    else
                     {
-                        TempData["Error"] = "No se puede eliminar la categoría en este momento.";
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
+                            
+                            if (operationResult?.Message?.Contains("habitaciones asociadas") == true)
+                            {
+                                TempData["Error"] = "No se puede eliminar la categoría porque tiene habitaciones asociadas.";
+                            }
+                            else
+                            {
+                                TempData["Error"] = operationResult?.Message ?? "Error al eliminar la categoría.";
+                            }
+                        }
+                        catch
+                        {
+                            TempData["Error"] = "No se puede eliminar la categoría en este momento.";
+                        }
+                        
+                        if (Request.Path.Value?.Contains("/Delete/") == true)
+                        {
+                            return RedirectToAction(nameof(Delete), new { id });
+                        }
+                        
+                        return RedirectToAction(nameof(Index));
                     }
-                    
-                    if (Request.Path.Value?.Contains("/Delete/") == true)
-                    {
-                        return RedirectToAction(nameof(Delete), new { id });
-                    }
-                    
-                    return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
@@ -346,24 +414,69 @@ namespace WebApi.Controllers.RoomControllers
         // GET: CategoriaController/GetByDescripcion
         public async Task<ActionResult> GetByDescripcion(string descripcion)
         {
+            List<CategoriaModel> categorias = new List<CategoriaModel>();
             try
             {
-                var client = _httpClientFactory.CreateClient();
-                HttpResponseMessage response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetCategoriaByDescripcion/{descripcion}");
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetCategoriaByDescripcion/{descripcion}");
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var categoria = JsonConvert.DeserializeObject<CategoriaModel>(content);
-                    
-                    var categorias = new List<CategoriaModel> { categoria };
-                    ViewBag.TituloLista = $"Categoría con descripción: {descripcion}";
-                    return View("Index", categorias);
-                }
-                else
-                {
-                    TempData["Error"] = $"Error al buscar categoría: {response.ReasonPhrase}";
-                    return RedirectToAction(nameof(Index));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        CategoriaModel categoria = null;
+                        
+                        try 
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
+                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
+                            {
+                                categoria = JsonConvert.DeserializeObject<CategoriaModel>(
+                                    JsonConvert.SerializeObject(operationResult.Data));
+                            }
+                            else if (operationResult != null)
+                            {
+                                TempData["Error"] = operationResult.Message ?? "No se encontró la categoría.";
+                                return RedirectToAction(nameof(Index));
+                            }
+                        }
+                        catch (JsonSerializationException)
+                        {
+                            try
+                            {
+                                categoria = JsonConvert.DeserializeObject<CategoriaModel>(content);
+                            }
+                            catch (Exception ex)
+                            {
+                                TempData["Error"] = $"Error al procesar datos: {ex.Message}";
+                                return RedirectToAction(nameof(Index));
+                            }
+                        }
+                        
+                        if (categoria != null)
+                        {
+                            categorias.Add(categoria);
+                            ViewBag.TituloLista = $"Categoría con descripción: {descripcion}";
+                            return View("Index", categorias);
+                        }
+                        
+                        TempData["Error"] = "No se encontró la categoría.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
+                            TempData["Error"] = operationResult?.Message ?? $"Error al buscar categoría: {response.ReasonPhrase}";
+                        }
+                        catch
+                        {
+                            TempData["Error"] = $"Error al buscar categoría: {response.ReasonPhrase}";
+                        }
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
             }
             catch (Exception ex)
@@ -376,23 +489,67 @@ namespace WebApi.Controllers.RoomControllers
         // GET: CategoriaController/GetByCapacidad
         public async Task<ActionResult> GetByCapacidad(int capacidad)
         {
+            List<CategoriaModel> categorias = new List<CategoriaModel>();
             try
             {
-                var client = _httpClientFactory.CreateClient();
-                HttpResponseMessage response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetHabitacionByCapacidad/{capacidad}");
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetHabitacionByCapacidad/{capacidad}");
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var categorias = JsonConvert.DeserializeObject<List<CategoriaModel>>(content);
-                    
-                    ViewBag.TituloLista = $"Categorías por capacidad: {capacidad}";
-                    return View("Index", categorias);
-                }
-                else
-                {
-                    TempData["Error"] = $"Error al buscar categorías: {response.ReasonPhrase}";
-                    return RedirectToAction(nameof(Index));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        
+                        try 
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
+                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
+                            {
+                                categorias = JsonConvert.DeserializeObject<List<CategoriaModel>>(
+                                    JsonConvert.SerializeObject(operationResult.Data));
+                            }
+                            else if (operationResult != null)
+                            {
+                                TempData["Error"] = operationResult.Message ?? "No se encontraron categorías con esa capacidad.";
+                                return RedirectToAction(nameof(Index));
+                            }
+                        }
+                        catch (JsonSerializationException)
+                        {
+                            try
+                            {
+                                categorias = JsonConvert.DeserializeObject<List<CategoriaModel>>(content);
+                            }
+                            catch (Exception ex)
+                            {
+                                TempData["Error"] = $"Error al procesar datos: {ex.Message}";
+                                return RedirectToAction(nameof(Index));
+                            }
+                        }
+                        
+                        if (categorias.Any())
+                        {
+                            ViewBag.TituloLista = $"Categorías por capacidad: {capacidad}";
+                            return View("Index", categorias);
+                        }
+                        
+                        TempData["Error"] = "No se encontraron categorías con esa capacidad.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
+                            TempData["Error"] = operationResult?.Message ?? $"Error al buscar categorías: {response.ReasonPhrase}";
+                        }
+                        catch
+                        {
+                            TempData["Error"] = $"Error al buscar categorías: {response.ReasonPhrase}";
+                        }
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
             }
             catch (Exception ex)
@@ -407,42 +564,97 @@ namespace WebApi.Controllers.RoomControllers
         {
             try
             {
-                var client = _httpClientFactory.CreateClient();
-              
-                HttpResponseMessage responseServicios = await client.GetAsync($"{_apiBaseUrl}/Servicio/GetAllServicios");
-                
-                if (responseServicios.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var contentServicios = await responseServicios.Content.ReadAsStringAsync();
-                    var servicios = JsonConvert.DeserializeObject<List<ServicioModel>>(contentServicios);
+                    var response = await client.GetAsync($"{_apiBaseUrl}/Servicio/GetAllServicios");
                     
-                    ViewBag.Servicios = servicios.Select(s => new SelectListItem
+                    if (response.IsSuccessStatusCode)
                     {
-                        Value = s.IdServicio.ToString(),
-                        Text = s.Nombre
-                    }).ToList();
-                }
-                else
-                {
-                    ViewBag.Servicios = new List<SelectListItem>
-                    {
-                        new SelectListItem { Value = "", Text = "-- Sin servicio --" },
-                        new SelectListItem { Value = "1", Text = "Desayuno" },
-                        new SelectListItem { Value = "2", Text = "Todo Incluido" },
-                        new SelectListItem { Value = "3", Text = "Básico" }
-                    };
+                        var content = await response.Content.ReadAsStringAsync();
+                        
+                        try
+                        {
+                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
+                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
+                            {
+                                List<ServicioModel> servicios;
+                                
+                                if (operationResult.Data is List<ServicioModel> directList)
+                                {
+                                    servicios = directList;
+                                }
+                                else
+                                {
+                                    var json = JsonConvert.SerializeObject(operationResult.Data);
+                                    servicios = JsonConvert.DeserializeObject<List<ServicioModel>>(json);
+                                }
+                                
+                                if (servicios != null && servicios.Any())
+                                {
+                                    var selectItems = new List<SelectListItem>();
+                                    
+                                    foreach (var s in servicios)
+                                    {
+                                        selectItems.Add(new SelectListItem
+                                        {
+                                            Value = s.IdServicio.ToString(),
+                                            Text = s.Nombre
+                                        });
+                                    }
+                                    
+                                    ViewBag.Servicios = selectItems;
+                                    return;
+                                }
+                            }
+                        }
+                        catch (JsonSerializationException)
+                        {
+                            try
+                            {
+                                var servicios = JsonConvert.DeserializeObject<List<ServicioModel>>(content);
+                                
+                                if (servicios != null && servicios.Any())
+                                {
+                                    var selectItems = new List<SelectListItem>();
+                                    
+                                    foreach (var s in servicios)
+                                    {
+                                        selectItems.Add(new SelectListItem
+                                        {
+                                            Value = s.IdServicio.ToString(),
+                                            Text = s.Nombre
+                                        });
+                                    }
+                                    
+                                    ViewBag.Servicios = selectItems;
+                                    return;
+                                }
+                            }
+                            catch
+                            {
+                                SetDefaultServices();
+                            }
+                        }
+                    }
+                    
+                    SetDefaultServices();
                 }
             }
             catch
             {
-                ViewBag.Servicios = new List<SelectListItem>
-                {
-                    new SelectListItem { Value = "", Text = "-- Sin servicio --" },
-                    new SelectListItem { Value = "1", Text = "Desayuno" },
-                    new SelectListItem { Value = "2", Text = "Todo Incluido" },
-                    new SelectListItem { Value = "3", Text = "Básico" }
-                };
+                SetDefaultServices();
             }
+        }
+        
+        private void SetDefaultServices()
+        {
+            ViewBag.Servicios = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "", Text = "-- Sin servicio --" },
+                new SelectListItem { Value = "1", Text = "Desayuno" },
+                new SelectListItem { Value = "2", Text = "Todo Incluido" },
+                new SelectListItem { Value = "3", Text = "Básico" }
+            };
         }
     }
 }
