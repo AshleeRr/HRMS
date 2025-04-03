@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs;
+using Newtonsoft.Json;
 
 namespace HRMS.APIs.Controllers.UsersControllers
 {
@@ -21,7 +22,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             _userRoleService = userRoleService;
         }
 
-        [HttpPost("/role")]
+        [HttpPost("role")]
         public async Task<IActionResult> SaveUserRole([FromBody] SaveUserRoleDTO userRole)
         {
             var createdUserRole = await _userRoleService.Save(userRole);
@@ -34,7 +35,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return BadRequest("Error al crear un nuevo rol");
         }
 
-        [HttpGet("/roles")]
+        [HttpGet("roles")]
         public async Task<IActionResult> GetAllUserRoles()
         {
             var userRoles = await _userRoleService.GetAll();
@@ -45,7 +46,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(userRoles);
         }
 
-        [HttpGet("/role/{id}")]
+        [HttpGet("role/{id}")]
         public async Task<IActionResult> GetUserRoleById(int id)
         {
             ValidateId(id);
@@ -57,7 +58,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(existingUserRole);
         }
 
-        [HttpGet("/role/description")]
+        [HttpGet("role/description")]
         public async Task<IActionResult> GetRoleByDescription(string descripcion)
         {
             ValidateNull(descripcion, "descripcion");
@@ -139,16 +140,24 @@ namespace HRMS.APIs.Controllers.UsersControllers
             return Ok(rolNewName);
         }
 
-        [HttpDelete("/role/{id}")]
-        public async Task<IActionResult> Delete([FromBody] RemoveUserRoleDTO userRole)
+        [HttpDelete("role/{id}")]
+        public async Task<IActionResult> Delete([FromBody] RemoveUserRoleDTO dto )
         {
-            var rol = await _userRoleService.Remove(userRole);
-            if (!rol.IsSuccess)
-            {
-                return BadRequest("Error eliminando el rol");
+            if(dto.IdUserRole > 0){
+                var rol = await _userRoleService.Remove(dto);
+                if (!rol.IsSuccess)
+                {
+                    return BadRequest($"Error eliminando el rol: {rol.Message}");
+                }
+                _logger.LogInformation("Rol eliminado correctamente");
+                return Ok(rol);
+
             }
-            _logger.LogInformation("Rol eliminado correctamente");
-            return Ok(rol);
+            else
+            {
+                return BadRequest("El id debe ser mayor que 0");
+            }
+            
         }
         private IActionResult ValidateId(int id)
         {

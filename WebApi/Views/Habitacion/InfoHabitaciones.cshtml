@@ -1,0 +1,349 @@
+﻿@model IEnumerable<WebApi.Models.RoomModels.HabitacionInfoModel>
+
+@{
+    ViewData["Title"] = "Información Detallada de Habitaciones";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="text-primary"><i class="bi bi-info-circle"></i> Información Detallada de Habitaciones</h1>
+        <a asp-action="Index" class="btn btn-primary">
+            <i class="bi bi-arrow-left"></i> Volver a la Lista
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar habitación...">
+                    </div>
+                </div>
+                <div class="col-md-7 text-end">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-light" id="filterPisoBtn">
+                            <i class="bi bi-layers"></i> Filtrar por Piso
+                        </button>
+                        <button type="button" class="btn btn-outline-light" id="filterCategoriaBtn">
+                            <i class="bi bi-tag"></i> Filtrar por Categoría
+                        </button>
+                        <button type="button" class="btn btn-outline-light" id="printBtn">
+                            <i class="bi bi-printer"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered" id="habitacionesInfoTable">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>Número</th>
+                            <th>Detalle</th>
+                            <th>Precio</th>
+                            <th>Piso</th>
+                            <th>Categoría</th>
+                            <th>Servicio</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="text-center">@item.Numero</td>
+                                    <td>
+                                        @if (string.IsNullOrEmpty(item.Detalle))
+                                        {
+                                            <span class="text-muted fst-italic">Sin descripción</span>
+                                        }
+                                        else
+                                        {
+                                            @(item.Detalle.Length > 50 ? item.Detalle.Substring(0, 47) + "..." : item.Detalle)
+                                        }
+                                    </td>
+                                    <td class="text-center text-success fw-bold">$@item.PrecioPorNoche</td>
+                                    <td class="text-center">@item.DescripcionPiso</td>
+                                    <td class="text-center">@item.DescripcionCategoria</td>
+                                    <td class="text-center">@item.NombreServicio</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-info btn-sm view-details-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#detailsModal"
+                                                data-id="@item.IdHabitacion"
+                                                data-numero="@item.Numero"
+                                                data-detalle="@item.Detalle"
+                                                data-precio="@item.PrecioPorNoche"
+                                                data-piso="@item.DescripcionPiso"
+                                                data-categoria="@item.DescripcionCategoria"
+                                                data-servicio="@item.NombreServicio"
+                                                data-servicio-desc="@item.DescripcionServicio">
+                                            <i class="bi bi-eye-fill"></i> Ver Detalles
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <div class="alert alert-info m-3">
+                                        <i class="bi bi-info-circle me-2"></i> No hay información de habitaciones disponible
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de detalles -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="detailsModalLabel">Detalles de la Habitación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h5 class="text-primary">Información Básica</h5>
+                            <p><strong>Número:</strong> <span id="modalNumero"></span></p>
+                            <p><strong>Detalle:</strong> <span id="modalDetalle"></span></p>
+                            <p><strong>Precio por Noche:</strong> $<span id="modalPrecio"></span></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <h5 class="text-primary">Ubicación y Categoría</h5>
+                            <p><strong>Piso:</strong> <span id="modalPiso"></span></p>
+                            <p><strong>Categoría:</strong> <span id="modalCategoria"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <h5 class="text-primary">Servicio Incluido</h5>
+                        <p><strong>Nombre del Servicio:</strong> <span id="modalServicioNombre"></span></p>
+                        <p><strong>Descripción del Servicio:</strong></p>
+                        <div class="alert alert-light">
+                            <span id="modalServicioDescripcion"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex justify-content-between w-100">
+                    <div>
+                        <a href="#" id="modalEditLink" class="btn btn-warning">
+                            <i class="bi bi-pencil-square"></i> Editar Habitación
+                        </a>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de filtro por piso -->
+<div class="modal fade" id="pisoFilterModal" tabindex="-1" aria-labelledby="pisoFilterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="pisoFilterModalLabel">Filtrar por Piso</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group" id="pisoFilterList">
+                    <!-- Se llenará dinámicamente con JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de filtro por categoría -->
+<div class="modal fade" id="categoriaFilterModal" tabindex="-1" aria-labelledby="categoriaFilterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="categoriaFilterModalLabel">Filtrar por Categoría</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group" id="categoriaFilterList">
+                    <!-- Se llenará dinámicamente con JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Búsqueda en la tabla
+            $("#searchInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#habitacionesInfoTable tbody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+
+            // Imprimir
+            $("#printBtn").click(function() {
+                window.print();
+            });
+
+            // Configuración modal de detalles
+            $('.view-details-btn').on('click', function() {
+                const id = $(this).data('id');
+                const numero = $(this).data('numero');
+                const detalle = $(this).data('detalle');
+                const precio = $(this).data('precio');
+                const piso = $(this).data('piso');
+                const categoria = $(this).data('categoria');
+                const servicio = $(this).data('servicio');
+                const servicioDesc = $(this).data('servicio-desc');
+
+                console.log('Mostrando detalles de habitación:', id);
+
+                $('#modalNumero').text(numero);
+                $('#modalDetalle').text(detalle || "Sin descripción disponible");
+                $('#modalPrecio').text(precio);
+                $('#modalPiso').text(piso);
+                $('#modalCategoria').text(categoria);
+                $('#modalServicioNombre').text(servicio || "Sin servicio asignado");
+                $('#modalServicioDescripcion').text(servicioDesc || "Sin descripción del servicio");
+                
+                // Link a editar
+                $('#modalEditLink').attr('href', '/Habitacion/Edit/' + id);
+            });
+            
+            // Generar filtros para pisos
+            var pisosUnicos = [];
+            $('#habitacionesInfoTable tbody tr').each(function() {
+                var piso = $(this).find('td:eq(3)').text().trim();
+                if (piso && $.inArray(piso, pisosUnicos) === -1) {
+                    pisosUnicos.push(piso);
+                }
+            });
+            
+            // Llenar modal de pisos
+            $('#pisoFilterList').empty();
+            $('#pisoFilterList').append('<a href="#" class="list-group-item list-group-item-action active" data-filter="all">Todos los pisos</a>');
+            $.each(pisosUnicos.sort(), function(i, piso) {
+                $('#pisoFilterList').append('<a href="#" class="list-group-item list-group-item-action" data-filter="' + piso + '">' + piso + '</a>');
+            });
+            
+            // Generar filtros para categorías
+            var categoriasUnicas = [];
+            $('#habitacionesInfoTable tbody tr').each(function() {
+                var categoria = $(this).find('td:eq(4)').text().trim();
+                if (categoria && $.inArray(categoria, categoriasUnicas) === -1) {
+                    categoriasUnicas.push(categoria);
+                }
+            });
+            
+            // Llenar modal de categorías
+            $('#categoriaFilterList').empty();
+            $('#categoriaFilterList').append('<a href="#" class="list-group-item list-group-item-action active" data-filter="all">Todas las categorías</a>');
+            $.each(categoriasUnicas.sort(), function(i, categoria) {
+                $('#categoriaFilterList').append('<a href="#" class="list-group-item list-group-item-action" data-filter="' + categoria + '">' + categoria + '</a>');
+            });
+            
+            // Filtrar por piso
+            $('#pisoFilterBtn').on('click', function() {
+                var pisoModal = new bootstrap.Modal(document.getElementById('pisoFilterModal'));
+                pisoModal.show();
+            });
+            
+            $('#pisoFilterList').on('click', 'a', function(e) {
+                e.preventDefault();
+                
+                // Actualizar indicador visual de selección
+                $('#pisoFilterList a').removeClass('active');
+                $(this).addClass('active');
+                
+                var filter = $(this).data('filter');
+                if (filter === 'all') {
+                    $('#habitacionesInfoTable tbody tr').show();
+                } else {
+                    $('#habitacionesInfoTable tbody tr').hide();
+                    $('#habitacionesInfoTable tbody tr').each(function() {
+                        if ($(this).find('td:eq(3)').text().trim() === filter) {
+                            $(this).show();
+                        }
+                    });
+                }
+                
+                // Cerrar modal
+                var pisoModal = bootstrap.Modal.getInstance(document.getElementById('pisoFilterModal'));
+                pisoModal.hide();
+            });
+            
+            // Filtrar por categoría
+            $('#filterCategoriaBtn').on('click', function() {
+                var categoriaModal = new bootstrap.Modal(document.getElementById('categoriaFilterModal'));
+                categoriaModal.show();
+            });
+            
+            $('#categoriaFilterList').on('click', 'a', function(e) {
+                e.preventDefault();
+                
+                // Actualizar indicador visual de selección
+                $('#categoriaFilterList a').removeClass('active');
+                $(this).addClass('active');
+                
+                var filter = $(this).data('filter');
+                if (filter === 'all') {
+                    $('#habitacionesInfoTable tbody tr').show();
+                } else {
+                    $('#habitacionesInfoTable tbody tr').hide();
+                    $('#habitacionesInfoTable tbody tr').each(function() {
+                        if ($(this).find('td:eq(4)').text().trim() === filter) {
+                            $(this).show();
+                        }
+                    });
+                }
+                
+                // Cerrar modal
+                var categoriaModal = bootstrap.Modal.getInstance(document.getElementById('categoriaFilterModal'));
+                categoriaModal.hide();
+            });
+        });
+    </script>
+}

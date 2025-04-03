@@ -1,83 +1,59 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using WebApi.Models.UsersModels;
 
 namespace WebApi.Controllers.UsersControllers
 {
     public class ClientController : Controller
     {
         // GET: ClientController
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            List<ClientModel> clients = new List<ClientModel>();
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync("https://localhost:7175/api/Client/clients");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonString = await response.Content.ReadAsStringAsync();
+                        clients = JsonConvert.DeserializeObject<List<ClientModel>>(jsonString);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error inesperado: {ex.Message}";
+            }
+
+            return View(clients);
         }
 
         // GET: ClientController/Details/5
-        public ActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            return View();
-        }
-
-        // GET: ClientController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: ClientController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
+            ClientModel cliente = new ClientModel();
             try
             {
-                return RedirectToAction(nameof(Index));
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync($"https://localhost:7175/api/Client/client/{id}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonString = await response.Content.ReadAsStringAsync();
+                        cliente = JsonConvert.DeserializeObject<ClientModel>(jsonString);
+                        
+                    }
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                TempData["Error"] = $"Error inesperado: {ex.Message}";
             }
+
+            return View(cliente);
         }
 
-        // GET: ClientController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: ClientController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: ClientController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: ClientController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }

@@ -106,16 +106,19 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                 rolUsuario.Descripcion = entity.Descripcion;
                 rolUsuario.RolNombre = entity.RolNombre;
                 rolUsuario.FechaCreacion = entity.FechaCreacion;
-
                 _context.UserRoles.Update(rolUsuario);
-                await _context.SaveChangesAsync();
                 result.IsSuccess = true;
                 result.Message = "Rol de usuario actualizado correctamente.";
+                result.Data = rolUsuario;
+                await _context.SaveChangesAsync();
+                
+                
             }
             catch (Exception ex)
             {
                 result = await _loggerServices.LogError(ex.Message, this);
             }
+
             return result;
         }
         public async Task<UserRole> GetRoleByNameAsync(string rolNombre)
@@ -158,14 +161,10 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                                        TipoDocumento = users.TipoDocumento,
                                        Documento = users.Documento,
                                    }).ToListAsync();
-                result.Data = query;
-                result.IsSuccess = true;
-                if (!query.Any())
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se encontraron usuarios con este rol";
-                    return result;
-                }
+                    result.Data = query ?? new List<UserModel>();
+                    result.IsSuccess = query.Any();
+                    result.Message = query.Any() ? "Usuarios encontrados." : "No se encontraron usuarios con este rol.";
+ 
             }
             catch (Exception ex)
             {

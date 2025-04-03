@@ -1,0 +1,134 @@
+﻿@model WebApi.Models.RoomModels.TarifaModel
+
+@{
+    ViewData["Title"] = "Crear Tarifa";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container mt-4">
+    <div class="card shadow mb-4">
+        <div class="card-header bg-success text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Crear Nueva Tarifa
+                </h5>
+                <a asp-action="Index" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver al Listado
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" id="createForm">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="Descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                <input asp-for="Descripcion" class="form-control" placeholder="Ej. Tarifa Temporada Alta" required />
+                            </div>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="IdCategoria" class="form-label">Categoría <span class="text-danger">*</span></label>
+                            <select asp-for="IdCategoria" class="form-select" asp-items="ViewBag.Categorias" required>
+                                <option value="">-- Seleccione una categoría --</option>
+                            </select>
+                            <span asp-validation-for="IdCategoria" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="FechaInicio" class="form-label">Fecha Inicio <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                <input asp-for="FechaInicio" class="form-control" type="date" required />
+                            </div>
+                            <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="FechaFin" class="form-label">Fecha Fin <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                <input asp-for="FechaFin" class="form-control" type="date" required />
+                            </div>
+                            <span asp-validation-for="FechaFin" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="PrecioPorNoche" class="form-label">Precio por Noche <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                                <input asp-for="PrecioPorNoche" class="form-control" type="number" step="0.01" min="0" required />
+                            </div>
+                            <span asp-validation-for="PrecioPorNoche" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="Descuento" class="form-label">Descuento (%)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-percent"></i></span>
+                                <input asp-for="Descuento" class="form-control" type="number" step="0.01" min="0" max="100" value="0" />
+                            </div>
+                            <span asp-validation-for="Descuento" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" asp-for="ChangeTime" value="@DateTime.Now" />
+                <input type="hidden" asp-for="UserID" value="1" /> <!-- Esto se debe cambiar por el ID del usuario actual -->
+
+                <div class="form-group mt-4 d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Guardar Tarifa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Calcular precio con descuento en tiempo real
+            $("#PrecioPorNoche, #Descuento").on("change keyup", function() {
+                var precio = parseFloat($("#PrecioPorNoche").val()) || 0;
+                var descuento = parseFloat($("#Descuento").val()) || 0;
+
+                if (precio > 0 && descuento > 0) {
+                    var precioFinal = precio - (precio * descuento / 100);
+                    $("#precioConDescuento").html("Precio final: $" + precioFinal.toFixed(2));
+                    $("#precioConDescuento").show();
+                } else {
+                    $("#precioConDescuento").hide();
+                }
+            });
+        });
+    </script>
+}

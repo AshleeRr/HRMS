@@ -123,6 +123,7 @@ namespace HRMS.Application.Services.UsersServices
                 if (!validDTO.IsSuccess) 
                 {
                     result.Message = "Error validando los datos para guardar";
+                    result.Data = dto;
                     return result;
                 }
                 var existingCorreo = await _userRepository.GetUserByEmailAsync(dto.Correo);
@@ -143,8 +144,17 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _userRepository.SaveEntityAsync(usuario);
                 if (result.IsSuccess)
                 {
+                    var viewDto = new UserViewDTO
+                    {
+                        IdUsuario = usuario.IdUsuario,
+                        NombreCompleto = usuario.NombreCompleto,
+                        Correo = usuario.Correo,
+                        Documento = usuario.Documento,
+                        TipoDocumento = usuario.TipoDocumento,
+                        IdUserRole = usuario.IdRolUsuario
+                    };
                     result.Message = "Usuario guardado correctamente";
-                    result.Data = MapUserToViewDTO(usuario);
+                    result.Data = viewDto;
                 }
                 else
                 {
