@@ -1,0 +1,119 @@
+﻿@model IEnumerable<HRMS.WebApi.Models.Reservation_2023_0731.ReservationDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservationId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.State)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EntryDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DepartureDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DepartureConfirmationDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InitialPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Advance)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RemainingPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalPaid)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PenaltyCost)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Observation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ClientId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoomId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ChangeTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserID)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReservationId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.State)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EntryDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DepartureDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DepartureConfirmationDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InitialPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Advance)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RemainingPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalPaid)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PenaltyCost)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Observation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ClientId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoomId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ChangeTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserID)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { item.ReservationId }) |
+                @Html.ActionLink("Details", "Details", new { item.ReservationId })
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

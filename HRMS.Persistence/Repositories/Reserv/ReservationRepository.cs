@@ -17,18 +17,15 @@ namespace HRMS.Persistence.Repositories.Reserv
 {
     public class ReservationRepository : BaseRepository<Reservation, int>, IReservationRepository
     {
-        private ILogger<ReservationRepository> _logger;
         private ILoggingServices _loggingServices;
         private IValidator<Reservation> _validator;
-        private IConfiguration _configuration;
          
-        public ReservationRepository(HRMSContext context, ILogger<ReservationRepository> logger, ILoggingServices loggingServices,
-            IConfiguration configuration, IValidator<Reservation> validator) : base(context)
+        public ReservationRepository(HRMSContext context,  ILoggingServices loggingServices,
+            IValidator<Reservation> validator) : base(context)
         {
-            _logger = logger;
+  
             _loggingServices = loggingServices;
             _validator = validator;
-            _configuration = configuration;
         }
 
         public override async Task<bool> ExistsAsync(Expression<Func<Reservation, bool>> filter)
@@ -56,14 +53,14 @@ namespace HRMS.Persistence.Repositories.Reserv
         public override async Task<OperationResult> SaveEntityAsync(Reservation entity)
         {
             OperationResult result;
-            Task<bool> t_isRoomDisponible = _isRoomDisponible(entity.IdHabitacion, entity.FechaEntrada.Value, entity.FechaSalida.Value);
             var validRes = _validator.Validate(entity);
-            bool isRoomDisponible = await t_isRoomDisponible;
             if (!validRes.IsSuccess)
             {
                 return validRes;
             }
-            else if (!isRoomDisponible)
+
+            bool isRoomDisponible = await _isRoomDisponible(entity.IdHabitacion, entity.FechaEntrada.Value, entity.FechaSalida.Value);
+            if (!isRoomDisponible)
             {
                 var opRes = new OperationResult();
                 opRes.IsSuccess = false;
@@ -109,22 +106,29 @@ namespace HRMS.Persistence.Repositories.Reserv
         private async Task<OperationResult> _validReservationForUpdating(Reservation resev)
         {
             OperationResult operationResult = new OperationResult();
+            EstadoReserva estadoPrevio = await getActualEstadoReserva(resev.IdRecepcion);
             List<string> errors = new List<string>();
             var b = _validator.Validate(resev);
             if (b.IsSuccess)
             {
 
-                if (!resev.Estado.HasValue || !resev.Estado.Value)
+                if (!estadoPrevio.Equals(EstadoReserva.Pendiente))
                 {
                     var opRes = new OperationResult();
                     opRes.IsSuccess = false;
-                    opRes.Message = "No se puede editar una reserva ya eliminada";
+                    opRes.Message = "Solo puedes actualizar Reservaciones pendientes";
                     return opRes;
                 }
             }
 
             return b;
         }
+
+        private async  Task<EstadoReserva> getActualEstadoReserva(int id)
+        {
+            return await _context.Reservations.Where(r => r.IdRecepcion == id).Select(r => r.EstadoReserva).FirstAsync();
+        }
+
         public override async Task<OperationResult> UpdateEntityAsync(Reservation entity)
         {
             OperationResult result;
@@ -147,7 +151,7 @@ namespace HRMS.Persistence.Repositories.Reserv
 
         public override async Task<Reservation> GetEntityByIdAsync(int id)
         {
-            if (id != 0)
+            if (id > 0)
             {
                 return await base.GetEntityByIdAsync(id);
             }
@@ -158,7 +162,7 @@ namespace HRMS.Persistence.Repositories.Reserv
         {
             OperationResult result = new OperationResult();
 
-            if (clientId == 0)
+            if (clientId <= 0)
             {
                 result.IsSuccess = false;
                 result.Message = "No se ha especificado un cliente.";
@@ -332,43 +336,58 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-        public async Task<bool> HasRoomCapacity(int categoryId, int people)
-        {
-            try
-            {
-                if (categoryId == 0 || people == 0)
-                {
-                    return false;
-                }
-                return await _context.Categorias.AnyAsync(c => c.IdCategoria == categoryId && c.Capacidad >= people);
-            }
-            catch (Exception ex)
-            {
-
-                await _loggingServices.LogError(ex.Message, this);
-            }
-            
-            throw new NotImplementedException();
-        }
-
-
-        public async Task<OperationResult> GetCategoryForReserv(int categoryId, int people, DateTime start, DateTime end)
+        public async Task<OperationResult> HasRoomCapacity(int categoryId, int people)
         {
             OperationResult result = new OperationResult();
             try
             {
-                if (categoryId == 0 || people == 0)
+                if (categoryId <= 0)
                 {
                     result.IsSuccess = false;
-                    result.Message = "Categoria o numero de personas no especificado";
+                    result.Message = "Categoria no especificada";
+                }
+                else if (people <= 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Numero de personas no valido";
+                }
+                else
+                {
+                    result.IsSuccess = await _context.Categorias.AnyAsync(c => c.IdCategoria == categoryId && c.Capacidad >= people);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                result = await _loggingServices.LogError(ex.Message, this);
+            }
+            
+            return result;
+        }
+
+
+        public async Task<OperationResult> GetCategoryForReserv(int categoryId,  DateTime start, DateTime end)
+        {
+            OperationResult result = new OperationResult();
+            try
+            {
+                if (categoryId <= 0 )
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Categoria no especificada";
+                }
+                else if(start > end)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Fecha de fin no puede ser anterior a la fecha de inicio";
                 }
                 else
                 {
                     var query = from c in _context.Categorias
                                 join t in _context.Tarifas on c.IdCategoria equals t.IdCategoria
                                 where c.IdCategoria == categoryId
-                                //  &&t.FechaInicio >= start && t.FechaInicio < end &&
-                                //t.FechaFin > start && t.FechaFin <= end
+                                  && t.FechaInicio >= start && t.FechaInicio < end
+                                  && t.FechaFin > start && t.FechaFin <= end
                                 select new CategoryRoomForReserv
                                 {
                                     Id = c.IdCategoria,
@@ -377,7 +396,7 @@ namespace HRMS.Persistence.Repositories.Reserv
                                     Descuento = t.Descuento
                                 };
                     var res = await query.FirstOrDefaultAsync();
-                    if(res == null)
+                    if (res == null)
                     {
                         result.IsSuccess = false;
                         result.Message = "No se ha encontrado la categoria especificada";
@@ -397,15 +416,20 @@ namespace HRMS.Persistence.Repositories.Reserv
             return result;
         }
 
-        public async Task<OperationResult> GetCategoryForReservByRoom(int rommId, int people, DateTime start, DateTime end)
+        public async Task<OperationResult> GetCategoryForReservByRoom(int rommId,  DateTime start, DateTime end)
         {
             OperationResult result = new OperationResult();
             try
             {
-                if (rommId == 0 || people == 0)
+                if (rommId <= 0 )
                 {
                     result.IsSuccess = false;
-                    result.Message = "Categoria o numero de personas no especificado";
+                    result.Message = "Categoria no especificada";
+                }
+                else if (start > end)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Fecha de fin no puede ser anterior a la fecha de inicio";
                 }
                 else
                 {
@@ -413,8 +437,8 @@ namespace HRMS.Persistence.Repositories.Reserv
                                 join h in _context.Habitaciones on c.IdCategoria equals h.IdCategoria
                                 join t in _context.Tarifas on c.IdCategoria equals t.IdCategoria
                                 where h.IdHabitacion == rommId
-                                //  &&t.FechaInicio >= start && t.FechaInicio < end &&
-                                //t.FechaFin > start && t.FechaFin <= end
+                                  && t.FechaInicio >= start && t.FechaInicio < end
+                                  && t.FechaFin > start && t.FechaFin <= end
                                 select new CategoryRoomForReserv
                                 {
                                     Id = c.IdCategoria,
@@ -448,7 +472,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             OperationResult result = new OperationResult();
             try
             {
-                if (reservationId == 0)
+                if (reservationId <= 0)
                 {
                     result.IsSuccess = false;
                     result.Message = "Reservacion no especificada";
@@ -476,7 +500,7 @@ namespace HRMS.Persistence.Repositories.Reserv
             OperationResult result = new OperationResult();
             try
             {
-                if (userId == 0)
+                if (userId <= 0)
                 {
                     result.IsSuccess = false;
                     result.Message = "No se ha especificado el usuario";

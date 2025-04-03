@@ -5,6 +5,7 @@ using HRMS.Domain.Entities.Reservations;
 using HRMS.Domain.Entities.Servicio;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Domain.Repository;
+using HRMS.Infraestructure.Notification;
 using HRMS.Models.Models.ReservationModels;
 
 namespace HRMS.Application.Services.Reservation_2023_0731
@@ -12,11 +13,13 @@ namespace HRMS.Application.Services.Reservation_2023_0731
     public class ReservationService : IReservationService
     {
         private readonly IReservationRepository _reservationRepository;
+        private readonly INotificationService _notificationService;
         private readonly ILoggingServices _loggingServices;
 
-        public ReservationService(IReservationRepository reservationRepository, ILoggingServices loggingServices)
+        public ReservationService(IReservationRepository reservationRepository, INotificationService notificationService, ILoggingServices loggingServices)
         {
             _reservationRepository = reservationRepository;
+            _notificationService = notificationService;
             _loggingServices = loggingServices;
         }
 
@@ -25,6 +28,12 @@ namespace HRMS.Application.Services.Reservation_2023_0731
             var result = new OperationResult();
             try
             {
+                if(id <= 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se ha especificado la reserva a buscar";
+                    return result;
+                }
                 Reservation resv = await _reservationRepository.GetEntityByIdAsync(id);
                 if (resv == null)
                 {
@@ -32,10 +41,10 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                     result.Message = "No se ha encontrado la reserva";
                     return result;
                 }
-                else if (resv.EstadoReserva == EstadoReserva.Confirmada)
+                else if (!resv.EstadoReserva.Equals(EstadoReserva.Pendiente))
                 {
                     result.IsSuccess = false;
-                    result.Message = "No se puede cancelar una reserva confirmada";
+                    result.Message = "Solo se pueden cancelar reservas Pendientes, no confirmadas ni canceladas";
                     return result;
                 }
                 else
@@ -57,22 +66,24 @@ namespace HRMS.Application.Services.Reservation_2023_0731
             var result = new OperationResult();
             try
             {
+                if (dto.ReservationId <= 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se ha especificado la reserva a confirmar";
+                    return result;
+                }
                 Reservation resv = await _reservationRepository.GetEntityByIdAsync(dto.ReservationId);
                 if(resv == null)
                 {
                     result.IsSuccess = false;
-                    result.Message = "No se ha encontrado la reserva";
+                    result.Message = "No se ha encontrado la reserva a confirmar";
                      
                 }
-                else if (resv.EstadoReserva == EstadoReserva.Cancelada)
+                else if (!resv.EstadoReserva.Equals(EstadoReserva.Pendiente))
                 {
                     result.IsSuccess = false;
-                    result.Message = "No se puede confirmar una reserva cancelada";
-                }
-                else if(resv.EstadoReserva == EstadoReserva.Confirmada)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "La reserva ya ha sido confirmada";
+                    result.Message = "Solo se pueden confirmar reservas Pendientes, no confirmadas ni canceladas";
+                    return result;
                 }
                 else if(!(resv.PrecioRestante == dto.Abono))
                 {
@@ -86,6 +97,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                     result = await _reservationRepository.UpdateEntityAsync(resv);
                     result.Data = resv;
                 }
+                await _notificationService.SendNotification(dto.UserID, "Su reservación ha sido confirmada");
             }
             catch (Exception ex)
             {
@@ -114,8 +126,18 @@ namespace HRMS.Application.Services.Reservation_2023_0731
             var result = new OperationResult();
             try
             {
-                var resv = await _reservationRepository.GetEntityByIdAsync(id);
-                result.Data = resv;
+                if(id <= 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "El id no se ha especificado";
+                   
+                }
+                else
+                {
+                    var resv = await _reservationRepository.GetEntityByIdAsync(id);
+                    result.Data = MapToDto(resv);
+                }
+
             }
             catch (Exception ex)
             {
@@ -129,9 +151,17 @@ namespace HRMS.Application.Services.Reservation_2023_0731
             var result = new OperationResult();
             try
             {
-                var resv = await _reservationRepository.GetReservationsByClientId(id);
-                var dto = MapToDTOClientInfo(resv.Data);
-                result.Data = dto;
+                if (id <= 0)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "El id no se ha especificado";
+                }
+                else
+                {
+                    var resv = await _reservationRepository.GetReservationsByClientId(id);
+                    var dto = ((IEnumerable<ReservHabitClientModel>)resv.Data).Select(r => MapToDTOClientInfo(r));
+                    result.Data = dto;
+                }
             }
             catch (Exception ex)
             {
@@ -178,23 +208,21 @@ namespace HRMS.Application.Services.Reservation_2023_0731
             var result = new OperationResult();
             try
             {
-                var servicesSelected = await _reservationRepository.GetPricesForServicesinRoomCategory(dto.RoomCategoryID, dto.Services);
+                
                 var userExists = await _reservationRepository.ExistUser(dto.UserID);
-                OperationResult CatAndTarif = await _reservationRepository.GetCategoryForReserv(dto.RoomCategoryID, dto.PeopleNumber,dto.In, dto.Out);
-                if (!servicesSelected.IsSuccess)
-                {
-                    result = servicesSelected;
-                }
-                else if (!CatAndTarif.IsSuccess)
+                OperationResult CatAndTarif = await _reservationRepository.GetCategoryForReserv(dto.RoomCategoryID, dto.In, dto.Out);
+
+                if (!CatAndTarif.IsSuccess)
                 {
                     result.IsSuccess = false;
                     result.Message = "No se ha encontrado la categoria de habitación seleccionada";
                 }
-                else if(userExists.IsSuccess)
+                else if (!userExists.IsSuccess)
                 {
                     result.IsSuccess = false;
                     result.Message = "No se ha encontrado el usuario";
                 }
+
                 else if (((CategoryRoomForReserv)CatAndTarif.Data).Capacity < dto.PeopleNumber)
                 {
                     result.IsSuccess = false;
@@ -202,80 +230,90 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                 }
                 else
                 {
-                    var habitacionId = await _reservationRepository.GetDisponibleRoomsOfCategoryInTimeLapse(dto.In, dto.Out, dto.RoomCategoryID);
-                    if (!habitacionId.IsSuccess)
+                    var servicesSelected = await _reservationRepository.GetPricesForServicesinRoomCategory(dto.RoomCategoryID, dto.Services);
+                    if (!servicesSelected.IsSuccess)
                     {
-                        result = habitacionId;
+                        result = servicesSelected;
                     }
                     else
                     {
-                        var categoryInfo = ((CategoryRoomForReserv)CatAndTarif.Data);
-                        int idHabitacion = ((int)habitacionId.Data);
-
-                        //Calculo de precio solo por la habitación
-                        int days = (dto.Out - dto.In).Days;
-                        decimal totalForRoom = categoryInfo.PricePerNight * days;
-
-                        //Extracción de Servicios y precio
-                        var ServicesForReserv = ((ServicioPorCategoria[])servicesSelected.Data);
-                        decimal totalForServices = ServicesForReserv.Sum(x => x.Precio);
-
-                        decimal total = totalForRoom + totalForServices;
-                        if (total < dto.Adelanto)
+                        var habitacionId = await _reservationRepository.GetDisponibleRoomsOfCategoryInTimeLapse(dto.In, dto.Out, dto.RoomCategoryID);
+                        if (!habitacionId.IsSuccess)
                         {
-                            result.IsSuccess = false;
-                            result.Message = "El adelanto no puede ser mayor al total de la reserva";
-                        }
-                        else if (dto.Adelanto < (total * 0.3m))
-                        {
-                            result.IsSuccess = false;
-                            result.Message = "El adelanto debe ser al menos el 30% del total de la reserva";
+                            result = habitacionId;
                         }
                         else
                         {
-                            Reservation reservation = new Reservation()
-                            {
-                                IdHabitacion = idHabitacion,
-                                FechaCreacion = DateTime.Now,
-                                FechaEntrada = dto.In,
-                                FechaSalida = dto.Out,
-                                Observacion = dto.Observations,
-                                PrecioInicial = total,
-                                IdCliente = dto.UserID,
-                                Adelanto = dto.Adelanto,
-                                EstadoReserva = EstadoReserva.Pendiente,
-                                TotalPagado = dto.Adelanto,
-                                PrecioRestante = total - dto.Adelanto,
-                                CostoPenalidad = 0,
-                                ReservaServicios = ServicesForReserv.Select(x => new ServicioPorReservacion()
-                                {
-                                    ServicioID = x.ServicioID,
-                                    Precio = x.Precio
-                                }).ToList()
-                            };
+                            var categoryInfo = ((CategoryRoomForReserv)CatAndTarif.Data);
+                            int idHabitacion = ((int)habitacionId.Data);
 
+                            //Calculo de precio solo por la habitación
+                            int days = (dto.Out - dto.In).Days;
+                            decimal totalForRoom = categoryInfo.PricePerNight * days;
 
-                            result = await _reservationRepository.SaveEntityAsync(reservation);
-                            if (result.IsSuccess)
+                            //Extracción de Servicios y precio
+                            var ServicesForReserv = ((ServicioPorCategoria[])servicesSelected.Data);
+                            decimal totalForServices = ServicesForReserv.Sum(x => x.Precio);
+
+                            decimal total = totalForRoom + totalForServices;
+                            if (total < dto.Adelanto)
                             {
-                                /*
-                                var servicios = ServicesForReserv.Select(x => new ServicioPorReservacion()
-                                {
-                                    ServicioID = x.ServicioID,
-                                    Precio = x.Precio,
-                                    ReservacionID = reservation.IdRecepcion
-                                });
-                                */
+                                result.IsSuccess = false;
+                                result.Message = "El adelanto no puede ser mayor al total de la reserva";
+                            }
+                            else if (dto.Adelanto < (total * 0.3m))
+                            {
+                                result.IsSuccess = false;
+                                result.Message = "El adelanto debe ser al menos el 30% del total de la reserva";
                             }
                             else
                             {
-                                result.IsSuccess = false;
-                                result.Message = "No se ha podido guardar la reserva";
+                                Reservation reservation = new Reservation()
+                                {
+                                    IdHabitacion = idHabitacion,
+                                    FechaCreacion = DateTime.Now,
+                                    FechaEntrada = dto.In,
+                                    FechaSalida = dto.Out,
+                                    Observacion = dto.Observations,
+                                    PrecioInicial = total,
+                                    IdCliente = dto.UserID,
+                                    Adelanto = dto.Adelanto,
+                                    EstadoReserva = EstadoReserva.Pendiente,
+                                    TotalPagado = dto.Adelanto,
+                                    PrecioRestante = total - dto.Adelanto,
+                                    CostoPenalidad = 0,
+                                    ReservaServicios = ServicesForReserv.Select(x => new ServicioPorReservacion()
+                                    {
+                                        ServicioID = x.ServicioID,
+                                        Precio = x.Precio
+                                    }).ToList()
+                                };
+
+
+                                result = await _reservationRepository.SaveEntityAsync(reservation);
+                                if (result.IsSuccess)
+                                {
+                                    /*
+                                    var servicios = ServicesForReserv.Select(x => new ServicioPorReservacion()
+                                    {
+                                        ServicioID = x.ServicioID,
+                                        Precio = x.Precio,
+                                        ReservacionID = reservation.IdRecepcion
+                                    });
+                                    */
+                                    await _notificationService.SendNotification(dto.UserID, "Su reservación ha sido creada");
+                                }
+                                else
+                                {
+                                    result.IsSuccess = false;
+                                    result.Message = "No se ha podido guardar la reserva";
+                                }
                             }
                         }
-                    }
 
+                    }
                 }
+                
             }
             catch(Exception ex)
             {
@@ -293,24 +331,18 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                 if (reservation == null)
                 {
                     result.IsSuccess = false;
-                    result.Message = "No se ha encontrado la reserva";
+                    result.Message = "No se ha encontrado la reserva a actualizar";
                     return result;
                 }
-                else if (reservation.EstadoReserva == EstadoReserva.Cancelada)
+                else if (reservation.EstadoReserva != EstadoReserva.Pendiente)
                 {
                     result.IsSuccess = false;
-                    result.Message = "No se puede modificar una reserva cancelada";
-                    return result;
-                }
-                else if(reservation.EstadoReserva == EstadoReserva.Confirmada)
-                {
-                    result.IsSuccess = false;
-                    result.Message = "No se puede modificar una reserva confirmada";
+                    result.Message = "No se puede modificar cuyo estado no sea pendiente";
                     return result;
                 }
                 else
                 {
-                    var tarifInfo = await _reservationRepository.GetCategoryForReservByRoom(reservation.IdHabitacion.Value, 1, dto.In, dto.Out);
+                    var tarifInfo = await _reservationRepository.GetCategoryForReservByRoom(reservation.IdHabitacion.Value, dto.In, dto.Out);
                     if (reservation.FechaEntrada != dto.In || reservation.FechaSalida != dto.Out)
                     {
                         OperationResult newRoom = await _reservationRepository.GetDisponibleRoomsOfCategoryInTimeLapse(dto.In, dto.Out, tarifInfo.Data.Id);
@@ -327,6 +359,7 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                             }
                             else
                             {
+                                reservation.Observacion = dto.Observations;
                                 int days = (dto.Out - dto.In).Days;
                                 decimal totalForRoom = tarifInfo.Data.PricePerNight * days;
                                 reservation.IdHabitacion = (int)newRoom.Data;
@@ -373,7 +406,8 @@ namespace HRMS.Application.Services.Reservation_2023_0731
                 RemainingPrice = reservation.PrecioRestante,
                 PenaltyCost = reservation.CostoPenalidad,
                 ReservationId = reservation.IdRecepcion,
-                TotalPaid = reservation.TotalPagado
+                TotalPaid = reservation.TotalPagado,
+                ClientId = reservation.IdCliente
             };
 
         public ReservClientInfoDTO MapToDTOClientInfo(ReservHabitClientModel model)
