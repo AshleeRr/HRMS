@@ -71,7 +71,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
         {
             ValidateNull(tipoDocumento, "tipo documento");
             var clientes = await _clientRepository.GetClientsByTypeDocumentAsync(tipoDocumento);
-            if(!clientes.Any())
+            if(!clientes.IsSuccess)
             {
                return NotFound("No se han encontrado clientes con este tipo de documento");
             }

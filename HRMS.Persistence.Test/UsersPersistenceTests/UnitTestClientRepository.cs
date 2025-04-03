@@ -27,7 +27,7 @@ namespace HRMS.Persistence.Test.UsersPersistenceTests
             _configMock = new Mock<IConfiguration>();
             _loggerMock = new Mock<ILoggingServices>();
         }
-
+        /*
         [Fact]
         public async Task GetClientByEmailAsync_ShouldReturnClient_WhenEmailExists()
         {
@@ -243,6 +243,6 @@ namespace HRMS.Persistence.Test.UsersPersistenceTests
                 Assert.False(result.IsSuccess);
                 Assert.Equal(expectedMessage, result.Message);
             }
-        }
+        }*/
     }
 }

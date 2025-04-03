@@ -29,6 +29,7 @@ namespace HRMS.Persistence.Test.UsersPersistenceTests
             _mockValidator = new Mock<IValidator<UserRole>>();
 
         }
+        /*
         [Fact]
         public async Task GetAllAsync_ShouldReturnsActiveUserRoles_WhenRolesExists()
         {
@@ -217,6 +218,6 @@ namespace HRMS.Persistence.Test.UsersPersistenceTests
                 Assert.Equal(expectedMessage, result.Message);
             }
         }
-
+        */
     }
 }

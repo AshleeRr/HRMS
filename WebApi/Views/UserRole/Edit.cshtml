@@ -1,11 +1,10 @@
-﻿@model WebApi.Models.UsersModels.UserRoleModels.UserRoleUpdateModel
+﻿@model WebApi.Models.UsersModels.UserRoleModels.UserRoleModel
 
 @{
     ViewData["Title"] = "Edit";
 }
 
 <h1>Edit</h1>
-
 
 <hr />
 <div class="row">
@@ -28,14 +27,14 @@
                 <span asp-validation-for="Descripcion" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FechaCreacion" class="control-label"></label>
-                <input asp-for="FechaCreacion" class="form-control" />
-                <span asp-validation-for="FechaCreacion" class="text-danger"></span>
+                <label asp-for="ChangeTime" class="control-label"></label>
+                <input asp-for="ChangeTime" class="form-control" />
+                <span asp-validation-for="ChangeTime" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Estado" /> @Html.DisplayNameFor(model => model.Estado)
-                </label>
+            <div class="form-group">
+                <label asp-for="UserID" class="control-label"></label>
+                <input asp-for="UserID" class="form-control" />
+                <span asp-validation-for="UserID" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

@@ -2,6 +2,6 @@
 {
     public class UserRoleViewDTO : UserRoleDTO
     {
-        public int IdUserRole { get; set; }
+        public int IdRolUsuario { get; set; }
     }
 }

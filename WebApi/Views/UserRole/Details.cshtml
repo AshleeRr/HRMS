@@ -1,4 +1,4 @@
-﻿@model WebApi.Models.UsersModels.UserRoleModels.UserRoleByIdModel
+﻿@model WebApi.Models.UsersModels.UserRoleModels.UserRoleModel
 
 @{
     ViewData["Title"] = "Details";
@@ -7,38 +7,50 @@
 <h1>Details</h1>
 
 <div>
-   
+    
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IdRolUsuario)
+           
+            <span>IdRolUsuario</span>
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IdRolUsuario)
+           
+            <span>@Model.IdRolUsuario</span>
+        </dd>
+        <dt class="col-sm-2">
+
+            <span>Nombre</span>
+        </dt>
+        <dd class="col-sm-10">
+
+            <span>@Model.RolNombre</span>
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RolNombre)
+          
+            <span>Descripcion</span>
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RolNombre)
+           
+            <span>@Model.Descripcion</span>
+        </dd>
+        
+        <dt class = "col-sm-2">
+          
+            <span>ChangeTime</span>
+        </dt>
+        <dd class = "col-sm-10">
+           
+
+            <span>@Model.ChangeTime</span>
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descripcion)
+           
+			<span>UserID</span>
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descripcion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaCreacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaCreacion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
+           
+            <span>@Model.UserID</span>
         </dd>
     </dl>
 </div>
