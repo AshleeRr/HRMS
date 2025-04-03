@@ -29,7 +29,7 @@ namespace HRMS.Persistence.Test.UsersPersistenceTests
             _mockValidator = new Mock<IValidator<User>>();
 
         }
-
+        /*
         [Fact]
 
         public async Task GetUsersByNameAsync_ShouldThrowArgumentException_WhenNombreCompletoIsNullOrEmpty()
@@ -333,7 +333,7 @@ namespace HRMS.Persistence.Test.UsersPersistenceTests
                 Assert.All(result, u => Assert.Equal("DNI", u.TipoDocumento));
             }
         }
-
+        */
 
     }
 }

@@ -1,4 +1,4 @@
-﻿@model WebApi.Models.UsersModels.ClientModel
+﻿@model WebApi.Models.UsersModels.ClientModels.ClientModel
 
 @{
     ViewData["Title"] = "Details";
@@ -52,16 +52,16 @@
             @Html.DisplayFor(model => model.Correo)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaCreacion)
+            @Html.DisplayNameFor(model => model.ChangeTime)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaCreacion)
+            @Html.DisplayFor(model => model.ChangeTime)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
+            @Html.DisplayNameFor(model => model.UserID)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
+            @Html.DisplayFor(model => model.UserID)
         </dd>
     </dl>
 </div>

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebApi.Models.UsersModels.ClientModel>
+﻿@model IEnumerable<WebApi.Models.UsersModels.ClientModels.ClientModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -6,18 +6,11 @@
 
 <h1>Index</h1>
 
-
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.IdCliente)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TipoDocumento)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Documento)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.IdUsuario)
@@ -29,10 +22,16 @@
                 @Html.DisplayNameFor(model => model.Correo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FechaCreacion)
+                @Html.DisplayNameFor(model => model.Documento)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Estado)
+                @Html.DisplayNameFor(model => model.TipoDocumento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ChangeTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserID)
             </th>
             <th></th>
         </tr>
@@ -44,12 +43,6 @@
                 @Html.DisplayFor(modelItem => item.IdCliente)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TipoDocumento)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Documento)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.IdUsuario)
             </td>
             <td>
@@ -59,14 +52,19 @@
                 @Html.DisplayFor(modelItem => item.Correo)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FechaCreacion)
+                @Html.DisplayFor(modelItem => item.Documento)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Estado)
+                @Html.DisplayFor(modelItem => item.TipoDocumento)
             </td>
             <td>
-                
-                @Html.ActionLink("Details", "Details", new { id=item.IdCliente }) |
+                @Html.DisplayFor(modelItem => item.ChangeTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserID)
+            </td>
+            <td>
+                @Html.ActionLink("Details", "Details", new { id=item.IdCliente}) 
             </td>
         </tr>
 }

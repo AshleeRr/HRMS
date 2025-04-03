@@ -11,7 +11,7 @@ namespace HRMS.Application.DTOs.UsersDTOs.ValidationsForSaveDTOs
                 .WithErrorMessage("El rol de usuario no puede ser nulo");
             AddRule(ur => ur.Descripcion != null && ur.Descripcion.Length <= 50)
                 .WithErrorMessage("La descripcion rol de usuario debe tener menos de 50 caracteres");
-            AddRule(ur => ur.Nombre != null && ur.Nombre.Length <= 30)
+            AddRule(ur => ur.RolNombre != null && ur.RolNombre.Length <= 30)
                 .WithErrorMessage("El nombre del rol de usuario debe tener menos de 50 caracteres");
         }
 

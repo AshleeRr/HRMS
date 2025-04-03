@@ -6,6 +6,7 @@ using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
+//using HRMS.Infraestructure.Notification;
 
 namespace HRMS.Application.Services.UsersServices
 {
@@ -14,11 +15,16 @@ namespace HRMS.Application.Services.UsersServices
         private readonly IClientRepository _clientRepository;
         private readonly ILoggingServices _loggingServices;
         private readonly IValidator<SaveClientDTO> _validator;
-        public ClientService(IClientRepository clientRepository, IValidator<SaveClientDTO> validator, ILoggingServices loggingServices)
+        private readonly IUserRepository _userRepository;
+        //private readonly INotificationService _notificationService;
+        public ClientService(IClientRepository clientRepository, IValidator<SaveClientDTO> validator, //INotificationService notificationService,
+                                                                                                      ILoggingServices loggingServices, IUserRepository userRepository)
         {
             _clientRepository = clientRepository;
             _validator = validator;
             _loggingServices = loggingServices;
+            _userRepository = userRepository;
+            //_notificationService = notificationService;
         }
 
         //mappers
@@ -32,6 +38,7 @@ namespace HRMS.Application.Services.UsersServices
                 Documento = dto.Documento,
                 TipoDocumento = dto.TipoDocumento,
                 FechaCreacion = DateTime.Now,
+                UserID = dto.UserID,
             };
         }
 
@@ -39,14 +46,15 @@ namespace HRMS.Application.Services.UsersServices
         {
             return new ClientViewDTO()
             {
-                IdClient = client.IdCliente,
+                IdCliente = client.IdCliente,
                 IdUsuario = client.IdUsuario,
                 NombreCompleto = client.NombreCompleto,
                 Correo = client.Correo,
                 Clave = client.Clave,
                 Documento = client.Documento,
                 TipoDocumento = client.TipoDocumento,
-                ChangeTime = (DateTime)client.FechaCreacion,
+                ChangeTime = client.FechaCreacion,
+                UserID = client.UserID 
             };
         }
         //methods
@@ -103,8 +111,9 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateId(dto.Id);
-                var client = await _clientRepository.GetEntityByIdAsync(dto.Id);
+                ValidateId(dto.IdUsuario);
+                await ValidateUserIDAsync(dto.UserID);
+                var client = await _clientRepository.GetEntityByIdAsync(dto.IdUsuario);
                 ValidateClient(client);
                 client.Estado = false;
                 result = await _clientRepository.UpdateEntityAsync(client);
@@ -129,9 +138,34 @@ namespace HRMS.Application.Services.UsersServices
             }
             return result;
         }
-        public async Task<Client> GetClientByUserIdAsync(int idUsuario)
+        public async Task<OperationResult> GetClientByUserIdAsync(int idUsuario)
         {
-            return await _clientRepository.GetClientByUserIdAsync(idUsuario);
+            OperationResult result = new OperationResult();
+            try
+            {
+                ValidateId(idUsuario);
+                var client = await _clientRepository.GetClientByUserIdAsync(idUsuario);
+                if (client == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontró un cliente con este id";
+                }
+                else
+                {
+                    result.Data = client;
+                    result.Message = "Cliente encontrado correctamente";
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                result = await _loggingServices.LogError(ex.Message, this);
+            }
+            return result;
         }
         public async Task<OperationResult> Save(SaveClientDTO dto)
         {
@@ -142,31 +176,29 @@ namespace HRMS.Application.Services.UsersServices
                 if (!validDTO.IsSuccess)
                 {
                     result.Message = "Error validando los datos para guardar";
-                    result.IsSuccess = false;
-                    return result;
                 }
-                var existingCorreo = await _clientRepository.GetClientByEmailAsync(dto.Correo);
-                if (existingCorreo != null)
+                else
                 {
-                    result.Message = "Este correo ya esta registrado";
-                    result.IsSuccess = false;
-                    return result;
-                }
-                var existingDocument = await _clientRepository.GetClientByDocumentAsync(dto.Documento);
-                if (existingDocument != null)
-                {
-                    result.Message = "Este documento ya esta registrado";
-                    result.IsSuccess = false;
-                    return result;
-                }
-                var client = MapSaveToDto(dto);
+                    var existingCorreo = await _clientRepository.GetClientByEmailAsync(dto.Correo);
+                    var existingDocument = await _clientRepository.GetClientByDocumentAsync(dto.Documento);
+                    ValidateExistingData(existingCorreo, "correo");
+                    ValidateExistingData(existingDocument, "documento");
+                    await ValidateUserIDAsync(dto.UserID);
+                    var client = MapSaveToDto(dto);
 
-                result = await _clientRepository.SaveEntityAsync(client);
-                if (result.IsSuccess)
-                {
-                    result.Message = "Cliente guardado correctamente";
-                    result.Data = MapClientToViewDto(client);
+                    result = await _clientRepository.SaveEntityAsync(client);
+                    if (result.IsSuccess)
+                    {
+                        result.Message = "Cliente guardado correctamente";
+                        result.Data = MapClientToViewDto(client);
+                        //_notificationService.SendNotification(dto.IdUsuario, $"Bienvenido, {dto.NombreCompleto}!\nGracias por registrarte en la aplicación de nuestro hotel.\nCorreo registrado: {dto.Correo}\nSi necesitas asistencia, no dudes en contactarnos.");
+                    }
+                    else
+                    {
+                        result.Message = "Error guardando el cliente";
+                    }
                 }
+                
             }
             catch (Exception ex)
             {
@@ -184,29 +216,28 @@ namespace HRMS.Application.Services.UsersServices
                 var client = await _clientRepository.GetClientByUserIdAsync(dto.IdUsuario);
                 ValidateClient(client);
                 var existingCorreo = await _clientRepository.GetClientByEmailAsync(dto.Correo);
-                if (existingCorreo != null && existingCorreo.IdUsuario != dto.IdUsuario)
-                {
-                    result.Message = "Este correo ya esta registrado";
-                    result.IsSuccess = false;
-                }
                 var existingDocument = await _clientRepository.GetClientByDocumentAsync(dto.Documento);
-                if (existingDocument != null && existingDocument.IdUsuario != dto.IdUsuario)
-                {
-                    result.Message = "Este documento ya esta registrado";
-                    result.IsSuccess = false;
-                }
-                
+                ValidateExistingData(existingCorreo, "correo");
+                ValidateExistingData(existingDocument, "documento");
+                await ValidateUserIDAsync(dto.UserID);
                 client.IdUsuario = dto.IdUsuario;
                 client.NombreCompleto = dto.NombreCompleto;
                 client.TipoDocumento = dto.TipoDocumento;
                 client.Documento = dto.Documento;
                 client.Clave = dto.Clave;
                 client.Correo = dto.Correo;
-                dto.ChangeTime = dto.ChangeTime;
-                await _clientRepository.UpdateEntityAsync(client);
-                result.Message = "Cliente actualizado correctamente";
-                result.IsSuccess = true;
-                result.Data = MapClientToViewDto(client);
+                client.FechaCreacion = dto.ChangeTime;
+                client.UserID = dto.UserID;
+                result = await _clientRepository.UpdateEntityAsync(client);
+                if (result.IsSuccess)
+                {
+                    result.Message = "Cliente actualizado correctamente";
+                    result.Data = MapClientToViewDto(client);
+                }
+                else
+                {
+                    result.Message = "Error actualizando el cliente";
+                }
             }
             catch (ArgumentException ex)
             {
@@ -260,11 +291,7 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateId(id);
                 ValidateNulleable(nuevoCorreo, "nuevo correo");
                 var existingCorreo = await _clientRepository.GetClientByEmailAsync(nuevoCorreo);
-                if (existingCorreo != null && existingCorreo.IdUsuario != id)
-                {
-                    result.Message = "Este correo ya esta registrado";
-                    result.IsSuccess = true;
-                }
+                ValidateExistingData(existingCorreo, "correo");
                 var client = await _clientRepository.GetClientByUserIdAsync(id);
                 ValidateClient(client);
                 client.Correo = nuevoCorreo;
@@ -334,16 +361,12 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateNulleable(documento, "documento");
                 ValidateNulleable(tipoDocumento, "tipo documento");
                 var existingDocument = await _clientRepository.GetClientByDocumentAsync(documento);
-                if (existingDocument != null && existingDocument.IdUsuario != id)
-                {
-                    result.Message = "Este documento ya esta registrado";
-                    result.IsSuccess = true;
-                }
+                ValidateExistingData(existingDocument, "documento");
                 var cliente = await _clientRepository.GetClientByUserIdAsync(id);
                 ValidateClient(cliente);
                 cliente.Documento = documento;
                 cliente.TipoDocumento = tipoDocumento;
-                await _clientRepository.UpdateEntityAsync(cliente);
+                result = await _clientRepository.UpdateEntityAsync(cliente);
                 if (!result.IsSuccess)
                 {
                     result.Message = "Error actualizando los datos";
@@ -380,6 +403,23 @@ namespace HRMS.Application.Services.UsersServices
                 throw new ArgumentNullException("No existe un cliente con este id");
             }
             return client;
+        }
+        private async Task ValidateUserIDAsync(int userID)
+        {
+            ValidateId(userID);
+
+            bool userExists = await _userRepository.UserIDExistsAsync(userID);
+            if (!userExists)
+            {
+                throw new ArgumentException("El UserID ingresado no está registrado. No se puede proceder con el proceso");
+            }
+        }
+        private void ValidateExistingData(OperationResult client, string data)
+        {
+            if (client.IsSuccess)
+            {
+                throw new ArgumentException($"Este {data} ya esta registrado");
+            }
         }
         private void ValidateNulleable(string x, string message)
         {

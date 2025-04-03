@@ -12,5 +12,6 @@ namespace HRMS.Domain.Entities.Users
         public int IdRolUsuario { get; set; }
         public string? RolNombre { get; set; }
         public string? Descripcion { get; set; }
+        public int UserID { get; set; }
     }
 }

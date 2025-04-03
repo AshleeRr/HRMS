@@ -41,7 +41,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.IdClient)
+                @Html.DisplayFor(modelItem => item.IdCliente)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.IdUsuario)
@@ -66,7 +66,7 @@
             </td>
             <td>
               
-                @Html.ActionLink("Details", "Details", new { id=item.IdClient  }) |
+                @Html.ActionLink("Details", "Details", new { id=item.IdCliente  }) |
             </td>
         </tr>
 }

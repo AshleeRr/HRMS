@@ -2,10 +2,10 @@
 @model IEnumerable<WebApi.Models.UsersModels.UserRoleModels.UserRoleModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Roles";
 }
 
-<h1>Index</h1>
+<h1>Roles</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -14,14 +14,15 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.IdUserRole)
+                @Html.DisplayNameFor(model => model.IdRolUsuario)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RolNombre)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Descripcion)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
+            
             <th>
                 @Html.DisplayNameFor(model => model.ChangeTime)
             </th>
@@ -35,13 +36,13 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.IdUserRole)
+                @Html.DisplayFor(modelItem => item.IdRolUsuario)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RolNombre)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Descripcion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ChangeTime)
@@ -50,8 +51,8 @@
                 @Html.DisplayFor(modelItem => item.UserID)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.IdUserRole }) |
-                @Html.ActionLink("Details", "Details", new { id=item.IdUserRole}) |
+                @Html.ActionLink("Edit", "Edit", new { id = item.IdRolUsuario }) |
+                @Html.ActionLink("Details", "Details", new { id=item.IdRolUsuario}) |
             </td>
         </tr>
 }

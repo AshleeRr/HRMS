@@ -12,6 +12,8 @@ namespace HRMS.Domain.Entities.Users
         public int IdUsuario { get; set; }
         [ForeignKey("IdRolUsuario")]
         public int IdRolUsuario { get; set; }
+        public int UserID { get; set; }
+        public int ReferenceID { get; set; }
     }
 }
 

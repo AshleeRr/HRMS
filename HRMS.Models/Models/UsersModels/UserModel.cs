@@ -10,5 +10,7 @@
         public string? Correo { get; set; }
         public string? TipoDocumento { get; set; }
         public string? Documento { get; set; }
+        public int UserID { get; set; }
+        public int ReferenceID { get; set; }
     }
 }

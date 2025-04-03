@@ -82,8 +82,8 @@ namespace WebApi.Controllers.UsersControllers
                     var response = await client.PostAsJsonAsync<UserSaveModel>("https://localhost:7175/api/User/user", model);
                     if (response.IsSuccessStatusCode)
                     {
+                        var jsonString = await response.Content.ReadAsStringAsync();
                         op = await response.Content.ReadFromJsonAsync<OperationResult>();
-
                     }
                     else
                     {
@@ -112,14 +112,10 @@ namespace WebApi.Controllers.UsersControllers
                     if (response.IsSuccessStatusCode)
                     {
                         var jsonString = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"JSON recibido: {jsonString}");
-
-                        // Deserializar el JSON al modelo OperationResult
                         var result = JsonConvert.DeserializeObject<OperationResult>(jsonString);
 
                         if (result != null && result.IsSuccess && result.Data != null)
                         {
-                            // Convertir el dynamic Data a un JSON válido y deserializar a UserModel
                             var dataJson = JsonConvert.SerializeObject(result.Data);
                             usuario = JsonConvert.DeserializeObject<UserModel>(dataJson);
                         }
@@ -160,7 +156,6 @@ namespace WebApi.Controllers.UsersControllers
                     if (response.IsSuccessStatusCode)
                     {
                         op = await response.Content.ReadFromJsonAsync<OperationResult>();
-                        Console.WriteLine($"JSON recibido: {op}");
                     }
                     else
                     {
@@ -171,9 +166,10 @@ namespace WebApi.Controllers.UsersControllers
                 
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch(Exception ex)
             {
-                return View();
+                ViewBag.Error = $"Error inesperado: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
         }
     }
