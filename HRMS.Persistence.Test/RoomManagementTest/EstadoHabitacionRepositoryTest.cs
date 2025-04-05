@@ -92,7 +92,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
         public async Task SaveEntityAsync_ValidEntity_SavesSuccessfully()
         {
             // Arrange
-            var estado = new EstadoHabitacion { Descripcion = "Disponib" };
+            var estado = new EstadoHabitacion { Descripcion = "Disponible" };
 
             using (var context = new HRMSContext(_dbOptions))
             {

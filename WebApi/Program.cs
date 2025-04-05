@@ -1,3 +1,7 @@
+using WebApi.Interfaces;
+using WebApi.Interfaces.RoomInterface;
+using WebApi.Repositories;
+
 namespace WebApi
 {
     public class Program
@@ -7,11 +11,21 @@ namespace WebApi
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            // En Program.cs o Startup.cs
-            builder.Services.AddHttpClient();
             builder.Services.AddControllersWithViews();
+            
+            // Configuración de la API
+            string apiBaseUrl = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl") ?? "https://localhost:7175/api";
+            
+            builder.Services.AddSingleton<IApiClient>(provider => new ApiClient(apiBaseUrl));
+            
+            // Registrar los repositorios como servicios con ámbito (scoped)
+            builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+
+            // Agregar soporte para HttpClient factory
+            builder.Services.AddHttpClient();
 
             var app = builder.Build();
+            
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {

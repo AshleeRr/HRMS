@@ -189,7 +189,7 @@ namespace HRMS.Persistence.Test.RoomManagementTest
 
                 // Assert
                 Assert.False(result.IsSuccess);
-                Assert.Contains("mayor que cero", result.Message);
+                Assert.Contains("mayor a 0", result.Message);
             }
         }
 
