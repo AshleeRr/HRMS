@@ -1,0 +1,87 @@
+﻿@model WebApi.Models.RoomModels.CategoriaModel
+
+@{
+    ViewData["Title"] = "Editar Categoría";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container mt-4">
+    <div class="card shadow mb-4">
+        <div class="card-header bg-warning text-dark py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil-square"></i> Editar Categoría
+                </h5>
+                <a asp-action="Index" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver al Listado
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" id="editForm">
+                <!-- Asegúrate de que el ID está presente en el formulario -->
+                <input type="hidden" asp-for="IdCategoria" value="@Model.IdCategoria" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="Descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                <input asp-for="Descripcion" class="form-control" placeholder="Ej. Suite Deluxe" required />
+                            </div>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="Capacidad" class="form-label">Capacidad <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-people"></i></span>
+                                <input asp-for="Capacidad" class="form-control" type="number" min="1" required />
+                            </div>
+                            <span asp-validation-for="Capacidad" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group mb-3">
+                            <label asp-for="IdServicio" class="form-label">Servicio</label>
+                            <select asp-for="IdServicio" class="form-select" asp-items="ViewBag.Servicios">
+                                <option value="">-- Sin servicio --</option>
+                            </select>
+                            <span asp-validation-for="IdServicio" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campos ocultos -->
+                <input type="hidden" asp-for="ChangeTime" value="@DateTime.Now" />
+                <input type="hidden" asp-for="UserID" value="@Model.UserID" />
+
+                <div class="form-group mt-4 d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

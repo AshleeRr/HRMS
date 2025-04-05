@@ -6,19 +6,19 @@ using WebApi.Models.RoomModels;
 
 namespace WebApi.Controllers.RoomControllers
 {
-    public class PisoController : Controller
+    public class EstadoHabitacionController : Controller
     {
         private const string _apiBaseUrl = "https://localhost:7175/api";
 
-        // GET: PisoController
+        // GET: EstadoHabitacionController
         public async Task<IActionResult> Index()
         {
-            List<PisoModel> pisos = new List<PisoModel>();
+            List<EstadoHabitacionModel> estados = new List<EstadoHabitacionModel>();
             try
             {
                 using (var client = new HttpClient())
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Piso/GetAllPisos");
+                    var response = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoHabitaciones");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -29,7 +29,7 @@ namespace WebApi.Controllers.RoomControllers
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
                             if (operationResult?.IsSuccess == true && operationResult.Data != null)
                             {
-                                pisos = JsonConvert.DeserializeObject<List<PisoModel>>(
+                                estados = JsonConvert.DeserializeObject<List<EstadoHabitacionModel>>(
                                     JsonConvert.SerializeObject(operationResult.Data));
                             }
                         }
@@ -37,7 +37,7 @@ namespace WebApi.Controllers.RoomControllers
                         {
                             try
                             {
-                                pisos = JsonConvert.DeserializeObject<List<PisoModel>>(content);
+                                estados = JsonConvert.DeserializeObject<List<EstadoHabitacionModel>>(content);
                             }
                             catch (Exception ex)
                             {
@@ -51,11 +51,11 @@ namespace WebApi.Controllers.RoomControllers
                         try
                         {
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener pisos: {response.ReasonPhrase}";
+                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener estados: {response.ReasonPhrase}";
                         }
                         catch
                         {
-                            TempData["Error"] = $"Error al obtener pisos: {response.ReasonPhrase}";
+                            TempData["Error"] = $"Error al obtener estados: {response.ReasonPhrase}";
                         }
                     }
                 }
@@ -65,19 +65,19 @@ namespace WebApi.Controllers.RoomControllers
                 TempData["Error"] = $"Error inesperado: {ex.Message}";
             }
             
-            TempData["Success"] = TempData["Success"]; // Preservar mensajes
-            return View(pisos);
+            TempData["Success"] = TempData["Success"]; 
+            return View(estados);
         }
 
-        // GET: PisoController/Details/5
+        // GET: EstadoHabitacionController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            PisoModel piso = new PisoModel();
+            EstadoHabitacionModel estado = new EstadoHabitacionModel();
             try
             {
                 using (var client = new HttpClient())
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Piso/GetPisoById{id}");
+                    var response = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoBy(id){id}");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -88,16 +88,16 @@ namespace WebApi.Controllers.RoomControllers
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
                             if (operationResult?.IsSuccess == true && operationResult.Data != null)
                             {
-                                piso = JsonConvert.DeserializeObject<PisoModel>(
+                                estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(
                                     JsonConvert.SerializeObject(operationResult.Data));
                             }
                         }
                         catch
                         {
-                            piso = JsonConvert.DeserializeObject<PisoModel>(content);
+                            estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(content);
                         }
                         
-                        return View(piso);
+                        return View(estado);
                     }
                     else
                     {
@@ -105,11 +105,11 @@ namespace WebApi.Controllers.RoomControllers
                         try
                         {
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener los detalles del piso: {response.ReasonPhrase}";
+                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener los detalles del estado: {response.ReasonPhrase}";
                         }
                         catch
                         {
-                            TempData["Error"] = $"Error al obtener los detalles del piso: {response.ReasonPhrase}";
+                            TempData["Error"] = $"Error al obtener los detalles del estado: {response.ReasonPhrase}";
                         }
                         return RedirectToAction(nameof(Index));
                     }
@@ -122,16 +122,16 @@ namespace WebApi.Controllers.RoomControllers
             }
         }
 
-        // GET: PisoController/Create
+        // GET: EstadoHabitacionController/Create
         public ActionResult Create()
         {
-            return View(new PisoModel());
+            return View(new EstadoHabitacionModel());
         }
 
-        // POST: PisoController/Create
+        // POST: EstadoHabitacionController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PisoModel piso)
+        public async Task<IActionResult> Create(EstadoHabitacionModel estado)
         {
             try
             {
@@ -139,10 +139,10 @@ namespace WebApi.Controllers.RoomControllers
                 {
                     using (var client = new HttpClient())
                     {
-                        var json = JsonConvert.SerializeObject(piso);
+                        var json = JsonConvert.SerializeObject(estado);
                         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                        var response = await client.PostAsync($"{_apiBaseUrl}/Piso/CreatePiso", content);
+                        var response = await client.PostAsync($"{_apiBaseUrl}/EstadoHabitacion/CreateEstadoHabitacion", content);
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -152,13 +152,13 @@ namespace WebApi.Controllers.RoomControllers
                                 var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
                                 if (operationResult != null && operationResult.IsSuccess)
                                 {
-                                    TempData["Success"] = operationResult.Message ?? "Piso creado correctamente.";
+                                    TempData["Success"] = operationResult.Message ?? "Estado de habitación creado correctamente.";
                                     return RedirectToAction(nameof(Index));
                                 }
                             }
                             catch
                             {
-                                TempData["Success"] = "Piso creado correctamente.";
+                                TempData["Success"] = "Estado de habitación creado correctamente.";
                                 return RedirectToAction(nameof(Index));
                             }
                         }
@@ -167,33 +167,33 @@ namespace WebApi.Controllers.RoomControllers
                         try
                         {
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al crear el piso: {errorContent}";
+                            TempData["Error"] = operationResult?.Message ?? $"Error al crear el estado: {errorContent}";
                         }
                         catch
                         {
-                            TempData["Error"] = $"Error al crear el piso: {errorContent}";
+                            TempData["Error"] = $"Error al crear el estado: {errorContent}";
                         }
                     }
                 }
                 
-                return View(piso);
+                return View(estado);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error inesperado: {ex.Message}";
-                return View(piso);
+                return View(estado);
             }
         }
 
-        // GET: PisoController/Edit/5
+        // GET: EstadoHabitacionController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            PisoModel piso = new PisoModel();
+            EstadoHabitacionModel estado = new EstadoHabitacionModel();
             try
             {
                 using (var client = new HttpClient())
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Piso/GetPisoById{id}");
+                    var response = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoBy(id){id}");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -204,21 +204,21 @@ namespace WebApi.Controllers.RoomControllers
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
                             if (operationResult?.IsSuccess == true && operationResult.Data != null)
                             {
-                                piso = JsonConvert.DeserializeObject<PisoModel>(
+                                estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(
                                     JsonConvert.SerializeObject(operationResult.Data));
                             }
                         }
                         catch
                         {
-                            piso = JsonConvert.DeserializeObject<PisoModel>(content);
+                            estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(content);
                         }
                         
-                        if (piso != null && piso.IdPiso != id)
+                        if (estado != null && estado.IdEstadoHabitacion != id)
                         {
-                            piso.IdPiso = id;
+                            estado.IdEstadoHabitacion = id;
                         }
                         
-                        return View(piso);
+                        return View(estado);
                     }
                     else
                     {
@@ -226,11 +226,11 @@ namespace WebApi.Controllers.RoomControllers
                         try
                         {
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener el piso: {response.ReasonPhrase}";
+                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener el estado: {response.ReasonPhrase}";
                         }
                         catch
                         {
-                            TempData["Error"] = $"Error al obtener el piso: {response.ReasonPhrase}";
+                            TempData["Error"] = $"Error al obtener el estado: {response.ReasonPhrase}";
                         }
                         return RedirectToAction(nameof(Index));
                     }
@@ -243,28 +243,28 @@ namespace WebApi.Controllers.RoomControllers
             }
         }
 
-        // POST: PisoController/Edit/5
+        // POST: EstadoHabitacionController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, PisoModel piso)
+        public async Task<IActionResult> Edit(int id, EstadoHabitacionModel estado)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    if (piso.IdPiso != id)
+                    if (estado.IdEstadoHabitacion != id)
                     {
-                        piso.IdPiso = id;
+                        estado.IdEstadoHabitacion = id;
                     }
                     
-                    piso.ChangeTime = DateTime.Now;
+                    estado.ChangeTime = DateTime.Now;
                     
                     using (var client = new HttpClient())
                     {
-                        var json = JsonConvert.SerializeObject(piso);
+                        var json = JsonConvert.SerializeObject(estado);
                         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                        var request = new HttpRequestMessage(new HttpMethod("PATCH"), $"{_apiBaseUrl}/Piso/UpdatePiso{id}");
+                        var request = new HttpRequestMessage(new HttpMethod("PATCH"), $"{_apiBaseUrl}/EstadoHabitacion/UpdateEstadoHabitacionById{id}");
                         request.Content = content;
                         
                         var response = await client.SendAsync(request);
@@ -277,13 +277,13 @@ namespace WebApi.Controllers.RoomControllers
                                 var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
                                 if (operationResult != null && operationResult.IsSuccess)
                                 {
-                                    TempData["Success"] = operationResult.Message ?? "Piso actualizado correctamente.";
+                                    TempData["Success"] = operationResult.Message ?? "Estado de habitación actualizado correctamente.";
                                     return RedirectToAction(nameof(Index));
                                 }
                             }
                             catch
                             {
-                                TempData["Success"] = "Piso actualizado correctamente.";
+                                TempData["Success"] = "Estado de habitación actualizado correctamente.";
                                 return RedirectToAction(nameof(Index));
                             }
                         }
@@ -292,33 +292,33 @@ namespace WebApi.Controllers.RoomControllers
                         try
                         {
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al actualizar el piso: {errorContent}";
+                            TempData["Error"] = operationResult?.Message ?? $"Error al actualizar el estado: {errorContent}";
                         }
                         catch
                         {
-                            TempData["Error"] = $"Error al actualizar el piso: {errorContent}";
+                            TempData["Error"] = $"Error al actualizar el estado: {errorContent}";
                         }
                     }
                 }
                 
-                return View(piso);
+                return View(estado);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error inesperado: {ex.Message}";
-                return View(piso);
+                return View(estado);
             }
         }
 
-        // GET: PisoController/Delete/5
-        public async Task<IActionResult> Delete(int id)
+        // GET: EstadoHabitacionController/Delete/5
+        public async Task<ActionResult> Delete(int id)
         {
-            PisoModel piso = new PisoModel();
+            EstadoHabitacionModel estado = new EstadoHabitacionModel();
             try
             {
                 using (var client = new HttpClient())
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Piso/GetPisoById{id}");
+                    var response = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoBy(id){id}");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -329,16 +329,16 @@ namespace WebApi.Controllers.RoomControllers
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
                             if (operationResult?.IsSuccess == true && operationResult.Data != null)
                             {
-                                piso = JsonConvert.DeserializeObject<PisoModel>(
+                                estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(
                                     JsonConvert.SerializeObject(operationResult.Data));
                             }
                         }
                         catch
                         {
-                            piso = JsonConvert.DeserializeObject<PisoModel>(content);
+                            estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(content);
                         }
                         
-                        return View(piso);
+                        return View(estado);
                     }
                     else
                     {
@@ -346,11 +346,11 @@ namespace WebApi.Controllers.RoomControllers
                         try
                         {
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener el piso: {response.ReasonPhrase}";
+                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener el estado: {response.ReasonPhrase}";
                         }
                         catch
                         {
-                            TempData["Error"] = $"Error al obtener el piso: {response.ReasonPhrase}";
+                            TempData["Error"] = $"Error al obtener el estado: {response.ReasonPhrase}";
                         }
                         return RedirectToAction(nameof(Index));
                     }
@@ -363,16 +363,16 @@ namespace WebApi.Controllers.RoomControllers
             }
         }
 
-        // POST: PisoController/Delete/5
+        // POST: EstadoHabitacionController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int id, IFormCollection collection)
         {
             try
             {
                 using (var client = new HttpClient())
                 {
-                    var response = await client.DeleteAsync($"{_apiBaseUrl}/Piso/DeletePiso{id}");
+                    var response = await client.DeleteAsync($"{_apiBaseUrl}/EstadoHabitacion/DeleteEstadoHabitacionById{id}");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -382,13 +382,13 @@ namespace WebApi.Controllers.RoomControllers
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
                             if (operationResult != null && operationResult.IsSuccess)
                             {
-                                TempData["Success"] = operationResult.Message ?? "Piso eliminado correctamente.";
+                                TempData["Success"] = operationResult.Message ?? "Estado de habitación eliminado correctamente.";
                                 return RedirectToAction(nameof(Index));
                             }
                         }
                         catch
                         {
-                            TempData["Success"] = "Piso eliminado correctamente.";
+                            TempData["Success"] = "Estado de habitación eliminado correctamente.";
                             return RedirectToAction(nameof(Index));
                         }
                     }
@@ -398,19 +398,18 @@ namespace WebApi.Controllers.RoomControllers
                     {
                         var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
                         
-                        if (operationResult?.Message?.Contains("habitaciones asociadas") == true || 
-                            operationResult?.Message?.Contains("relacionado con habitaciones") == true)
+                        if (operationResult?.Message?.Contains("habitaciones asociadas") == true)
                         {
-                            TempData["Error"] = "No se puede eliminar el piso porque tiene habitaciones asociadas.";
+                            TempData["Error"] = "No se puede eliminar el estado porque tiene habitaciones asociadas.";
                         }
                         else
                         {
-                            TempData["Error"] = operationResult?.Message ?? "Error al eliminar el piso.";
+                            TempData["Error"] = operationResult?.Message ?? "Error al eliminar el estado.";
                         }
                     }
                     catch
                     {
-                        TempData["Error"] = "No se puede eliminar el piso en este momento.";
+                        TempData["Error"] = "No se puede eliminar el estado en este momento.";
                     }
                     
                     if (Request.Path.Value?.Contains("/Delete/") == true)
@@ -428,27 +427,27 @@ namespace WebApi.Controllers.RoomControllers
             }
         }
 
-        // GET: PisoController/GetByDescripcion
-        public async Task<IActionResult> GetByDescripcion(string descripcion)
+        // GET: EstadoHabitacionController/GetByDescripcion
+        public async Task<ActionResult> GetByDescripcion(string descripcion)
         {
-            List<PisoModel> pisos = new List<PisoModel>();
+            List<EstadoHabitacionModel> estados = new List<EstadoHabitacionModel>();
             try
             {
                 using (var client = new HttpClient())
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Piso/GetPisoByDescripcion{descripcion}");
+                    var response = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoBy(descripcion){descripcion}");
 
                     if (response.IsSuccessStatusCode)
                     {
                         var content = await response.Content.ReadAsStringAsync();
-                        PisoModel piso = null;
+                        EstadoHabitacionModel estado = null;
                         
                         try 
                         {
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
                             if (operationResult?.IsSuccess == true && operationResult.Data != null)
                             {
-                                piso = JsonConvert.DeserializeObject<PisoModel>(
+                                estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(
                                     JsonConvert.SerializeObject(operationResult.Data));
                             }
                         }
@@ -456,7 +455,7 @@ namespace WebApi.Controllers.RoomControllers
                         {
                             try
                             {
-                                piso = JsonConvert.DeserializeObject<PisoModel>(content);
+                                estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(content);
                             }
                             catch (Exception ex)
                             {
@@ -465,14 +464,14 @@ namespace WebApi.Controllers.RoomControllers
                             }
                         }
                         
-                        if (piso != null)
+                        if (estado != null)
                         {
-                            pisos.Add(piso);
-                            ViewBag.TituloLista = $"Piso con descripción: {descripcion}";
-                            return View("Index", pisos);
+                            estados.Add(estado);
+                            ViewBag.TituloLista = $"Estado con descripción: {descripcion}";
+                            return View("Index", estados);
                         }
                         
-                        TempData["Error"] = "No se encontró el piso.";
+                        TempData["Error"] = "No se encontró el estado.";
                     }
                     else
                     {
@@ -480,11 +479,11 @@ namespace WebApi.Controllers.RoomControllers
                         try
                         {
                             var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al buscar piso: {response.ReasonPhrase}";
+                            TempData["Error"] = operationResult?.Message ?? $"Error al buscar estado: {response.ReasonPhrase}";
                         }
                         catch
                         {
-                            TempData["Error"] = $"Error al buscar piso: {response.ReasonPhrase}";
+                            TempData["Error"] = $"Error al buscar estado: {response.ReasonPhrase}";
                         }
                     }
                 }

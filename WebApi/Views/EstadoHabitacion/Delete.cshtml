@@ -1,0 +1,146 @@
+﻿@model WebApi.Models.RoomModels.EstadoHabitacionModel
+
+@{
+    ViewData["Title"] = "Eliminar Estado de Habitación";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container mt-4">
+    <div class="card shadow border-danger">
+        <div class="card-header bg-danger text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-trash"></i> Eliminar Estado de Habitación
+                </h5>
+                <a asp-action="Index" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left"></i> Volver al Listado
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>¡Advertencia!</strong> Esta acción eliminará permanentemente el estado de habitación.
+                Si hay habitaciones que utilizan este estado, la operación podría fallar.
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">Detalles del Estado</h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">ID</dt>
+                                <dd class="col-sm-8 fw-bold">@Model.IdEstadoHabitacion</dd>
+
+                                <dt class="col-sm-4">Descripción</dt>
+                                <dd class="col-sm-8">
+                                    @{
+                                        string badgeClass = "secondary";
+
+                                        switch (Model.IdEstadoHabitacion)
+                                        {
+                                            case 1:
+                                                badgeClass = "success"; // Disponible
+                                                break;
+                                            case 2:
+                                                badgeClass = "danger"; // Ocupada
+                                                break;
+                                            case 3:
+                                                badgeClass = "warning"; // Mantenimiento
+                                                break;
+                                            case 4:
+                                                badgeClass = "info"; // Reservada
+                                                break;
+                                        }
+                                    }
+                                    <span class="badge bg-@badgeClass">@Model.Descripcion</span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">Información de Auditoria</h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Usuario</dt>
+                                <dd class="col-sm-8">@Model.UserID</dd>
+
+                                <dt class="col-sm-4">Actualización</dt>
+                                <dd class="col-sm-8">@Model.ChangeTime.ToString("dd/MM/yyyy HH:mm")</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post" id="deleteForm">
+                <input type="hidden" asp-for="IdEstadoHabitacion" />
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">
+                        <i class="bi bi-trash"></i> Eliminar Estado
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="fs-5">¿Está completamente seguro que desea eliminar este estado de habitación?</p>
+                <p><strong>Estado:</strong> @Model.Descripcion</p>
+                <p class="text-danger">Esta operación no se puede deshacer. Si hay habitaciones asociadas a este estado, la operación podría fallar.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnSubmitForm">
+                    <i class="bi bi-exclamation-triangle"></i> Sí, eliminar definitivamente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Mostrar modal de confirmación
+            $("#btnConfirmarEliminar").click(function() {
+                var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                confirmModal.show();
+            });
+
+            // Enviar formulario desde el modal
+            $("#btnSubmitForm").click(function() {
+                $("#deleteForm").submit();
+            });
+        });
+    </script>
+}
