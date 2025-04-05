@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using WebApi.Models.UsersModels;
+using WebApi.Models.UsersModels.ClientModels;
 
 namespace WebApi.Controllers.UsersControllers
 {

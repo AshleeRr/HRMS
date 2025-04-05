@@ -22,6 +22,7 @@ namespace HRMS.IOC.UsersDependencies
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IValidator<SaveUserDTO>, UserServiceValidator>();
             services.AddScoped<ILoggingServices, LoggingServices>();
+            //services.AddScoped<INotificationService, NotificationServiceFake>();
             return services;
         }
     }

@@ -4,6 +4,6 @@ namespace HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs
 {
     public class RemoveUserRoleDTO : SoftDeleteBaseDTO
     {
-        public int IdUserRole { get; set; }
+        public int IdRolUsuario { get; set; }
     }
 }

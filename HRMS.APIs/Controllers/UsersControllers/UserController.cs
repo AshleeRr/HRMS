@@ -1,7 +1,6 @@
 ﻿using HRMS.Application.DTOs.UsersDTOs.ClientDTOs;
 using HRMS.Application.DTOs.UsersDTOs.UserDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
-using HRMS.Domain.Entities.Users;
 using HRMS.Persistence.Interfaces.IUsersRepository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,7 +41,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             var createdUser = (UserViewDTO)u.Data;
             var userId = createdUser.IdUsuario;
             
-            if (user.IdUserRole == 1)
+            if (user.IdRolUsuario == 1)
             {
                 var clientDto = new SaveClientDTO
                 {
@@ -51,7 +50,9 @@ namespace HRMS.APIs.Controllers.UsersControllers
                     Clave = user.Clave,
                     Documento = user.Documento,
                     TipoDocumento = user.TipoDocumento,
-                    IdUsuario = userId 
+                    IdUsuario = userId,
+                    UserID = user.UserID
+
                 };
                 var client = await _clientService.Save(clientDto);
                 if (!client.IsSuccess)
@@ -149,7 +150,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 return BadRequest($"No se ha podido encontrar un usuario con este id:{id}");
             }
             var updatedUser = await _userService.Update(user);
-            if (user.IdUserRole == 1)
+            if (user.IdRolUsuario == 1)
             {
                 var client = await _clientService.GetById(id);
                 if (client != null)
@@ -174,7 +175,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 
             }
             var createdUser = (UserViewDTO)user.Data;
-            var userRole = createdUser.IdUserRole;
+            var userRole = createdUser.IdRolUsuario;
             if(userRole == 1)
             {
                 var c = await _clientService.GetClientByUserIdAsync(id);
@@ -214,7 +215,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
 
             var createdUser = (UserViewDTO)user.Data;
-            var userRole = createdUser.IdUserRole;
+            var userRole = createdUser.IdRolUsuario;
             if(userRole == 1)
             {
                 var c = await _clientService.GetClientByUserIdAsync(id);
@@ -240,7 +241,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 return BadRequest("Error actualizando la clave del usuario");
             }
             var createdUser = (UserViewDTO)user.Data;
-            var userRole = createdUser.IdUserRole;
+            var userRole = createdUser.IdRolUsuario;
             if(userRole == 1)
             {
                 var c = await _clientService.GetClientByUserIdAsync(id);
@@ -265,7 +266,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
                 return BadRequest("Error actualizando el correo usuario");
             }
             var createdUser = (UserViewDTO)user.Data;
-            var userRole = createdUser.IdUserRole;
+            var userRole = createdUser.IdRolUsuario;
             if(userRole == 1)
             {
                 var c = await _clientService.GetClientByUserIdAsync(id);
@@ -288,7 +289,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             {
                 return BadRequest("Error al eliminar el usuario");
             }
-            var c = await _clientService.GetClientByUserIdAsync(user.Id);
+            var c = await _clientService.GetClientByUserIdAsync(user.IdUsuario);
             if (c != null)
             {
                 var client = await _clientService.Remove(user);

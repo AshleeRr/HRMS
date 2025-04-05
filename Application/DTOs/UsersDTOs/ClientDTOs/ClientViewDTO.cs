@@ -2,6 +2,6 @@
 {
     public class ClientViewDTO : ClientDTO
     {
-        public int IdClient { get; set; }
+        public int IdCliente { get; set; }
     }
 }

@@ -50,7 +50,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
         public async Task<IActionResult> GetUserRoleById(int id)
         {
             ValidateId(id);
-            var existingUserRole = await _userRoleRepository.GetEntityByIdAsync(id);
+            var existingUserRole = await _userRoleService.GetById(id);
             if (existingUserRole == null)
             {
                 return NotFound($"Rol de usuario con id: {id} no encontrado");
@@ -98,14 +98,15 @@ namespace HRMS.APIs.Controllers.UsersControllers
         public async Task<IActionResult> UpdateUserRole(int id, [FromBody] UpdateUserRoleDTO userRole)
         {
             ValidateNull(userRole.Descripcion, "descripcion");
-            ValidateNull(userRole.Nombre, "nombre");
+            ValidateNull(userRole.RolNombre, "nombre");
             ValidateId(id);
-            var rol = await _userRoleService.GetById(id);
-            if (rol == null)
+            var  existingRol = await _userRoleService.GetById(id);
+            if (!existingRol.IsSuccess)
             {
-                return NotFound("Rol de usuario no encontrado");
+                return BadRequest($"No se ha podido encontrar un rol con este id:{id}");
             }
             var updatedRol = await _userRoleService.Update(userRole);
+
             if (!updatedRol.IsSuccess)
             {
                 return BadRequest("Ocurrio un error actualizando el rol");
@@ -143,7 +144,8 @@ namespace HRMS.APIs.Controllers.UsersControllers
         [HttpDelete("role/{id}")]
         public async Task<IActionResult> Delete([FromBody] RemoveUserRoleDTO dto )
         {
-            if(dto.IdUserRole > 0){
+            if(dto.IdRolUsuario > 0)
+            {
                 var rol = await _userRoleService.Remove(dto);
                 if (!rol.IsSuccess)
                 {

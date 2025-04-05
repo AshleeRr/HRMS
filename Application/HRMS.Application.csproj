@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HRMS.Application\HRMS.Infraestructure.csproj" />
+    <ProjectReference Include="..\HRMS.Domain\HRMS.Domain.csproj" />
+    <ProjectReference Include="..\HRMS.Models\HRMS.Models.csproj" />
     <ProjectReference Include="..\HRMS.Persistence\HRMS.Persistence.csproj" />
   </ItemGroup>
 

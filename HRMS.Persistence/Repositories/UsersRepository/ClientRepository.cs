@@ -24,40 +24,96 @@ namespace HRMS.Persistence.Repositories.UsersRepository
             _validator = validator;
         }
        
-        public async Task<Client> GetClientByEmailAsync(string correo) 
+        public async Task<OperationResult> GetClientByEmailAsync(string correo) 
         {
-            ValidateNulleable(correo, "correo");
-            var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Correo == correo);
-            if (cliente == null) 
+            OperationResult result = new OperationResult();
+            try
             {
-                await _loggerServices.LogWarning("No se encontró un cliente con este correo", this, nameof(GetClientByEmailAsync));
+                ValidateNulleable(correo, "correo");
+                var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Correo == correo);
+                if (cliente == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontró un cliente con este correo";
+                    await _loggerServices.LogWarning(result.Message, this, nameof(GetClientByEmailAsync));
+                }
+                else
+                {
+                    result.IsSuccess = true;
+                    result.Data = cliente;
+                    result.Message = "Cliente encontrado correctamente";
+                }
+
+            } catch (Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
             }
-            return cliente;
+            
+            return result;
         }
-        public async Task<Client> GetClientByDocumentAsync(string documento)
+        public async Task<OperationResult> GetClientByDocumentAsync(string documento)
         {
-            ValidateNulleable(documento, "documento");
-            var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Documento == documento);
-            if (cliente == null)
+            OperationResult result = new OperationResult();
+            try
             {
-                await _loggerServices.LogWarning("No se encontró un cliente con este documento", this, nameof(GetClientByDocumentAsync));
+                ValidateNulleable(documento, "documento");
+                var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.Documento == documento);
+                if (cliente == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontró un cliente con este documento";
+                    await _loggerServices.LogWarning(result.Message, this, nameof(GetClientByDocumentAsync));
+                }
+                else
+                {
+                    result.IsSuccess = true;
+                    result.Data = cliente;
+                    result.Message = "Cliente encontrado correctamente";
+                }
+
+            }catch(Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
             }
-            return cliente;
+            
+            return result;
         }
-        public async Task<List<Client>> GetClientsByTypeDocumentAsync(string tipoDocumento)
+        public async Task<OperationResult> GetClientsByTypeDocumentAsync(string tipoDocumento)
         {
-            ValidateNulleable(tipoDocumento, "tipo documento");
-            var clientes = await _context.Clients.Where(c => c.TipoDocumento == tipoDocumento).ToListAsync();
-            if (!clientes.Any())
+            OperationResult result = new OperationResult();
+            try
             {
-                await _loggerServices.LogWarning("No se encontraron clientes con ese tipo de documento", this, nameof(GetClientsByTypeDocumentAsync));
+                ValidateNulleable(tipoDocumento, "tipo documento");
+                var clientes = await _context.Clients.Where(c => c.TipoDocumento == tipoDocumento).ToListAsync();
+                if (!clientes.Any())
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontraron clientes con ese tipo de documento";
+                    await _loggerServices.LogWarning(result.Message, this, nameof(GetClientsByTypeDocumentAsync));
+                }
+                else
+                {
+                    result.IsSuccess = true;
+                    result.Data = clientes;
+                    result.Message = "Clientes encontrados correctamente";
+                }
+
+            }catch (Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
             }
-            return clientes;
+
+            return result;
         }
         public async Task<Client> GetClientByUserIdAsync(int idUsuario)
         {
             ValidateId(idUsuario);
-            return await _context.Clients.FirstOrDefaultAsync(c => c.IdUsuario == idUsuario);
+            var cliente = await _context.Clients.FirstOrDefaultAsync(c => c.IdUsuario == idUsuario);
+            if (cliente == null)
+            {
+                await _loggerServices.LogWarning("No se encontró un cliente con este id de usuario", this, nameof(GetClientByUserIdAsync));
+            }
+            return cliente;
         }
         public override async Task<OperationResult> GetAllAsync(Expression<Func<Client, bool>> filter)
         {
@@ -169,7 +225,6 @@ namespace HRMS.Persistence.Repositories.UsersRepository
         {
             if (string.IsNullOrEmpty(x))
             {
-                _loggerServices.LogError(x, $"El campo: {message} no puede estar vacio.");
                 throw new ArgumentException($"El campo: {message} no puede estar vacío.");
             }
         }

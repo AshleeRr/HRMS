@@ -121,25 +121,56 @@ namespace HRMS.Persistence.Repositories.UsersRepository
 
             return result;
         }
-        public async Task<UserRole> GetRoleByNameAsync(string rolNombre)
+        public async Task<OperationResult> GetRoleByNameAsync(string rolNombre)
         {
-            ValidateNulleable(rolNombre, "rol nombre");
-            var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.RolNombre == rolNombre);
-            if (rolUsuario == null)
+            OperationResult result = new OperationResult();
+            try
             {
-                await _loggerServices.LogError("No se encontró un rol con este nombre", this, nameof(GetRoleByNameAsync));
+                ValidateNulleable(rolNombre, "rol nombre");
+                var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.RolNombre == rolNombre);
+                if (rolUsuario == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontró un rol con este nombre";
+                    await _loggerServices.LogError(result.Message, this, nameof(GetRoleByNameAsync));
+                }
+                else {
+                    result.Data = rolUsuario;
+                    result.IsSuccess = true;
+                    result.Message = "Rol encontrado correctamente";
+                }
             }
-            return rolUsuario;
+            catch(Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
+            }
+            return result;
         }
-        public async Task<UserRole> GetRoleByDescriptionAsync(string descripcion)
+        public async Task<OperationResult> GetRoleByDescriptionAsync(string descripcion)
         {
-            ValidateNulleable(descripcion, "descripcion");
-            var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.Descripcion == descripcion);
-            if(rolUsuario == null)
+            OperationResult result = new OperationResult();
+            try
             {
-                await _loggerServices.LogWarning("No se encontró un rol con esta descripción", this, nameof(GetRoleByDescriptionAsync));
+                ValidateNulleable(descripcion, "descripcion");
+                var rolUsuario = await _context.UserRoles.AsNoTracking().FirstOrDefaultAsync(ur => ur.Descripcion == descripcion);
+                if (rolUsuario == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No se encontró un rol con esta descripción";
+                    await _loggerServices.LogWarning(result.Message, this, nameof(GetRoleByDescriptionAsync));
+                }
+                else
+                {
+                    result.Data = rolUsuario;
+                    result.IsSuccess = true;
+                    result.Message = "Rol encontrado correctamente";
+                }
+            }catch (Exception ex)
+            {
+                result = await _loggerServices.LogError(ex.Message, this);
             }
-            return rolUsuario;
+
+            return result;
         }
         public async Task<OperationResult> GetUsersByUserRoleIdAsync(int id)
         {
@@ -160,6 +191,8 @@ namespace HRMS.Persistence.Repositories.UsersRepository
                                        Email = users.Correo,
                                        TipoDocumento = users.TipoDocumento,
                                        Documento = users.Documento,
+                                       UserID = users.UserID,
+                                       ReferenceID = users.ReferenceID
                                    }).ToListAsync();
                     result.Data = query ?? new List<UserModel>();
                     result.IsSuccess = query.Any();
