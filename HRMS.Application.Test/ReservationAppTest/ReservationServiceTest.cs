@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HRMS.Domain.InfraestructureInterfaces.Logging;
+using HRMS.Infraestructure.Logging;
 
 namespace HRMS.Application.Test.ReservationAppTest
 {
@@ -118,7 +120,6 @@ namespace HRMS.Application.Test.ReservationAppTest
             reservTestId = ReservToReadPlaceHolder.IdRecepcion;
             reservToUpdate = ReservToReadPlaceHolder;
             _reservCanceled = ReservCanceledPlaceHolder;
-            _reservationService = new ReservationService(reservationRepository, new FakeLoggingServices());
         }
 
 

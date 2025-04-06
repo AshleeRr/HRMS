@@ -1,6 +1,7 @@
-﻿namespace WebApi.Models.RoomModels;
+﻿
+namespace WebApi.Models.RoomModels;
 
-public class HabitacionInfoModel : AuditEntity
+public class HabitacionInfoModel
 {
     public int IdHabitacion { get; set; }
     public string Numero { get; set; }

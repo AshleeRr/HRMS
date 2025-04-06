@@ -1,6 +1,8 @@
-﻿namespace WebApi.Models.RoomModels;
+﻿using WebApi.Models.BaseDTO;
 
-public class HabitacionModel : AuditEntity
+namespace WebApi.Models.RoomModels;
+
+public class HabitacionModel : DtoBase
 {
     public int idHabitacion { get; set; }
     public string numero { get; set; }

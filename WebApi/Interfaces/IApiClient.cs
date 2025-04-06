@@ -9,5 +9,6 @@ namespace WebApi.Interfaces
         Task<OperationResult> PostAsync<T>(string endpoint, T data);
         Task<OperationResult> PutAsync<T>(string endpoint, int id, T data);
         Task<OperationResult> DeleteAsync(string endpoint, int id);
+        Task<OperationResult> PatchAsync<T>(string endpoint, int id, T data);
     }
 }

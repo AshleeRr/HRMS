@@ -1,6 +1,7 @@
 using WebApi.Interfaces;
 using WebApi.Interfaces.RoomInterface;
 using WebApi.Repositories;
+using WebApi.Repositories.RoomRepositories;
 
 namespace WebApi
 {
@@ -20,6 +21,8 @@ namespace WebApi
             
             // Registrar los repositorios como servicios con ámbito (scoped)
             builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+            builder.Services.AddScoped<IPisoRepository, PisoRepository>();
+            builder.Services.AddScoped<IEstadoHabitacionRepository, EstadoHabitacionRepository>();
 
             // Agregar soporte para HttpClient factory
             builder.Services.AddHttpClient();

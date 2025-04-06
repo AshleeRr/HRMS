@@ -1,8 +1,7 @@
-﻿using HRMS.WebApi.Models;
-using HRMS.WebApi.Models.Reservation_2023_0731;
+﻿using HRMS.WebApi.Models.Reservation_2023_0731;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HRMS.Web.Controllers.ReservationControllers
+namespace WebApi.Controllers.ReservationControllers
 {
     public class ReservationController : Controller
     {
@@ -147,8 +146,5 @@ namespace HRMS.Web.Controllers.ReservationControllers
                 return View();
             }
         }
-
-
-}
     }
 }

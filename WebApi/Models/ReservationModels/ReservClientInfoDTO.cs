@@ -1,8 +1,8 @@
-﻿using HRMS.WebApi.Models.BaseDTO;
+﻿using WebApi.Models.BaseDTO;
 
 namespace HRMS.WebApi.Models.Reservation_2023_0731
 {
-    public class ReservClientInfoDTO : DTOBase
+    public class ReservClientInfoDTO : DtoBase
     {
         public int ReservationID { get; set; }
         public DateTime In { get; set; }

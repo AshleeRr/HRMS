@@ -256,7 +256,7 @@ namespace WebApi.Controllers.RoomControllers
         {
             try
             {
-                // Usamos directamente el apiClient para obtener los servicios
+                //No disponemos de un servicio para cargar los servicios, por lo que se hace una llamada a la API
                 var servicios = await _apiClient.GetAsync<IEnumerable<ServicioModel>>("Servicio/GetAllServicios");
                 
                 if (servicios != null && servicios.Any())

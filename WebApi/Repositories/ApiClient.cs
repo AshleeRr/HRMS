@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WebApi.Interfaces;
 using WebApi.Models;
@@ -24,8 +27,33 @@ namespace WebApi.Repositories
         /// </summary>
         public async Task<T> GetAsync<T>(string endpoint)
         {
-            var response = await _httpClient.GetAsync($"{_baseUrl}/{endpoint}");
-            return await ProcessResponseAsync<T>(response);
+            try
+            {
+                // Preservar el formato original del endpoint
+                string url = $"{_baseUrl}/{endpoint}";
+                
+                var response = await _httpClient.GetAsync(url);
+                var result = await ProcessResponseAsync<T>(response);
+
+                if (result == null || EqualityComparer<T>.Default.Equals(result, default(T)))
+                {
+                    if (typeof(T) == typeof(OperationResult))
+                    {
+                        return (T)(object)OperationResult.Failure($"Error al obtener datos de {endpoint}");
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                if (typeof(T) == typeof(OperationResult))
+                {
+                    return (T)(object)OperationResult.Failure($"Error inesperado: {ex.Message}");
+                }
+
+                return default(T);
+            }
         }
 
         /// <summary>
@@ -33,8 +61,33 @@ namespace WebApi.Repositories
         /// </summary>
         public async Task<T> GetByIdAsync<T>(string endpoint, int id)
         {
-            var response = await _httpClient.GetAsync($"{_baseUrl}/{endpoint}{id}");
-            return await ProcessResponseAsync<T>(response);
+            try
+            {
+                // No modificar el endpoint - dejarlo como está
+                string url = $"{_baseUrl}/{endpoint}{id}";
+                
+                var response = await _httpClient.GetAsync(url);
+                var result = await ProcessResponseAsync<T>(response);
+
+                if (result == null || EqualityComparer<T>.Default.Equals(result, default(T)))
+                {
+                    if (typeof(T) == typeof(OperationResult))
+                    {
+                        return (T)(object)OperationResult.Failure($"Error al obtener datos con ID {id} de {endpoint}");
+                    }
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                if (typeof(T) == typeof(OperationResult))
+                {
+                    return (T)(object)OperationResult.Failure($"Error inesperado: {ex.Message}");
+                }
+
+                return default(T);
+            }
         }
 
         /// <summary>
@@ -42,10 +95,20 @@ namespace WebApi.Repositories
         /// </summary>
         public async Task<OperationResult> PostAsync<T>(string endpoint, T data)
         {
-            var json = JsonConvert.SerializeObject(data);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"{_baseUrl}/{endpoint}", content);
-            return await ProcessOperationResultAsync(response);
+            try
+            {
+                var json = JsonConvert.SerializeObject(data);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                
+                string url = $"{_baseUrl}/{endpoint}";
+                var response = await _httpClient.PostAsync(url, content);
+                
+                return await ProcessOperationResultAsync(response);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failure($"Error al realizar POST: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -53,10 +116,21 @@ namespace WebApi.Repositories
         /// </summary>
         public async Task<OperationResult> PutAsync<T>(string endpoint, int id, T data)
         {
-            var json = JsonConvert.SerializeObject(data);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"{_baseUrl}/{endpoint}{id}", content);
-            return await ProcessOperationResultAsync(response);
+            try
+            {
+                var json = JsonConvert.SerializeObject(data);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                
+                // Concatenar el ID directamente sin barra diagonal
+                string url = $"{_baseUrl}/{endpoint}{id}";
+                var response = await _httpClient.PutAsync(url, content);
+                
+                return await ProcessOperationResultAsync(response);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failure($"Error al realizar PUT: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -64,8 +138,51 @@ namespace WebApi.Repositories
         /// </summary>
         public async Task<OperationResult> DeleteAsync(string endpoint, int id)
         {
-            var response = await _httpClient.DeleteAsync($"{_baseUrl}/{endpoint}{id}");
-            return await ProcessOperationResultAsync(response);
+            try
+            {
+                // Concatenar el ID directamente sin barra diagonal
+                string url = $"{_baseUrl}/{endpoint}{id}";
+                var response = await _httpClient.DeleteAsync(url);
+                
+                // Manejo específico para errores comunes en eliminación
+                var content = await response.Content.ReadAsStringAsync();
+                if (!response.IsSuccessStatusCode && content.Contains("habitaciones asociadas"))
+                {
+                    return OperationResult.Failure("No se puede eliminar porque tiene elementos asociados. Debe eliminar o reubicar estos elementos primero.");
+                }
+                
+                return await ProcessOperationResultAsync(response);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failure($"Error al realizar DELETE: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Realiza una petición PATCH a la API
+        /// </summary>
+        public async Task<OperationResult> PatchAsync<T>(string endpoint, int id, T data)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(data);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // Concatenar el ID directamente sin barra diagonal
+                string url = $"{_baseUrl}/{endpoint}{id}";
+                
+                // Crear una solicitud PATCH
+                var request = new HttpRequestMessage(new HttpMethod("PATCH"), url);
+                request.Content = content;
+
+                var response = await _httpClient.SendAsync(request);
+                return await ProcessOperationResultAsync(response);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failure($"Error al realizar PATCH: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -73,54 +190,80 @@ namespace WebApi.Repositories
         /// </summary>
         private async Task<T> ProcessResponseAsync<T>(HttpResponseMessage response)
         {
+            var content = await response.Content.ReadAsStringAsync();
+
             if (!response.IsSuccessStatusCode)
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                throw new ApiException(errorContent, response.StatusCode);
+                try
+                {
+                    var apiError = JsonConvert.DeserializeObject<ApiErrorResponse>(content);
+                    if (apiError != null && !string.IsNullOrEmpty(apiError.Detail))
+                    {
+                        if (typeof(T) == typeof(OperationResult))
+                        {
+                            return (T)(object)OperationResult.Failure(apiError.Detail, apiError);
+                        }
+
+                        return default(T);
+                    }
+                }
+                catch
+                {
+                    // Ignorar errores de deserialización y continuar
+                }
+
+                if (typeof(T) == typeof(OperationResult))
+                {
+                    return (T)(object)OperationResult.Failure($"Error: {response.ReasonPhrase}. Detalles: {content}");
+                }
+
+                return default(T);
             }
 
-            var content = await response.Content.ReadAsStringAsync();
-            
             try
             {
-                // Primero intentamos deserializar como OperationResult
                 var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                
-                if (operationResult?.IsSuccess == true && operationResult.Data != null)
+
+                if (operationResult != null)
                 {
-                    // Si es un OperationResult exitoso, deserializamos su propiedad Data
-                    return JsonConvert.DeserializeObject<T>(
-                        JsonConvert.SerializeObject(operationResult.Data));
-                }
-                else if (operationResult?.IsSuccess == false)
-                {
-                    // Si es un OperationResult fallido, lanzamos una excepción
-                    throw new ApiException(operationResult.Message ?? "Error en la operación", response.StatusCode);
+                    if (operationResult.IsSuccess && operationResult.Data != null)
+                    {
+                        return JsonConvert.DeserializeObject<T>(
+                            JsonConvert.SerializeObject(operationResult.Data));
+                    }
+                    else if (!operationResult.IsSuccess)
+                    {
+                        if (typeof(T) == typeof(OperationResult))
+                        {
+                            return (T)(object)operationResult;
+                        }
+
+                        return default(T);
+                    }
                 }
             }
-            catch (JsonSerializationException)
+            catch
             {
-                // Si no es un OperationResult, continuamos con el siguiente intento
+                // Ignorar errores de deserialización y continuar
             }
-            
-            // Si no pudimos deserializar como OperationResult o si el objeto no era un OperationResult,
-            // intentamos deserializar directamente al tipo solicitado
+
             try
             {
-                return JsonConvert.DeserializeObject<T>(content);
+                var result = JsonConvert.DeserializeObject<T>(content);
+                return result;
             }
-            catch (JsonSerializationException ex)
+            catch
             {
-                // Si tampoco podemos deserializar directamente, lanzamos una excepción detallada
-                throw new ApiException(
-                    $"No se pudo deserializar la respuesta. Contenido: {content}. Error: {ex.Message}",
-                    response.StatusCode);
+                if (typeof(T) == typeof(OperationResult))
+                {
+                    return (T)(object)OperationResult.Failure(
+                        $"No se pudo deserializar la respuesta. Contenido: {content}");
+                }
+
+                return default(T);
             }
         }
 
-        /// <summary>
-        /// Procesa la respuesta HTTP para operaciones que devuelven OperationResult
-        /// </summary>
         /// <summary>
         /// Procesa la respuesta HTTP para operaciones que devuelven OperationResult
         /// </summary>
@@ -136,12 +279,7 @@ namespace WebApi.Repositories
                     var apiError = JsonConvert.DeserializeObject<ApiErrorResponse>(content);
                     if (apiError != null && !string.IsNullOrEmpty(apiError.Detail))
                     {
-                        return new OperationResult
-                        {
-                            IsSuccess = false,
-                            Message = apiError.Detail,
-                            Data = apiError
-                        };
+                        return OperationResult.Failure(apiError.Detail, apiError);
                     }
                 }
                 catch
@@ -163,24 +301,17 @@ namespace WebApi.Repositories
                     // Si no es un OperationResult, continuamos
                 }
 
-                // Si no pudimos deserializar en ninguno de los formatos conocidos,
-                // creamos un OperationResult genérico de error
-                return new OperationResult
-                {
-                    IsSuccess = false,
-                    Message = $"Error: {response.ReasonPhrase}. Detalles: {content}"
-                };
+                return OperationResult.Failure($"Error: {response.ReasonPhrase}. Detalles: {content}");
             }
 
             try
             {
-                return JsonConvert.DeserializeObject<OperationResult>(content) ??
-                       new OperationResult { IsSuccess = true, Message = "Operación completada con éxito" };
+                var result = JsonConvert.DeserializeObject<OperationResult>(content);
+                return result ?? OperationResult.Success("Operación completada con éxito");
             }
             catch
             {
-                // Si no podemos deserializar como OperationResult, creamos uno nuevo con éxito
-                return new OperationResult { IsSuccess = true, Message = "Operación completada con éxito" };
+                return OperationResult.Success("Operación completada con éxito");
             }
         }
     }

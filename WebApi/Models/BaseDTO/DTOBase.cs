@@ -1,8 +1,8 @@
-﻿namespace HRMS.WebApi.Models.BaseDTO
+﻿namespace WebApi.Models.BaseDTO
 {
-    public abstract class DTOBase
+    public abstract class DtoBase
     {
-        public DateTime ChangeTime { get; set; }
-        public int UserID { get; set; }
+        public DateTime? ChangeTime { get; set; }
+        public int? UserID { get; set; }
     }
 }

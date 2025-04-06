@@ -22,16 +22,49 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/WebApi/Models/ApiErrorResponse.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Repositories/ApiClient.cs" afterDir="false" />
+    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment=",">
+      <change afterPath="$PROJECT_DIR$/WebApi/Interfaces/RoomInterface/IEstadoHabitacionRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WebApi/Interfaces/RoomInterface/IHabitacionRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WebApi/Interfaces/RoomInterface/IPisoRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WebApi/Repositories/RoomRepositories/EstadoHabitacionRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WebApi/Repositories/RoomRepositories/HabitacionRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WebApi/Repositories/RoomRepositories/PisoRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Application.Test/ReservationAppTest/ReservationServiceTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Application.Test/ReservationAppTest/ReservationServiceTest.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/ReservationTests/LoadPlaceHolderToContextInMemory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/ReservationTests/LoadPlaceHolderToContextInMemory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Controllers/ReservationControllers/ReservationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/ReservationControllers/ReservationController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WebApi/Controllers/RoomControllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/RoomControllers/CategoriaController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Repositories/ApiCliente.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Repositories/ApiException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/ApiException.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Repositories/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Repositories/CategoriaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Controllers/RoomControllers/EstadoHabitacionController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/RoomControllers/EstadoHabitacionController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Controllers/RoomControllers/PisoController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/RoomControllers/PisoController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Interfaces/IApiClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Interfaces/IApiClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/AuditEntity.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/BaseDTO/BaseUsersDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/BaseDTO/BaseUsersDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/BaseDTO/DTOBase.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/BaseDTO/DTOBase.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/BaseDTO/SoftDeleteBaseDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/BaseDTO/SoftDeleteBaseDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservClientInfoDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservClientInfoDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservationAddDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservationAddDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservationConfirmDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservationConfirmDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservationDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservationDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservationRemoveDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservationRemoveDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservationUpdateDTO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/ReservationModels/ReservationUpdateDTO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/RoomModels/CategoriaModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/CategoriaModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/RoomModels/EstadoHabitacionModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/EstadoHabitacionModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/RoomModels/HabitacionInfoModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/HabitacionInfoModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/RoomModels/HabitacionModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/HabitacionModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/RoomModels/PisoModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/PisoModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Models/RoomModels/TarifaModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/RoomModels/TarifaModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Repositories/ApiClient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Repositories/ApiClient.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Repositories/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Repositories/RoomRepositories/CategoriaRepository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Views/Categoria/Delete.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/Categoria/Delete.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Views/Categoria/Details.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/Categoria/Details.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Views/EstadoHabitacion/Delete.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/EstadoHabitacion/Delete.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Views/EstadoHabitacion/Details.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/EstadoHabitacion/Details.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Views/Habitacion/Details.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/Habitacion/Details.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Views/Piso/Delete.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/Piso/Delete.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Views/Piso/Details.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/Piso/Details.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Views/Piso/Index.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/Piso/Index.cshtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Views/Tarifa/Details.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Views/Tarifa/Details.cshtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,14 +95,15 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Application/DTOs/RoomManagementDto/EstadoHabitacionDtos/BaseEstadoHabitacionDto.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Controllers/ReservationController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.APIs/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/EstadoHabitacionController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/WebApi/Controllers/RoomControllers/CategoriaController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/WebApi/Repositories/CategoriaRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/WebApi/Repositories/CategoriaRepository.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0fbc4d3b821e47d7a79878451a0956b944928/d0/f35b51ac/ValidationSummary.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5acc345db3c207bc9d886a36ff14867ef8d65557432172c2a42f19aeac04d1b/Nullable.cs" root0="FORCE_HIGHLIGHTING" />
@@ -82,7 +116,7 @@
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="SWEA" />
+    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -116,7 +150,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected=".NET Launch Settings Profile.WebApi: http">
+  <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.APIs: http">
     <configuration name="Unnamed (1)" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false" temporary="true">
       <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.Application.Test/HRMS.Application.Test.csproj" />
       <option name="PROJECT_TFM" value="" />
@@ -651,7 +685,23 @@
       <option name="project" value="LOCAL" />
       <updated>1743541209181</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Clase para menssaje de valiciones de la api">
+      <option name="closed" value="true" />
+      <created>1743897991476</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1743897991476</updated>
+    </task>
+    <task id="LOCAL-00022" summary=",">
+      <option name="closed" value="true" />
+      <created>1743898012500</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1743898012500</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -703,7 +753,9 @@
     <MESSAGE value="Metodo agregados para refactory" />
     <MESSAGE value="Enviado para mejora" />
     <MESSAGE value="Peores practicas del mundo" />
-    <option name="LAST_COMMIT_MESSAGE" value="Peores practicas del mundo" />
+    <MESSAGE value="Clase para menssaje de valiciones de la api" />
+    <MESSAGE value="," />
+    <option name="LAST_COMMIT_MESSAGE" value="," />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -1,6 +1,8 @@
-﻿namespace WebApi.Models.RoomModels;
+﻿using WebApi.Models.BaseDTO;
 
-public class TarifaModel : AuditEntity
+namespace WebApi.Models.RoomModels;
+
+public class TarifaModel : DtoBase
 {
     public int IdTarifa { get; set; }
     public DateTime FechaInicio { get; set; }

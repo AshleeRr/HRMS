@@ -1,6 +1,8 @@
-﻿namespace WebApi.Models.RoomModels;
+﻿using WebApi.Models.BaseDTO;
 
-public class CategoriaModel : AuditEntity
+namespace WebApi.Models.RoomModels;
+
+public class CategoriaModel : DtoBase
 {
 
         public int IdCategoria { get; set; }

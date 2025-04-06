@@ -1,119 +1,44 @@
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Text;
-using WebApi.Models;
+using WebApi.Interfaces;
+using WebApi.Interfaces.RoomInterface;
 using WebApi.Models.RoomModels;
 
 namespace WebApi.Controllers.RoomControllers
 {
     public class EstadoHabitacionController : Controller
     {
-        private const string _apiBaseUrl = "https://localhost:7175/api";
+        private readonly IEstadoHabitacionRepository _estadoHabitacionRepository;
+        private readonly IApiClient _apiClient;
 
+        public EstadoHabitacionController(IEstadoHabitacionRepository estadoHabitacionRepository, IApiClient apiClient)
+        {
+            _estadoHabitacionRepository = estadoHabitacionRepository;
+            _apiClient = apiClient;
+        }
+        
         // GET: EstadoHabitacionController
         public async Task<IActionResult> Index()
         {
             List<EstadoHabitacionModel> estados = new List<EstadoHabitacionModel>();
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoHabitaciones");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try 
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                estados = JsonConvert.DeserializeObject<List<EstadoHabitacionModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch (JsonSerializationException)
-                        {
-                            try
-                            {
-                                estados = JsonConvert.DeserializeObject<List<EstadoHabitacionModel>>(content);
-                            }
-                            catch (Exception ex)
-                            {
-                                TempData["Error"] = $"Error al procesar datos: {ex.Message}";
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener estados: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener estados: {response.ReasonPhrase}";
-                        }
-                    }
-                }
+                estados = (await _estadoHabitacionRepository.GetAllAsync()).ToList();
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error inesperado: {ex.Message}";
             }
-            
-            TempData["Success"] = TempData["Success"]; 
+
             return View(estados);
         }
 
         // GET: EstadoHabitacionController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            EstadoHabitacionModel estado = new EstadoHabitacionModel();
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoBy(id){id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(content);
-                        }
-                        
-                        return View(estado);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener los detalles del estado: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener los detalles del estado: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
-                }
+                var estado = await _estadoHabitacionRepository.GetByIdAsync(id);
+                return View(estado);
             }
             catch (Exception ex)
             {
@@ -137,43 +62,15 @@ namespace WebApi.Controllers.RoomControllers
             {
                 if (ModelState.IsValid)
                 {
-                    using (var client = new HttpClient())
+                    var result = await _estadoHabitacionRepository.CreateAsync(estado);
+                    
+                    if (result.IsSuccess)
                     {
-                        var json = JsonConvert.SerializeObject(estado);
-                        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                        var response = await client.PostAsync($"{_apiBaseUrl}/EstadoHabitacion/CreateEstadoHabitacion", content);
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var responseContent = await response.Content.ReadAsStringAsync();
-                            try
-                            {
-                                var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
-                                if (operationResult != null && operationResult.IsSuccess)
-                                {
-                                    TempData["Success"] = operationResult.Message ?? "Estado de habitación creado correctamente.";
-                                    return RedirectToAction(nameof(Index));
-                                }
-                            }
-                            catch
-                            {
-                                TempData["Success"] = "Estado de habitación creado correctamente.";
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                        
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al crear el estado: {errorContent}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al crear el estado: {errorContent}";
-                        }
+                        TempData["Success"] = result.Message ?? "Estado creado correctamente.";
+                        return RedirectToAction(nameof(Index));
                     }
+                    
+                    TempData["Error"] = result.Message ?? "Error al crear la estado de habitacion.";
                 }
                 
                 return View(estado);
@@ -188,53 +85,15 @@ namespace WebApi.Controllers.RoomControllers
         // GET: EstadoHabitacionController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            EstadoHabitacionModel estado = new EstadoHabitacionModel();
             try
             {
-                using (var client = new HttpClient())
+                var estado = await _estadoHabitacionRepository.GetByIdAsync(id);
+                
+                if (estado != null && estado.IdEstadoHabitacion != id)
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoBy(id){id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(content);
-                        }
-                        
-                        if (estado != null && estado.IdEstadoHabitacion != id)
-                        {
-                            estado.IdEstadoHabitacion = id;
-                        }
-                        
-                        return View(estado);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener el estado: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener el estado: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
+                    estado.IdEstadoHabitacion = id;
                 }
+                return View(estado);
             }
             catch (Exception ex)
             {
@@ -256,51 +115,17 @@ namespace WebApi.Controllers.RoomControllers
                     {
                         estado.IdEstadoHabitacion = id;
                     }
-                    
-                    estado.ChangeTime = DateTime.Now;
-                    
-                    using (var client = new HttpClient())
+                    var result = await _estadoHabitacionRepository.UpdateAsync(id, estado);
+            
+                    if (result.IsSuccess)
                     {
-                        var json = JsonConvert.SerializeObject(estado);
-                        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                        var request = new HttpRequestMessage(new HttpMethod("PATCH"), $"{_apiBaseUrl}/EstadoHabitacion/UpdateEstadoHabitacionById{id}");
-                        request.Content = content;
-                        
-                        var response = await client.SendAsync(request);
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var responseContent = await response.Content.ReadAsStringAsync();
-                            try
-                            {
-                                var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
-                                if (operationResult != null && operationResult.IsSuccess)
-                                {
-                                    TempData["Success"] = operationResult.Message ?? "Estado de habitación actualizado correctamente.";
-                                    return RedirectToAction(nameof(Index));
-                                }
-                            }
-                            catch
-                            {
-                                TempData["Success"] = "Estado de habitación actualizado correctamente.";
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                        
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al actualizar el estado: {errorContent}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al actualizar el estado: {errorContent}";
-                        }
+                        TempData["Success"] = result.Message ?? "Estado habitacion actualizado correctamente.";
+                        return RedirectToAction(nameof(Index));
                     }
+            
+                    TempData["Error"] = result.Message ?? "Error al actualizar el estado.";
                 }
-                
+        
                 return View(estado);
             }
             catch (Exception ex)
@@ -313,54 +138,17 @@ namespace WebApi.Controllers.RoomControllers
         // GET: EstadoHabitacionController/Delete/5
         public async Task<ActionResult> Delete(int id)
         {
-            EstadoHabitacionModel estado = new EstadoHabitacionModel();
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoBy(id){id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(content);
-                        }
-                        
-                        return View(estado);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener el estado: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener el estado: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
-                }
+                var estado = await _estadoHabitacionRepository.GetByIdAsync(id);
+                return View(estado);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error inesperado: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
+            
         }
 
         // POST: EstadoHabitacionController/Delete/5
@@ -370,123 +158,15 @@ namespace WebApi.Controllers.RoomControllers
         {
             try
             {
-                using (var client = new HttpClient())
+                var result = await _estadoHabitacionRepository.DeleteAsync(id);
+                
+                if (result.IsSuccess)
                 {
-                    var response = await client.DeleteAsync($"{_apiBaseUrl}/EstadoHabitacion/DeleteEstadoHabitacionById{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
-                            if (operationResult != null && operationResult.IsSuccess)
-                            {
-                                TempData["Success"] = operationResult.Message ?? "Estado de habitación eliminado correctamente.";
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                        catch
-                        {
-                            TempData["Success"] = "Estado de habitación eliminado correctamente.";
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    try
-                    {
-                        var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                        
-                        if (operationResult?.Message?.Contains("habitaciones asociadas") == true)
-                        {
-                            TempData["Error"] = "No se puede eliminar el estado porque tiene habitaciones asociadas.";
-                        }
-                        else
-                        {
-                            TempData["Error"] = operationResult?.Message ?? "Error al eliminar el estado.";
-                        }
-                    }
-                    catch
-                    {
-                        TempData["Error"] = "No se puede eliminar el estado en este momento.";
-                    }
-                    
-                    if (Request.Path.Value?.Contains("/Delete/") == true)
-                    {
-                        return RedirectToAction(nameof(Delete), new { id });
-                    }
+                    TempData["Success"] = result.Message ?? "Estado eliminado correctamente.";
+                    return RedirectToAction(nameof(Index));
                 }
                 
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = $"Error inesperado: {ex.Message}";
-                return RedirectToAction(nameof(Index));
-            }
-        }
-
-        // GET: EstadoHabitacionController/GetByDescripcion
-        public async Task<ActionResult> GetByDescripcion(string descripcion)
-        {
-            List<EstadoHabitacionModel> estados = new List<EstadoHabitacionModel>();
-            try
-            {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoBy(descripcion){descripcion}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        EstadoHabitacionModel estado = null;
-                        
-                        try 
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch (JsonSerializationException)
-                        {
-                            try
-                            {
-                                estado = JsonConvert.DeserializeObject<EstadoHabitacionModel>(content);
-                            }
-                            catch (Exception ex)
-                            {
-                                TempData["Error"] = $"Error al procesar datos: {ex.Message}";
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                        
-                        if (estado != null)
-                        {
-                            estados.Add(estado);
-                            ViewBag.TituloLista = $"Estado con descripción: {descripcion}";
-                            return View("Index", estados);
-                        }
-                        
-                        TempData["Error"] = "No se encontró el estado.";
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al buscar estado: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al buscar estado: {response.ReasonPhrase}";
-                        }
-                    }
-                }
+                TempData["Error"] = result.Message ?? "Error al eliminar el estado.";
             }
             catch (Exception ex)
             {
@@ -494,6 +174,34 @@ namespace WebApi.Controllers.RoomControllers
             }
             
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: EstadoHabitacionController/GetByDescripcion
+        public async Task<ActionResult> GetByDescripcion(string descripcion)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(descripcion))
+                {
+                    TempData["Error"] = "La descripción no puede ser nula o vacía.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var piso = await _estadoHabitacionRepository.GetByDescripcionAsync(descripcion);
+                
+                if (piso == null)
+                {
+                    TempData["Error"] = $"No se encontró un Estados con la descripción: {descripcion}";
+                    return RedirectToAction(nameof(Index));
+                }
+                
+                return View("Details", piso);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }
