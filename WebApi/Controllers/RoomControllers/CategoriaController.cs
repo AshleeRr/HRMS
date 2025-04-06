@@ -164,6 +164,7 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // POST: CategoriaController/Delete/5
+        // POST: CategoriaController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id, IFormCollection collection)
@@ -171,28 +172,28 @@ namespace WebApi.Controllers.RoomControllers
             try
             {
                 var result = await _categoriaRepository.DeleteAsync(id);
-                
+        
                 if (result.IsSuccess)
                 {
                     TempData["Success"] = result.Message ?? "Categoría eliminada correctamente.";
                     return RedirectToAction(nameof(Index));
                 }
-                
-                // Verificar si el mensaje de error contiene información sobre habitaciones asociadas
-                if (result.Message?.Contains("habitaciones asociadas") == true)
+        
+                if (result.Message?.Contains("habitaciones asociadas") == true || 
+                    result.Message?.Contains("no se puede eliminar") == true)
                 {
-                    TempData["Error"] = "No se puede eliminar la categoría porque tiene habitaciones asociadas.";
+                    TempData["Error"] = result.Message;
                 }
                 else
                 {
                     TempData["Error"] = result.Message ?? "Error al eliminar la categoría.";
                 }
-                
+        
                 if (Request.Path.Value?.Contains("/Delete/") == true)
                 {
                     return RedirectToAction(nameof(Delete), new { id });
                 }
-                
+        
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)

@@ -1,5 +1,8 @@
 ﻿namespace WebApi.Repositories;
 
+/// <summary>
+/// Excepción personalizada para errores de la API
+/// </summary>
 public class ApiException : Exception
 {
     public System.Net.HttpStatusCode StatusCode { get; }
