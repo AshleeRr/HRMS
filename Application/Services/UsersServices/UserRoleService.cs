@@ -5,6 +5,7 @@ using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
+using System.Data;
 
 namespace HRMS.Application.Services.UsersServices
 {
@@ -13,31 +14,35 @@ namespace HRMS.Application.Services.UsersServices
         private readonly ILoggingServices _loggerServices;
         private readonly IUserRoleRepository _userRoleRepository;
         private readonly IValidator<SaveUserRoleDTO> _validator;
+        private readonly IUserRepository _userRepository;
         public UserRoleService(IUserRoleRepository userRoleRepository, IValidator<SaveUserRoleDTO> validator,
-                                ILoggingServices loggerServices) 
+                                ILoggingServices loggerServices, IUserRepository userRepository)
         {
             _userRoleRepository = userRoleRepository;
             _validator = validator;
             _loggerServices = loggerServices;
+            _userRepository = userRepository;
         }
         // mappers
         private UserRole MapSaveDto(SaveUserRoleDTO dto)
         {
             return new UserRole()
             {
+                RolNombre = dto.RolNombre,
                 Descripcion = dto.Descripcion,
-                RolNombre = dto.Nombre,
                 FechaCreacion = DateTime.Now,
+                UserID = dto.UserID
             };
         }
         private UserRoleViewDTO MapUserRoleToViewDto(UserRole userRole)
         {
             return new UserRoleViewDTO
             {
+                IdRolUsuario = userRole.IdRolUsuario,
+                RolNombre = userRole.RolNombre,
                 Descripcion = userRole.Descripcion,
-                Nombre = userRole.RolNombre,
-                IdUserRole = userRole.IdRolUsuario,
-                ChangeTime = (DateTime)userRole.FechaCreacion,
+                ChangeTime = userRole.FechaCreacion,
+                UserID = userRole.UserID
             };
         }
         // metodos
@@ -51,13 +56,13 @@ namespace HRMS.Application.Services.UsersServices
                 if (!userRoles.Any())
                 {
                     result.IsSuccess = false;
-                    result.Data = new List<UserRoleViewDTO>();
+                    result.Data = new List<UserRoleDTO>();
                     result.Message = "No hay roles de usuario registrados";
                 }
                 else
                 {
                     result.IsSuccess = true;
-                    result.Data = userRoles.Select(x => MapUserRoleToViewDto(x)).ToList();
+                    result.Data = userRoles.Select(MapUserRoleToViewDto).ToList();
                 }
             }
             catch (Exception ex)
@@ -95,21 +100,26 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateId(dto.IdUserRole);
-                var rolInUse = await _userRoleRepository.GetUsersByUserRoleIdAsync(dto.IdUserRole);
-                result.Message = ($"Resultado de GetUsersByUserRoleIdAsync: IsSuccess={rolInUse.IsSuccess}, Data={rolInUse.Data}");
+                ValidateId(dto.IdRolUsuario);
+                await ValidateUserIDAsync(dto.UserID);
+                var rolInUse = await _userRoleRepository.GetUsersByUserRoleIdAsync(dto.IdRolUsuario);
                 if (rolInUse.Data != null && rolInUse.Data.Count == 0) 
                 {
                     result.Message = "No hay usuarios utilizando el rol, se eliminara el rol seleccionado";
 
-                    var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
+                    var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdRolUsuario);
                     ValidateUserRole(userRole);
                     userRole.Estado = false;
-                    await _userRoleRepository.UpdateEntityAsync(userRole);
-                    result.IsSuccess = true;
-                    result.Message = "Rol de usuario eliminado correctamente";
-                    result.Data = dto;
-
+                    result = await _userRoleRepository.UpdateEntityAsync(userRole);
+                    if (result.IsSuccess)
+                    {
+                        result.Message = "Rol de usuario eliminado correctamente";
+                        result.Data = dto;
+                    }
+                    else
+                    {
+                        result.Message = "Error eliminando el rol de usuario";
+                    }
                 }
                 else
                 {
@@ -127,9 +137,6 @@ namespace HRMS.Application.Services.UsersServices
             catch (Exception ex)
             {
                 result = await _loggerServices.LogError(ex.Message, this);
-                ///
-                result.Message = "Se produjo un error inesperado durante la eliminación del rol.";
-                result.Message = ex.Message;
             }
             return result;
         }
@@ -145,12 +152,17 @@ namespace HRMS.Application.Services.UsersServices
                     result.Data = dto;
                     return result; 
                 }
+                await ValidateUserIDAsync(dto.UserID);
                 var userRole = MapSaveDto(dto);
                 result = await _userRoleRepository.SaveEntityAsync(userRole);
                 if (result.IsSuccess)
                 {
                     result.Message = "Rol de usuario guardado correctamente";
                     result.Data = dto;
+                }
+                else
+                {
+                    result.Message = "Error guardando el rol de usuario";
                 }
             }
             catch (Exception ex)
@@ -164,16 +176,25 @@ namespace HRMS.Application.Services.UsersServices
             OperationResult result = new OperationResult();
             try
             {
-                ValidateId(dto.IdUserRole);
-                var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
+                ValidateId(dto.IdRolUsuario);
+                await ValidateUserIDAsync(dto.UserID);
+                var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdRolUsuario);
                 ValidateUserRole(userRole);
                 userRole.Descripcion = dto.Descripcion;
-                userRole.RolNombre = dto.Nombre;
+                userRole.RolNombre = dto.RolNombre;
                 userRole.FechaCreacion = dto.ChangeTime;
-                await _userRoleRepository.UpdateEntityAsync(userRole);
-                result.Message = "Rol de usuario actualizado correctamente";
-                result.IsSuccess = true;
-                result.Data = dto;
+                userRole.UserID = dto.UserID;
+                result = await _userRoleRepository.UpdateEntityAsync(userRole);
+                if (result.IsSuccess)
+                {
+                    result.Message = "Rol de usuario actualizado correctamente";
+                    result.Data = MapUserRoleToViewDto(userRole);
+                }
+                else
+                {
+                    result.Message = "Error actualizando el rol de usuario";
+                }
+                
             }
             catch (ArgumentException ex)
             {
@@ -264,6 +285,16 @@ namespace HRMS.Application.Services.UsersServices
                 throw new ArgumentException("El id debe ser mayor que 0");
             }
             return id;
+        }
+        private async Task ValidateUserIDAsync(int userID)
+        {
+            ValidateId(userID);
+
+            bool userExists = await _userRepository.UserIDExistsAsync(userID);
+            if (!userExists)
+            {
+                throw new ArgumentException("El UserID ingresado no está registrado. No se puede proceder con el proceso");
+            }
         }
         private void ValidateNulleable(string x, string message)
         {

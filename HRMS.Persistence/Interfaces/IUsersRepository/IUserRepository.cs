@@ -6,9 +6,13 @@ namespace HRMS.Persistence.Interfaces.IUsersRepository
 {
     public interface IUserRepository : IBaseRepository<User, int>
     {
-        Task<List<User>> GetUsersByNameAsync(string nombreCompleto);
-        Task<User> GetUserByDocumentAsync(string documento);
-        Task<List<User>> GetUsersByTypeDocumentAsync(string tipoDocumento);
-        Task<User> GetUserByEmailAsync(string correo);
+        Task<OperationResult> GetUsersByNameAsync(string nombreCompleto);
+        Task<OperationResult> GetUserByDocumentAsync(string documento);
+        Task<OperationResult> GetUsersByTypeDocumentAsync(string tipoDocumento);
+        Task<OperationResult> GetUserByEmailAsync(string correo);
+        Task<int> GetLastReferenceIDAsync();
+        Task<bool> UserIDExistsAsync(int userID);
+
+
     }
 }

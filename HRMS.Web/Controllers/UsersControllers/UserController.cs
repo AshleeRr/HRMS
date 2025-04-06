@@ -53,7 +53,7 @@ namespace HRMS.Web.Controllers.UsersControllers
             try
             {
                 var user = await _userService.Save(dto);
-                if (dto.IdUserRole == 1)
+                if (dto.IdRolUsuario == 1)
                 {
                     var createdUser = user.Data;
                     var userID = createdUser.IdUser;
@@ -105,7 +105,7 @@ namespace HRMS.Web.Controllers.UsersControllers
             try
             {
                 var user = await _userService.Update(dto);
-                if (dto.IdUserRole == 1)
+                if (dto.IdUsuario == 1)
                 {
                     var client = await _clientService.GetClientByUserIdAsync(dto.IdUsuario);
                     if(client != null)

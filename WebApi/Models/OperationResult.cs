@@ -1,4 +1,4 @@
-﻿
+
 namespace WebApi.Models {
     public class OperationResult {
 

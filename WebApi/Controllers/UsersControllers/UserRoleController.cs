@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Reflection;
+using Newtonsoft.Json.Linq;
 using WebApi.Models;
-using WebApi.Models.UsersModels.UserModels;
 using WebApi.Models.UsersModels.UserRoleModels;
 
 namespace WebApi.Controllers.UsersControllers
@@ -44,7 +43,7 @@ namespace WebApi.Controllers.UsersControllers
         // GET: UserRoleController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            UserRoleByIdModel role = new UserRoleByIdModel();
+            UserRoleModel role = new UserRoleModel();
 
             try
             {
@@ -54,12 +53,10 @@ namespace WebApi.Controllers.UsersControllers
                     if (response.IsSuccessStatusCode)
                     {
                         var jsonString = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"JSON recibido: {jsonString}");
 
                         try
                         {
-                            // Deserialización directa
-                            role = JsonConvert.DeserializeObject<UserRoleByIdModel>(jsonString);
+                            role = JsonConvert.DeserializeObject<UserRoleModel>(jsonString);
                         }
                         catch (Exception ex)
                         {
@@ -106,8 +103,8 @@ namespace WebApi.Controllers.UsersControllers
                     var response = await client.PostAsJsonAsync<UserRoleSaveModel>("https://localhost:7175/api/UserRole/role", model);
                     if (response.IsSuccessStatusCode)
                     {
+                        var jsonString = await response.Content.ReadAsStringAsync();
                         op = await response.Content.ReadFromJsonAsync<OperationResult>();
-                        Console.WriteLine($"JSON recibido: {op}");
 
                     }
                     else
@@ -127,7 +124,7 @@ namespace WebApi.Controllers.UsersControllers
         // GET: UserRoleController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            UserRoleUpdateModel rol = new UserRoleUpdateModel();
+            UserRoleModel rol = new UserRoleModel();
 
             try
             {
@@ -137,10 +134,19 @@ namespace WebApi.Controllers.UsersControllers
                     if (response.IsSuccessStatusCode)
                     {
                         var jsonString = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"JSON recibido: {jsonString}");
+                        var result = JsonConvert.DeserializeObject<OperationResult>(jsonString);
 
-                        // Deserializar directamente a UserRoleUpdateModel
-                        rol = JsonConvert.DeserializeObject<UserRoleUpdateModel>(jsonString);
+                        if (result != null && result.IsSuccess && result.Data != null)
+                        {
+                            var dataJson = JsonConvert.SerializeObject(result.Data);
+                            Console.WriteLine($"JSON antes de deserializar: {dataJson}");
+                            rol = JsonConvert.DeserializeObject<UserRoleModel>(dataJson);
+                        }
+                        else
+                        {
+                            ViewBag.Message = "No se pudo procesar la respuesta de la API.";
+                            return View();
+                        }
                     }
                     else
                     {
@@ -152,23 +158,15 @@ namespace WebApi.Controllers.UsersControllers
             catch (Exception ex)
             {
                 ViewBag.Message = $"Error inesperado: {ex.Message}";
-                return View();
             }
-
-            if (rol == null)
-            {
-                ViewBag.Message = "No se encontró información para este rol.";
-                return View();
-            }
-
-            return View(rol);
+             return View(rol);
         }
 
 
         // POST: UserRoleController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(UserRoleUpdateModel model)
+        public async Task<IActionResult> Edit(UserRoleModel model)
         {
             OperationResult op = new OperationResult();
 
@@ -176,41 +174,25 @@ namespace WebApi.Controllers.UsersControllers
             {
                 using (var client = new HttpClient())
                 {
-                    // Crear modelo intermedio
-                    var apiModel = new UserRoleUpdateApiModel
-                    {
-                        IdUserRole = model.IdRolUsuario,
-                        Nombre = model.RolNombre, // Mapeo manual
-                        Descripcion = model.Descripcion,
-                        FechaCreacion = model.FechaCreacion,
-                        Estado = model.Estado
-                    };
-
-                    var response = await client.PutAsJsonAsync($"https://localhost:7175/api/UserRole/role/{model.IdRolUsuario}", apiModel);
+                    var response = await client.PutAsJsonAsync<UserRoleModel>($"https://localhost:7175/api/UserRole/role/{model.IdRolUsuario}", model);
 
                     if (response.IsSuccessStatusCode)
                     {
-                        var jsonString = await response.Content.ReadAsStringAsync();
-                        op = JsonConvert.DeserializeObject<OperationResult>(jsonString);
-
-                        if (op.IsSuccess)
-                            return RedirectToAction(nameof(Index));
-                        else
-                            ViewBag.Error = $"API Error: {op.Message}";
+                        op = await response.Content.ReadFromJsonAsync<OperationResult>();
                     }
                     else
                     {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        ViewBag.Error = $"Failed to update role: {errorContent}";
+                        ViewBag.Error = "Error al actualizar el rol";
+                        return View();
                     }
                 }
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 ViewBag.Error = $"Error inesperado: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
-
-            return View(model);
         }
     }
 }

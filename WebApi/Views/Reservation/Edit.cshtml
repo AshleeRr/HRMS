@@ -1,0 +1,62 @@
+﻿@model HRMS.WebApi.Models.Reservation_2023_0731.ReservationUpdateDTO
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ID" class="control-label"></label>
+                <input asp-for="ID" class="form-control" />
+                <span asp-validation-for="ID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="In" class="control-label"></label>
+                <input asp-for="In" class="form-control" />
+                <span asp-validation-for="In" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Out" class="control-label"></label>
+                <input asp-for="Out" class="form-control" />
+                <span asp-validation-for="Out" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Observations" class="control-label"></label>
+                <input asp-for="Observations" class="form-control" />
+                <span asp-validation-for="Observations" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AbonoPenalidad" class="control-label"></label>
+                <input asp-for="AbonoPenalidad" class="form-control" />
+                <span asp-validation-for="AbonoPenalidad" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ChangeTime" class="control-label"></label>
+                <input asp-for="ChangeTime" class="form-control" />
+                <span asp-validation-for="ChangeTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserID" class="control-label"></label>
+                <input asp-for="UserID" class="form-control" />
+                <span asp-validation-for="UserID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

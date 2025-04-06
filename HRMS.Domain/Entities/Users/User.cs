@@ -10,11 +10,10 @@ namespace HRMS.Domain.Entities.Users
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdUsuario { get; set; }
-        public string? Clave { get; set; }
         [ForeignKey("IdRolUsuario")]
         public int IdRolUsuario { get; set; }
-        public string? Documento { get; set; }
-        public string? TipoDocumento { get; set; }
+        public int UserID { get; set; }
+        public int ReferenceID { get; set; }
     }
 }
 

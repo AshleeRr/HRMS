@@ -2,12 +2,9 @@
 {
     public class UserRoleSaveModel
     {
-        public string Descripcion { get; set; }
-
-        public string Nombre { get; set; }
-
-        public DateTime ChangeTime { get; set; }
-
+        public string? RolNombre { get; set; }
+        public string? Descripcion { get; set; }
+        public DateTime FechaCreacion { get; set; }
         public int UserID { get; set; }
     }
 }
