@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using WebApi.Models;
 using WebApi.Models.UsersModels.UserRoleModels;
 

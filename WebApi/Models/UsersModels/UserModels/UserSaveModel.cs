@@ -1,14 +1,10 @@
-﻿namespace WebApi.Models.UsersModels.UserModels
+﻿using HRMS.Application.DTOs.BaseDTO;
+
+namespace WebApi.Models.UsersModels.UserModels
 {
-    public class UserSaveModel
+    public class UserSaveModel : BaseUsersDTO
     {
-        public string? NombreCompleto { get; set; }
-        public string? Clave { get; set; }
         public int IdRolUsuario { get; set; }
-        public string? Correo { get; set; }
-        public string? TipoDocumento { get; set; }
-        public string? Documento { get; set; }
         public DateTime FechaCreacion { get; set; }
-        public int UserID { get; set; }
     }
 }

@@ -6,7 +6,7 @@ using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
-//using HRMS.Infraestructure.Notification;
+using HRMS.Infraestructure.Notification;
 
 namespace HRMS.Application.Services.UsersServices
 {
@@ -16,27 +16,28 @@ namespace HRMS.Application.Services.UsersServices
         private readonly ILoggingServices _loggingServices;
         private readonly IValidator<SaveClientDTO> _validator;
         private readonly IUserRepository _userRepository;
-        //private readonly INotificationService _notificationService;
-        public ClientService(IClientRepository clientRepository, IValidator<SaveClientDTO> validator, //INotificationService notificationService,
+        private readonly INotificationService _notificationService;
+        public ClientService(IClientRepository clientRepository, IValidator<SaveClientDTO> validator, INotificationService notificationService,
                                                                                                       ILoggingServices loggingServices, IUserRepository userRepository)
         {
             _clientRepository = clientRepository;
             _validator = validator;
             _loggingServices = loggingServices;
             _userRepository = userRepository;
-            //_notificationService = notificationService;
+            _notificationService = notificationService;
         }
 
         //mappers
-        private Client MapSaveToDto(SaveClientDTO dto) { 
+        private Client MapSaveToDto(SaveClientDTO dto)
+        {
             return new Client()
             {
                 IdUsuario = dto.IdUsuario,
                 NombreCompleto = dto.NombreCompleto,
                 Correo = dto.Correo,
                 Clave = dto.Clave,
-                Documento = dto.Documento,
                 TipoDocumento = dto.TipoDocumento,
+                Documento = dto.Documento,
                 FechaCreacion = DateTime.Now,
                 UserID = dto.UserID,
             };
@@ -51,12 +52,13 @@ namespace HRMS.Application.Services.UsersServices
                 NombreCompleto = client.NombreCompleto,
                 Correo = client.Correo,
                 Clave = client.Clave,
-                Documento = client.Documento,
                 TipoDocumento = client.TipoDocumento,
+                Documento = client.Documento,
                 ChangeTime = client.FechaCreacion,
-                UserID = client.UserID 
+                UserID = client.UserID
             };
         }
+
         //methods
         public async Task<OperationResult> GetAll()
         {
@@ -191,7 +193,7 @@ namespace HRMS.Application.Services.UsersServices
                     {
                         result.Message = "Cliente guardado correctamente";
                         result.Data = MapClientToViewDto(client);
-                        //_notificationService.SendNotification(dto.IdUsuario, $"Bienvenido, {dto.NombreCompleto}!\nGracias por registrarte en la aplicación de nuestro hotel.\nCorreo registrado: {dto.Correo}\nSi necesitas asistencia, no dudes en contactarnos.");
+                        _notificationService.SendNotification(dto.IdUsuario, $"Bienvenido, {dto.NombreCompleto}!\nGracias por registrarte en la aplicación de nuestro hotel.\nCorreo registrado: {dto.Correo}\nSi necesitas asistencia, no dudes en contactarnos.");
                     }
                     else
                     {

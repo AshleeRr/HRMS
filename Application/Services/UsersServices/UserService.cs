@@ -5,7 +5,7 @@ using HRMS.Domain.Base.Validator;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.InfraestructureInterfaces.Logging;
 using HRMS.Persistence.Interfaces.IUsersRepository;
-//using HRMS.Infraestructure.Notification;
+using HRMS.Infraestructure.Notification;
 
 namespace HRMS.Application.Services.UsersServices
 {
@@ -14,45 +14,49 @@ namespace HRMS.Application.Services.UsersServices
         private readonly ILoggingServices _loggerServices;
         private readonly IUserRepository _userRepository;
         private readonly IValidator<SaveUserDTO> _validator;
-        //private readonly INotificationService _notificationService;
+        private readonly INotificationService _notificationService;
         public UserService(IUserRepository userRepository, IValidator<SaveUserDTO> validator,
-                                //INotificationService notificationService,
+                                INotificationService notificationService,
                                 ILoggingServices loggerServices)
         {
             _userRepository = userRepository;
             _validator = validator;
             _loggerServices = loggerServices;
-            //_notificationService = notificationService;
+            _notificationService = notificationService;
         }
         // mappers
-        private User MapSaveDto(SaveUserDTO dto) { 
+        // mappers
+        private User MapSaveDto(SaveUserDTO dto)
+        {
             return new User
             {
-                NombreCompleto = dto.NombreCompleto,
-                Clave = dto.Clave,
                 IdRolUsuario = dto.IdRolUsuario,
+                FechaCreacion = DateTime.Now,
+                NombreCompleto = dto.NombreCompleto,
                 Correo = dto.Correo,
+                Clave = dto.Clave,
                 TipoDocumento = dto.TipoDocumento,
                 Documento = dto.Documento,
-                FechaCreacion = DateTime.Now, 
                 UserID = dto.UserID,
             };
         }
-        private UserViewDTO MapUserToViewDTO(User user) {
+        private UserViewDTO MapUserToViewDTO(User user)
+        {
             return new UserViewDTO
             {
                 IdUsuario = user.IdUsuario,
-                NombreCompleto = user.NombreCompleto,
-                Clave = user.Clave,
+                ReferenceID = user.ReferenceID,
                 IdRolUsuario = user.IdRolUsuario,
+                NombreCompleto = user.NombreCompleto,
                 Correo = user.Correo,
+                Clave = user.Clave,
                 TipoDocumento = user.TipoDocumento,
                 Documento = user.Documento,
-				ChangeTime = user.FechaCreacion,
-                ReferenceID = user.ReferenceID,
+                ChangeTime = user.FechaCreacion,
                 UserID = user.UserID
             };
         }
+
         //methods
         public async Task<OperationResult> GetAll()
         {
@@ -207,7 +211,7 @@ namespace HRMS.Application.Services.UsersServices
                 {
                     result.Message = "Usuario actualizado correctamente";
                     result.Data = MapUserToViewDTO(user);
-                    //_notificationService.SendNotification(usuario.IdUsuario, $"No responda a este mensaje.\nEstimado usuario le informamos que sus datos han sido actualizados.\nCorreo asociado: {usuario.Correo}.\nNombre: {dto.NombreCompleto}.\nCorreo: {dto.Correo}.\nTipo de documento: {dto.TipoDocumento}.\nDocumento: {dto.Documento}.\n Si no ha realizado esta modificacion o tiene alguna duda consulte con el equipo de administracion.");
+                    _notificationService.SendNotification(user.IdUsuario, $"No responda a este mensaje.\nEstimado usuario le informamos que sus datos han sido actualizados.\nCorreo asociado: {user.Correo}.\nNombre: {dto.NombreCompleto}.\nCorreo: {dto.Correo}.\nTipo de documento: {dto.TipoDocumento}.\nDocumento: {dto.Documento}.\n Si no ha realizado esta modificacion o tiene alguna duda consulte con el equipo de administracion.");
                 }
                 else
                 {
@@ -247,7 +251,7 @@ namespace HRMS.Application.Services.UsersServices
                 {
                     result.Message = "Correo actualizado correctamente";
                     result.Data = MapUserToViewDTO(user);
-                    //_notificationService.SendNotification(usuario.IdUsuario, $"No responda a este mensaje.\nSu correo ha sido actualizado con éxito.\nNuevo correo asociado: {nuevoCorreo}. \nSi no ha realizado esta mmodificacion o tiene alguna duda consulte con el equipo de administracion.");
+                    _notificationService.SendNotification(user.IdUsuario, $"No responda a este mensaje.\nSu correo ha sido actualizado con éxito.\nNuevo correo asociado: {nuevoCorreo}. \nSi no ha realizado esta mmodificacion o tiene alguna duda consulte con el equipo de administracion.");
                 }
             }
             catch (ArgumentException ex)
@@ -279,7 +283,7 @@ namespace HRMS.Application.Services.UsersServices
                 {
                     result.Message = "Nombre actualizado correctamente";
                     result.Data = MapUserToViewDTO(user);
-                    //_notificationService.SendNotification(usuario.IdUsuario, $"No responda a este mensaje.\nSu nombre ha sido actualizado con éxito.\nNuevo nombre asociado: {nuevoNombreCompleto}. \nSi no ha realizado esta modificacion o tiene alguna duda consulte con el equipo de administracion.");
+                    _notificationService.SendNotification(user.IdUsuario, $"No responda a este mensaje.\nSu nombre ha sido actualizado con éxito.\nNuevo nombre asociado: {nuevoNombreCompleto}. \nSi no ha realizado esta modificacion o tiene alguna duda consulte con el equipo de administracion.");
                 }
 
             }
@@ -347,7 +351,7 @@ namespace HRMS.Application.Services.UsersServices
                 {
                     result.Message = "Datos actualizados correctamente";
                     result.Data = MapUserToViewDTO(usuario);
-                    //_notificationService.SendNotification(usuario.IdUsuario, $"No responda a este mensaje.\nSu documento de identidad ha sido actualizado con éxito.\nNuevo documento asociado: {documento}.\nTipo de documento: {tipoDocumento} \nSi no ha realizado esta modificacion o tiene alguna duda consulte con el equipo de administracion.");
+                    _notificationService.SendNotification(usuario.IdUsuario, $"No responda a este mensaje.\nSu documento de identidad ha sido actualizado con éxito.\nNuevo documento asociado: {documento}.\nTipo de documento: {tipoDocumento} \nSi no ha realizado esta modificacion o tiene alguna duda consulte con el equipo de administracion.");
                 }
                 else
                 {
@@ -381,7 +385,7 @@ namespace HRMS.Application.Services.UsersServices
                 {
                     result.Message = "Clave actualizada correctamente";
                     result.Data = MapUserToViewDTO(usuario);
-                    //_notificationService.SendNotification(usuario.IdUsuario, $"No responda a este mensaje.\nClave ha sido actualizado con éxito.\nSi no ha realizado esta modificacion o tiene alguna duda consulte con el equipo de administracion.");
+                    _notificationService.SendNotification(usuario.IdUsuario, $"No responda a este mensaje.\nClave ha sido actualizado con éxito.\nSi no ha realizado esta modificacion o tiene alguna duda consulte con el equipo de administracion.");
                 }
                 else
                 {

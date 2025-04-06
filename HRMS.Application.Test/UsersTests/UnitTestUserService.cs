@@ -11,10 +11,12 @@ namespace HRMS.Application.Test.UsersTests
 {
     public class UnitTestUserService
     {
+        /*
         private readonly Mock<IUserRepository> _mockUserRepository;
         private readonly UserService _userService;
         private readonly Mock<IValidator<SaveUserDTO>> _mockValidator;
         private readonly Mock<ILoggingServices> _mockLoggingServices;
+        
         public UnitTestUserService()
         {
             _mockUserRepository = new Mock<IUserRepository>();
@@ -22,7 +24,7 @@ namespace HRMS.Application.Test.UsersTests
             _mockLoggingServices = new Mock<ILoggingServices>();
             _userService = new UserService(_mockUserRepository.Object, _mockValidator.Object, _mockLoggingServices.Object);
         }
-        /*
+        
         [Fact]
         public async Task GetAll_ShoulReturnSuccess_WhenExist()
         {

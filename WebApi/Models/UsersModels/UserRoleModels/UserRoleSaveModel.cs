@@ -1,10 +1,11 @@
-﻿namespace WebApi.Models.UsersModels.UserRoleModels
+﻿using HRMS.WebApi.Models.BaseDTO;
+
+namespace WebApi.Models.UsersModels.UserRoleModels
 {
-    public class UserRoleSaveModel
+    public class UserRoleSaveModel : DTOBase
     {
         public string? RolNombre { get; set; }
         public string? Descripcion { get; set; }
         public DateTime FechaCreacion { get; set; }
-        public int UserID { get; set; }
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs;
-using Newtonsoft.Json;
 
 namespace HRMS.APIs.Controllers.UsersControllers
 {

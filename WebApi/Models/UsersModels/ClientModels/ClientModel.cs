@@ -1,15 +1,10 @@
-﻿namespace WebApi.Models.UsersModels.ClientModels
+﻿using HRMS.Application.DTOs.BaseDTO;
+
+namespace WebApi.Models.UsersModels.ClientModels
 {
-    public class ClientModel
+    public class ClientModel : BaseUsersDTO
     {
         public int IdCliente { get; set; }
         public int IdUsuario { get; set; }
-        public string? NombreCompleto { get; set; }
-        public string? Correo { get; set; }
-        public string? Clave { get; set; }
-        public string? Documento { get; set; }
-        public string? TipoDocumento { get; set; }
-        public DateTime ChangeTime { get; set; }
-        public int UserID { get; set; }
     }
 }
