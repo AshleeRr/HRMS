@@ -23,20 +23,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/WebApi/Interfaces/IApiClient.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Interfaces/IGenericInterface.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Interfaces/RoomInterface/ICategoriaRepository.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Repositories/ApiCliente.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Repositories/ApiException.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WebApi/Repositories/CategoriaRepository.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WebApi/Models/ApiErrorResponse.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/WebApi/Repositories/ApiClient.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/CategoriaRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/CategoriaRepositoryTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/EstadoHabitacionRepositoryTest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence.Test/RoomManagementTest/EstadoHabitacionRepositoryTest.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HRMS.Web/HRMS.Web.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Web/HRMS.Web.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Services/RoomServices/CategoriaServices.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/HRMS.Persistence/Repositories/RoomRepository/CategoriaRepository.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WebApi/Controllers/RoomControllers/CategoriaController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/RoomControllers/CategoriaController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Models/OperationResult.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/OperationResult.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/appsettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Repositories/ApiCliente.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Repositories/ApiException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Models/ApiException.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApi/Repositories/CategoriaRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Repositories/CategoriaRepository.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

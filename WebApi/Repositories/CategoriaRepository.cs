@@ -49,7 +49,18 @@ namespace WebApi.Repositories
 
         public async Task<OperationResult> DeleteAsync(int id)
         {
-            return await _apiClient.DeleteAsync($"{BaseEndpoint}/DeleteCategoriaById", id);
+            try
+            {
+                return await _apiClient.DeleteAsync($"{BaseEndpoint}/DeleteCategoriaById", id);
+            }
+            catch (ApiException ex)
+            {
+                return new OperationResult 
+                { 
+                    IsSuccess = false, 
+                    Message = ex.Message 
+                };
+            }
         }
     }
 }
