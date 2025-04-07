@@ -1,191 +1,96 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
-using System.Text;
-using WebApi.Models;
+using WebApi.Interfaces.RoomInterface;
 using WebApi.Models.RoomModels;
 
 namespace WebApi.Controllers.RoomControllers
 {
     public class TarifaController : Controller
     {
-        private const string _apiBaseUrl = "https://localhost:7175/api";
+        private readonly ITarifaRepository _tarifaRepository;
+        private readonly ICategoriaRepository _categoriaRepository;
 
-        // GET: TarifaController
-        public async Task<ActionResult> Index()
+        public TarifaController(ITarifaRepository tarifaRepository, ICategoriaRepository categoriaRepository)
         {
-            List<TarifaModel> tarifas = new List<TarifaModel>();
+            _tarifaRepository = tarifaRepository;
+            _categoriaRepository = categoriaRepository;
+        }
+        
+        // GET: TarifaController
+        public async Task<IActionResult> Index()
+        {
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Tarifa/GetAllTarifas");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try 
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                tarifas = JsonConvert.DeserializeObject<List<TarifaModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch (JsonSerializationException)
-                        {
-                            try
-                            {
-                                tarifas = JsonConvert.DeserializeObject<List<TarifaModel>>(content);
-                            }
-                            catch (Exception ex)
-                            {
-                                TempData["Error"] = $"Error al procesar datos: {ex.Message}";
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener tarifas: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener tarifas: {response.ReasonPhrase}";
-                        }
-                    }
-                }
+                var tarifas = await _tarifaRepository.GetAllAsync();
+                ViewBag.TituloLista = "Lista de Tarifas";
+                return View(tarifas);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error al cargar tarifas: {ex.Message}";
+                return View(new List<TarifaModel>());
             }
-            
-            TempData["Success"] = TempData["Success"]; 
-            return View(tarifas);
         }
 
         // GET: TarifaController/Details/5
-        public async Task<ActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            TarifaModel tarifa = new TarifaModel();
             try
             {
-                using (var client = new HttpClient())
+                var tarifa = await _tarifaRepository.GetByIdAsync(id);
+                
+                if (tarifa == null || tarifa.IdTarifa <= 0)
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Tarifa/GetTarifaById{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                tarifa = JsonConvert.DeserializeObject<TarifaModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            tarifa = JsonConvert.DeserializeObject<TarifaModel>(content);
-                        }
-                        
-                        await CargarCategorias();
-                        return View(tarifa);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener los detalles de la tarifa: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener los detalles de la tarifa: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
+                    TempData["Error"] = "Tarifa no encontrada.";
+                    return RedirectToAction(nameof(Index));
                 }
+                
+                return View(tarifa);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error al cargar detalles: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
         }
 
         // GET: TarifaController/Create
-        public async Task<ActionResult> Create()
+        public async Task<IActionResult> Create()
         {
-            await CargarCategorias();
-            return View(new TarifaModel());
+            try
+            {
+                await CargarCategorias();
+                return View(new TarifaModel());
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error al preparar formulario: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // POST: TarifaController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(TarifaModel tarifa)
+        public async Task<IActionResult> Create(TarifaModel tarifa)
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    if (tarifa.FechaFin < tarifa.FechaInicio)
-                    {
-                        ModelState.AddModelError("FechaFin", "La fecha de fin no puede ser anterior a la fecha de inicio");
-                        await CargarCategorias();
-                        return View(tarifa);
-                    }
-
-                    using (var client = new HttpClient())
-                    {
-                        var json = JsonConvert.SerializeObject(tarifa);
-                        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                        var response = await client.PostAsync($"{_apiBaseUrl}/Tarifa/CreateTarifa", content);
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var responseContent = await response.Content.ReadAsStringAsync();
-                            try
-                            {
-                                var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
-                                if (operationResult != null && operationResult.IsSuccess)
-                                {
-                                    TempData["Success"] = operationResult.Message ?? "Tarifa creada correctamente.";
-                                    return RedirectToAction(nameof(Index));
-                                }
-                            }
-                            catch
-                            {
-                                TempData["Success"] = "Tarifa creada correctamente.";
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                        
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al crear la tarifa: {errorContent}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al crear la tarifa: {errorContent}";
-                        }
-                    }
+                    await CargarCategorias();
+                    return View(tarifa);
                 }
                 
+                var result = await _tarifaRepository.CreateAsync(tarifa);
+                
+                if (result.IsSuccess)
+                {
+                    TempData["Success"] = result.Message ?? "Tarifa creada correctamente.";
+                    return RedirectToAction(nameof(Index));
+                }
+                
+                TempData["Error"] = result.Message ?? "Error al crear la tarifa.";
                 await CargarCategorias();
                 return View(tarifa);
             }
@@ -198,60 +103,24 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: TarifaController/Edit/5
-        public async Task<ActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            TarifaModel tarifa = new TarifaModel();
             try
             {
-                using (var client = new HttpClient())
+                var tarifa = await _tarifaRepository.GetByIdAsync(id);
+                
+                if (tarifa == null || tarifa.IdTarifa <= 0)
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Tarifa/GetTarifaById{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                tarifa = JsonConvert.DeserializeObject<TarifaModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            tarifa = JsonConvert.DeserializeObject<TarifaModel>(content);
-                        }
-                        
-                        if (tarifa != null && tarifa.IdTarifa != id)
-                        {
-                            tarifa.IdTarifa = id;
-                        }
-                        
-                        await CargarCategorias();
-                        return View(tarifa);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener la tarifa: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener la tarifa: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
+                    TempData["Error"] = "Tarifa no encontrada.";
+                    return RedirectToAction(nameof(Index));
                 }
+                
+                await CargarCategorias();
+                return View(tarifa);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error al cargar formulario: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -259,65 +128,31 @@ namespace WebApi.Controllers.RoomControllers
         // POST: TarifaController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(int id, TarifaModel tarifa)
+        public async Task<IActionResult> Edit(int id, TarifaModel tarifa)
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    if (tarifa.FechaFin < tarifa.FechaInicio)
-                    {
-                        ModelState.AddModelError("FechaFin", "La fecha de fin no puede ser anterior a la fecha de inicio");
-                        await CargarCategorias();
-                        return View(tarifa);
-                    }
-
-                    if (tarifa.IdTarifa != id)
-                    {
-                        tarifa.IdTarifa = id;
-                    }
-                    
-                    tarifa.ChangeTime = DateTime.Now;
-                    
-                    using (var client = new HttpClient())
-                    {
-                        var json = JsonConvert.SerializeObject(tarifa);
-                        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                        var response = await client.PutAsync($"{_apiBaseUrl}/Tarifa/UpdateTarifaBy{id}", content);
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var responseContent = await response.Content.ReadAsStringAsync();
-                            try
-                            {
-                                var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
-                                if (operationResult != null && operationResult.IsSuccess)
-                                {
-                                    TempData["Success"] = operationResult.Message ?? "Tarifa actualizada correctamente.";
-                                    return RedirectToAction(nameof(Index));
-                                }
-                            }
-                            catch
-                            {
-                                TempData["Success"] = "Tarifa actualizada correctamente.";
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                        
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al actualizar la tarifa: {errorContent}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al actualizar la tarifa: {errorContent}";
-                        }
-                    }
+                    await CargarCategorias();
+                    return View(tarifa);
                 }
                 
+                // Asegurar que el ID sea correcto
+                if (tarifa.IdTarifa != id)
+                {
+                    tarifa.IdTarifa = id;
+                }
+                
+                var result = await _tarifaRepository.UpdateAsync(id, tarifa);
+                
+                if (result.IsSuccess)
+                {
+                    TempData["Success"] = result.Message ?? "Tarifa actualizada correctamente.";
+                    return RedirectToAction(nameof(Index));
+                }
+                
+                TempData["Error"] = result.Message ?? "Error al actualizar la tarifa.";
                 await CargarCategorias();
                 return View(tarifa);
             }
@@ -330,55 +165,23 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: TarifaController/Delete/5
-        public async Task<ActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            TarifaModel tarifa = new TarifaModel();
             try
             {
-                using (var client = new HttpClient())
+                var tarifa = await _tarifaRepository.GetByIdAsync(id);
+                
+                if (tarifa == null || tarifa.IdTarifa <= 0)
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Tarifa/GetTarifaById{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                tarifa = JsonConvert.DeserializeObject<TarifaModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            tarifa = JsonConvert.DeserializeObject<TarifaModel>(content);
-                        }
-                        
-                        await CargarCategorias();
-                        return View(tarifa);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener la tarifa: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener la tarifa: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
+                    TempData["Error"] = "Tarifa no encontrada.";
+                    return RedirectToAction(nameof(Index));
                 }
+                
+                return View(tarifa);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error al cargar tarifa: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -386,56 +189,20 @@ namespace WebApi.Controllers.RoomControllers
         // POST: TarifaController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(int id, IFormCollection collection)
+        [ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
-                using (var client = new HttpClient())
+                var result = await _tarifaRepository.DeleteAsync(id);
+                
+                if (result.IsSuccess)
                 {
-                    var response = await client.DeleteAsync($"{_apiBaseUrl}/Tarifa/DeleteTarifaBy{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
-                            if (operationResult != null && operationResult.IsSuccess)
-                            {
-                                TempData["Success"] = operationResult.Message ?? "Tarifa eliminada correctamente.";
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                        catch
-                        {
-                            TempData["Success"] = "Tarifa eliminada correctamente.";
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    try
-                    {
-                        var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                        
-                        if (operationResult?.Message?.Contains("reservas asociadas") == true)
-                        {
-                            TempData["Error"] = "No se puede eliminar la tarifa porque tiene reservas asociadas.";
-                        }
-                        else
-                        {
-                            TempData["Error"] = operationResult?.Message ?? "Error al eliminar la tarifa.";
-                        }
-                    }
-                    catch
-                    {
-                        TempData["Error"] = "No se puede eliminar la tarifa en este momento.";
-                    }
-                    
-                    if (Request.Path.Value?.Contains("/Delete/") == true)
-                    {
-                        return RedirectToAction(nameof(Delete), new { id });
-                    }
+                    TempData["Success"] = result.Message ?? "Tarifa eliminada correctamente.";
+                }
+                else
+                {
+                    TempData["Error"] = result.Message ?? "Error al eliminar la tarifa.";
                 }
                 
                 return RedirectToAction(nameof(Index));
@@ -448,111 +215,33 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: TarifaController/GetByFecha
-        public async Task<ActionResult> GetByFecha(DateTime fecha)
+        public async Task<IActionResult> GetByFecha(DateTime fecha)
         {
-            List<TarifaModel> tarifas = new List<TarifaModel>();
             try
             {
-                var fechaFormateada = fecha.ToString("yyyy-MM-dd");
-                
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Tarifa/GetTarifaByFecha?fecha={fechaFormateada}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                tarifas = JsonConvert.DeserializeObject<List<TarifaModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            tarifas = JsonConvert.DeserializeObject<List<TarifaModel>>(content);
-                        }
-                        
-                        ViewBag.TituloLista = $"Tarifas para la fecha: {fecha.ToString("dd/MM/yyyy")}";
-                        return View("Index", tarifas);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al buscar tarifas: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al buscar tarifas: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
-                }
+                var tarifas = await _tarifaRepository.GetTarifaByFecha(fecha);
+                ViewBag.TituloLista = $"Tarifas para la fecha: {fecha.ToShortDateString()}";
+                return View("Index", tarifas);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error al buscar tarifas por fecha: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
         }
 
         // GET: TarifaController/GetByPrecio
-        public async Task<ActionResult> GetByPrecio(decimal precio)
+        public async Task<IActionResult> GetByPrecio(decimal precio)
         {
-            List<TarifaModel> tarifas = new List<TarifaModel>();
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Tarifa/GetTarifaByPrecio/{precio}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                tarifas = JsonConvert.DeserializeObject<List<TarifaModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            tarifas = JsonConvert.DeserializeObject<List<TarifaModel>>(content);
-                        }
-                        
-                        ViewBag.TituloLista = $"Tarifas con precio: ${precio}";
-                        return View("Index", tarifas);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al buscar tarifas: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al buscar tarifas: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
-                }
+                var tarifas = await _tarifaRepository.GetTarifaByPrecio(precio);
+                ViewBag.TituloLista = $"Tarifas para el precio: {precio:C}";
+                return View("Index", tarifas);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error al buscar tarifas por precio: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -561,52 +250,31 @@ namespace WebApi.Controllers.RoomControllers
         {
             try
             {
-                using (var client = new HttpClient())
+                var categorias = await _categoriaRepository.GetAllAsync();
+                
+                // Comprobamos si la propiedad es "Nombre" o "Descripcion"
+                bool usarNombre = categorias?.FirstOrDefault()?.GetType().GetProperty("Nombre") != null;
+                
+                if (categorias != null && categorias.Any())
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetAllCategorias");
-                    
-                    if (response.IsSuccessStatusCode)
+                    if (usarNombre)
                     {
-                        var content = await response.Content.ReadAsStringAsync();
-                        List<CategoriaModel> categorias = null;
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                categorias = JsonConvert.DeserializeObject<List<CategoriaModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            categorias = JsonConvert.DeserializeObject<List<CategoriaModel>>(content);
-                        }
-                        
-                        if (categorias != null && categorias.Any())
-                        {
-                            ViewBag.Categorias = categorias.Select(c => new SelectListItem
-                            {
-                                Value = c.IdCategoria.ToString(),
-                                Text = c.Descripcion
-                            }).ToList();
-                            return;
-                        }
+                        ViewBag.Categorias = new SelectList(categorias, "IdCategoria", "Nombre");
+                    }
+                    else
+                    {
+                        ViewBag.Categorias = new SelectList(categorias, "IdCategoria", "Descripcion");
                     }
                 }
+                else
+                {
+                    ViewBag.Categorias = new SelectList(new List<CategoriaModel>(), "IdCategoria", "Descripcion");
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                
-                
+                ViewBag.Categorias = new SelectList(new List<CategoriaModel>(), "IdCategoria", "Descripcion");
             }
-            
-            ViewBag.Categorias = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "1", Text = "Estándar" },
-                new SelectListItem { Value = "2", Text = "Suite" }
-            };
         }
     }
 }

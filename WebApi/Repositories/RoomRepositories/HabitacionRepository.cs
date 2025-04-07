@@ -8,27 +8,30 @@ namespace WebApi.Repositories.RoomRepositories;
 public class HabitacionRepository : IHabitacionRepository
 {
     private readonly IApiClient _apiClient;
+    private const string BaseEndpoint = "Habitacion";
 
     public HabitacionRepository(IApiClient apiClient)
     {
         _apiClient = apiClient;
     }
 
-    private const string BaseEndpoint = "Habitacion";
+    
     public async Task<IEnumerable<HabitacionModel>> GetAllAsync()
     {
         var result = await _apiClient.GetAsync<IEnumerable<HabitacionModel>>($"{BaseEndpoint}/GetAllHabitaciones");
-        return result ?? (Enumerable.Empty<HabitacionModel>());
+        return result ?? Enumerable.Empty<HabitacionModel>();
     }
 
     public async Task<HabitacionModel> GetByIdAsync(int id)
     {
-        var result = await _apiClient.GetByIdAsync<HabitacionModel>($"{BaseEndpoint}/GetByHabitacionById", id);
-        return result ?? (new HabitacionModel
+        var endpoint = $"{BaseEndpoint}/GetByHabitacionById";
+        var result = await _apiClient.GetAsync<HabitacionModel>($"{endpoint}{id}");
+        
+        return result ?? new HabitacionModel
         {
             idHabitacion = -1,
             detalle = "No se pudo obtener la habitación"
-        });
+        };
     }
 
     public Task<OperationResult> CreateAsync(HabitacionModel entity)
@@ -42,40 +45,50 @@ public class HabitacionRepository : IHabitacionRepository
         {
             entity.idHabitacion = id;
         }
-
-        return _apiClient.PutAsync($"{BaseEndpoint}/UpdateHabitacion", id, entity);
+        
+        // Formato exacto del endpoint: (UpdateHabitacionBy)1 (con paréntesis)
+        var endpoint = $"{BaseEndpoint}/(UpdateHabitacionBy)";
+        return _apiClient.PutAsync(endpoint, id, entity);
     }
 
     public Task<OperationResult> DeleteAsync(int id)
     {
-        return _apiClient.DeleteAsync($"{BaseEndpoint}/DeleteHabitacion", id);
+        // Formato exacto del endpoint: DeleteHabitacionBy0 (sin separador)
+        var endpoint = $"{BaseEndpoint}/DeleteHabitacionBy";
+        return _apiClient.DeleteAsync(endpoint, id);
     }
 
     public async Task<HabitacionModel> GetByNumeroAsync(string numero)
     {
-        var result =  await _apiClient.GetAsync<HabitacionModel>($"{BaseEndpoint}/GetHabitacionBy/{numero}");
-        return result ?? (new HabitacionModel
+        // Formato exacto del endpoint: GetHabitacionBy/101 (con separador)
+        var result = await _apiClient.GetAsync<HabitacionModel>($"{BaseEndpoint}/GetHabitacionBy/{numero}");
+        
+        return result ?? new HabitacionModel
         {
             idHabitacion = -1,
             detalle = "No se pudo encontrar la habitación por número"
-        });
+        };
     }
 
-    public Task<IEnumerable<HabitacionModel>> GetByCategoriaAsync(string categoria)
+    public async Task<IEnumerable<HabitacionModel>> GetByCategoriaAsync(string categoria)
     {
-        var result = _apiClient.GetAsync<IEnumerable<HabitacionModel>>($"{BaseEndpoint}/GetHabitacionByCategoria/{categoria}");
-        return result ?? (Task.FromResult(Enumerable.Empty<HabitacionModel>()));
+        var result = await _apiClient.GetAsync<IEnumerable<HabitacionModel>>($"{BaseEndpoint}/GetHabitacionByCategoria/{categoria}");
+        return result ?? Enumerable.Empty<HabitacionModel>();
     }
 
     public async Task<IEnumerable<HabitacionModel>> GetByPisoAsync(int pisoId)
     {
-        var result = await _apiClient.GetAsync<IEnumerable<HabitacionModel>>($"{BaseEndpoint}/GetHabitacionByPiso/{pisoId}");
-        return result ?? (Enumerable.Empty<HabitacionModel>());
+        var endpoint = $"{BaseEndpoint}/GetHabitacionByPiso/{pisoId}";
+        Console.WriteLine($"Intentando acceder a: {endpoint}");
+    
+        var result = await _apiClient.GetAsync<IEnumerable<HabitacionModel>>($"GetHabitacionByPiso/{pisoId}" );
+    
+        return result ?? Enumerable.Empty<HabitacionModel>();
     }
 
     public async Task<IEnumerable<HabitacionInfoModel>> GetInfoHabitaciones()
     {
         var result = await _apiClient.GetAsync<IEnumerable<HabitacionInfoModel>>($"{BaseEndpoint}/GetInfoHabitaciones");
-        return result ?? (Enumerable.Empty<HabitacionInfoModel>());
+        return result ?? Enumerable.Empty<HabitacionInfoModel>();
     }
 }

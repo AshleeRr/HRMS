@@ -1,182 +1,75 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
-using System.Text;
-using WebApi.Models;
+using WebApi.Interfaces;
+using WebApi.Interfaces.RoomInterface;
 using WebApi.Models.RoomModels;
 
 namespace WebApi.Controllers.RoomControllers
 {
     public class HabitacionController : Controller
     {
-        private const string _apiBaseUrl = "https://localhost:7175/api";
-
+        private readonly IHabitacionRepository _habitacionRepository;
+        private readonly IEstadoHabitacionRepository _estadoHabitacionRepository;
+        private readonly IPisoRepository _pisoRepository;
+        private readonly ICategoriaRepository _categoriaRepository;
+        
+        public HabitacionController(IHabitacionRepository habitacionRepository, IEstadoHabitacionRepository estadoHabitacionRepository, 
+            IPisoRepository pisoRepository, ICategoriaRepository categoriaRepository)
+        {
+            _habitacionRepository = habitacionRepository;
+            _estadoHabitacionRepository = estadoHabitacionRepository;
+            _pisoRepository = pisoRepository;
+            _categoriaRepository = categoriaRepository;
+        }
+        
         // GET: HabitacionController
         public async Task<IActionResult> Index()
         {
-            List<HabitacionModel> habitaciones = new List<HabitacionModel>();
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Habitacion/GetAllHabitaciones");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try 
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                habitaciones = JsonConvert.DeserializeObject<List<HabitacionModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch (JsonSerializationException)
-                        {
-                            try
-                            {
-                                habitaciones = JsonConvert.DeserializeObject<List<HabitacionModel>>(content);
-                            }
-                            catch (Exception ex)
-                            {
-                                TempData["Error"] = $"Error al procesar datos: {ex.Message}";
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener habitaciones: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener habitaciones: {response.ReasonPhrase}";
-                        }
-                    }
-                }
+                var habitaciones = await _habitacionRepository.GetAllAsync();
+                return View(habitaciones);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error al cargar habitaciones: {ex.Message}";
+                return View(new List<HabitacionModel>());
             }
-            
-            TempData["Success"] = TempData["Success"]; 
-            return View(habitaciones);
         }
 
         // GET: HabitacionController/InfoHabitaciones
         public async Task<IActionResult> InfoHabitaciones()
         {
-            List<HabitacionInfoModel> habitacionesInfo = new List<HabitacionInfoModel>();
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Habitacion/GetInfoHabitaciones");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try 
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                habitacionesInfo = JsonConvert.DeserializeObject<List<HabitacionInfoModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch (JsonSerializationException)
-                        {
-                            try
-                            {
-                                habitacionesInfo = JsonConvert.DeserializeObject<List<HabitacionInfoModel>>(content);
-                            }
-                            catch (Exception ex)
-                            {
-                                TempData["Error"] = $"Error al procesar datos: {ex.Message}";
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener información detallada: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener información detallada: {response.ReasonPhrase}";
-                        }
-                    }
-                }
+                var habitacionesInfo = await _habitacionRepository.GetInfoHabitaciones();
+                return View(habitacionesInfo);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error al cargar información de habitaciones: {ex.Message}";
+                return View(new List<HabitacionInfoModel>());
             }
-            
-            return View(habitacionesInfo);
         }
 
         // GET: HabitacionController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            HabitacionModel habitacion = new HabitacionModel();
             try
             {
-                using (var client = new HttpClient())
+                var habitacion = await _habitacionRepository.GetByIdAsync(id);
+                
+                if (habitacion == null)
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Habitacion/GetByHabitacionById{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                habitacion = JsonConvert.DeserializeObject<HabitacionModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            habitacion = JsonConvert.DeserializeObject<HabitacionModel>(content);
-                        }
-                        
-                        return View(habitacion);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener detalles de la habitación: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener detalles de la habitación: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
+                    TempData["Error"] = "Habitación no encontrada.";
+                    return RedirectToAction(nameof(Index));
                 }
+                
+                return View(habitacion);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error al cargar detalles: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -187,7 +80,6 @@ namespace WebApi.Controllers.RoomControllers
             try
             {
                 await CargarListasDesplegables();
-                
                 return View(new HabitacionModel());
             }
             catch (Exception ex)
@@ -206,43 +98,17 @@ namespace WebApi.Controllers.RoomControllers
             {
                 if (ModelState.IsValid)
                 {
-                    using (var client = new HttpClient())
+                    habitacion.ChangeTime = DateTime.Now;
+                    
+                    var result = await _habitacionRepository.CreateAsync(habitacion);
+                    
+                    if (result.IsSuccess)
                     {
-                        var json = JsonConvert.SerializeObject(habitacion);
-                        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                        var response = await client.PostAsync($"{_apiBaseUrl}/Habitacion/CreateHabitacion", content);
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var responseContent = await response.Content.ReadAsStringAsync();
-                            try
-                            {
-                                var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
-                                if (operationResult != null && operationResult.IsSuccess)
-                                {
-                                    TempData["Success"] = operationResult.Message ?? "Habitación creada correctamente.";
-                                    return RedirectToAction(nameof(Index));
-                                }
-                            }
-                            catch
-                            {
-                                TempData["Success"] = "Habitación creada correctamente.";
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                        
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al crear habitación: {errorContent}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al crear habitación: {errorContent}";
-                        }
+                        TempData["Success"] = result.Message ?? "Habitación creada correctamente.";
+                        return RedirectToAction(nameof(Index));
                     }
+                    
+                    TempData["Error"] = result.Message ?? "Error al crear la habitación.";
                 }
                 
                 await CargarListasDesplegables();
@@ -259,57 +125,18 @@ namespace WebApi.Controllers.RoomControllers
         // GET: HabitacionController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            HabitacionModel habitacion = new HabitacionModel();
             try
             {
-                using (var client = new HttpClient())
+                var habitacion = await _habitacionRepository.GetByIdAsync(id);
+                
+                if (habitacion == null)
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Habitacion/GetByHabitacionById{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                habitacion = JsonConvert.DeserializeObject<HabitacionModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            habitacion = JsonConvert.DeserializeObject<HabitacionModel>(content);
-                        }
-                        
-                        if (habitacion != null && habitacion.idHabitacion != id)
-                        {
-                            habitacion.idHabitacion = id;
-                        }
-                        
-                        await CargarListasDesplegables();
-                        
-                        return View(habitacion);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener la habitación: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener la habitación: {response.ReasonPhrase}";
-                        }
-                        
-                        return RedirectToAction(nameof(Index));
-                    }
+                    TempData["Error"] = "Habitación no encontrada.";
+                    return RedirectToAction(nameof(Index));
                 }
+                
+                await CargarListasDesplegables();
+                return View(habitacion);
             }
             catch (Exception ex)
             {
@@ -327,51 +154,17 @@ namespace WebApi.Controllers.RoomControllers
             {
                 if (ModelState.IsValid)
                 {
-                    if (habitacion.idHabitacion != id)
-                    {
-                        habitacion.idHabitacion = id;
-                    }
-                    
                     habitacion.ChangeTime = DateTime.Now;
                     
-                    using (var client = new HttpClient())
+                    var result = await _habitacionRepository.UpdateAsync(id, habitacion);
+                    
+                    if (result.IsSuccess)
                     {
-                        var json = JsonConvert.SerializeObject(habitacion);
-                        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                        var response = await client.PutAsync($"{_apiBaseUrl}/Habitacion/(UpdateHabitacionBy){id}", content);
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var responseContent = await response.Content.ReadAsStringAsync();
-                            try
-                            {
-                                var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
-                                if (operationResult != null && operationResult.IsSuccess)
-                                {
-                                    TempData["Success"] = operationResult.Message ?? "Habitación actualizada correctamente.";
-                                    return RedirectToAction(nameof(Index));
-                                }
-                            }
-                            catch
-                            {
-                                TempData["Success"] = "Habitación actualizada correctamente.";
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                        
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? "Error al actualizar la habitación.";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = "No se puede actualizar la habitación en este momento.";
-                        }
+                        TempData["Success"] = result.Message ?? "Habitación actualizada correctamente.";
+                        return RedirectToAction(nameof(Index));
                     }
+                    
+                    TempData["Error"] = result.Message ?? "Error al actualizar la habitación.";
                 }
                 
                 await CargarListasDesplegables();
@@ -388,48 +181,17 @@ namespace WebApi.Controllers.RoomControllers
         // GET: HabitacionController/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            HabitacionModel habitacion = new HabitacionModel();
             try
             {
-                using (var client = new HttpClient())
+                var habitacion = await _habitacionRepository.GetByIdAsync(id);
+                
+                if (habitacion == null)
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Habitacion/GetByHabitacionById{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                habitacion = JsonConvert.DeserializeObject<HabitacionModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            habitacion = JsonConvert.DeserializeObject<HabitacionModel>(content);
-                        }
-                        
-                        return View(habitacion);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al obtener la habitación: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al obtener la habitación: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
+                    TempData["Error"] = "Habitación no encontrada.";
+                    return RedirectToAction(nameof(Index));
                 }
+                
+                return View(habitacion);
             }
             catch (Exception ex)
             {
@@ -445,55 +207,27 @@ namespace WebApi.Controllers.RoomControllers
         {
             try
             {
-                using (var client = new HttpClient())
+                var result = await _habitacionRepository.DeleteAsync(id);
+                if (result.IsSuccess)
                 {
-                    var response = await client.DeleteAsync($"{_apiBaseUrl}/Habitacion/DeleteHabitacionBy{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(responseContent);
-                            if (operationResult != null && operationResult.IsSuccess)
-                            {
-                                TempData["Success"] = operationResult.Message ?? "Habitación eliminada correctamente.";
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                        catch
-                        {
-                            TempData["Success"] = "Habitación eliminada correctamente.";
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    
-                    try
-                    {
-                        var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                        
-                        if (operationResult?.Message?.Contains("reservas activas") == true)
-                        {
-                            TempData["Error"] = "No se puede eliminar la habitación porque tiene reservas activas.";
-                        }
-                        else
-                        {
-                            TempData["Error"] = operationResult?.Message ?? "Error al eliminar la habitación.";
-                        }
-                    }
-                    catch
-                    {
-                        TempData["Error"] = "No se puede eliminar la habitación en este momento.";
-                    }
-                    
-                    if (Request.Path.Value?.Contains("/Delete/") == true)
-                    {
-                        return RedirectToAction(nameof(Delete), new { id });
-                    }
+                    TempData["Success"] = result.Message ?? "Habitación eliminada correctamente.";
+                    return RedirectToAction(nameof(Index));
                 }
-                
+
+                if (result.Message?.Contains("Tiene reservas") == true)
+                {
+                    TempData["Error"] = "No se puede eliminar la habitación porque tiene reservas activas.";
+                }
+                else
+                {
+                    TempData["Error"] = result.Message ?? "Error al eliminar la habitación.";
+                }
+
+                if (Request.Path.Value?.Contains("/Delete/") == true)
+                {
+                    return RedirectToAction(nameof(Delete), new { id });
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -506,48 +240,22 @@ namespace WebApi.Controllers.RoomControllers
         // GET: HabitacionController/FilterByPiso/1
         public async Task<IActionResult> FilterByPiso(int id)
         {
-            List<HabitacionModel> habitaciones = new List<HabitacionModel>();
             try
             {
-                using (var client = new HttpClient())
+                var piso = await _pisoRepository.GetByIdAsync(id);
+                string pisoDescripcion = piso?.Descripcion ?? $"Piso {id}";
+                
+                var result = await _habitacionRepository.GetByPisoAsync(id);
+                if (result != null && result.Any())
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Habitacion/GetHabitacionByPiso/{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                habitaciones = JsonConvert.DeserializeObject<List<HabitacionModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            habitaciones = JsonConvert.DeserializeObject<List<HabitacionModel>>(content);
-                        }
-                        
-                        ViewBag.TituloLista = $"Habitaciones en el Piso {id}";
-                        return View("Filtered", habitaciones);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al filtrar habitaciones: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al filtrar habitaciones: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
+                    var habitaciones = result.ToList();
+                    ViewBag.TituloLista = $"Habitaciones del {pisoDescripcion}";
+                    return View("HabitacionFiltradas", habitaciones);
+                }
+                else
+                {
+                    TempData["Error"] = $"No se encontraron habitaciones en {pisoDescripcion}.";
+                    return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
@@ -560,48 +268,19 @@ namespace WebApi.Controllers.RoomControllers
         // GET: HabitacionController/FilterByCategoria/1
         public async Task<IActionResult> FilterByCategoria(string categoria)
         {
-            List<HabitacionModel> habitaciones = new List<HabitacionModel>();
             try
             {
-                using (var client = new HttpClient())
+                var result = await _habitacionRepository.GetByCategoriaAsync(categoria);
+                if (result != null && result.Any())
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Habitacion/GetHabitacionByCategoria/{categoria}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                habitaciones = JsonConvert.DeserializeObject<List<HabitacionModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            habitaciones = JsonConvert.DeserializeObject<List<HabitacionModel>>(content);
-                        }
-                        
-                        ViewBag.TituloLista = $"Habitaciones de Categoría: {categoria}";
-                        return View("Filtered", habitaciones);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al filtrar habitaciones: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al filtrar habitaciones: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
+                    var habitaciones = result.ToList();
+                    ViewBag.TituloLista = $"Habitaciones de la Categoría: {categoria}";
+                    return View("HabitacionFiltradas", habitaciones);
+                }
+                else
+                {
+                    TempData["Error"] = "No se encontraron habitaciones en esta categoría.";
+                    return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
@@ -616,55 +295,16 @@ namespace WebApi.Controllers.RoomControllers
         {
             try
             {
-                using (var client = new HttpClient())
+                var result = await _habitacionRepository.GetByNumeroAsync(numero);
+                if (result != null)
                 {
-                    var response = await client.GetAsync($"{_apiBaseUrl}/Habitacion/GetHabitacionBy/{numero}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        HabitacionModel habitacion = null;
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                habitacion = JsonConvert.DeserializeObject<HabitacionModel>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            habitacion = JsonConvert.DeserializeObject<HabitacionModel>(content);
-                        }
-                        
-                        if (habitacion != null)
-                        {
-                            var habitaciones = new List<HabitacionModel> { habitacion };
-                            ViewBag.TituloLista = $"Habitación Número: {numero}";
-                            return View("Filtered", habitaciones);
-                        }
-                        else
-                        {
-                            TempData["Error"] = "No se encontró la habitación.";
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(errorContent);
-                            TempData["Error"] = operationResult?.Message ?? $"Error al buscar habitación: {response.ReasonPhrase}";
-                        }
-                        catch
-                        {
-                            TempData["Error"] = $"Error al buscar habitación: {response.ReasonPhrase}";
-                        }
-                        return RedirectToAction(nameof(Index));
-                    }
+                    ViewBag.TituloLista = $"Habitación: {numero}";
+                    return View("HabitacionFiltradas", new List<HabitacionModel> { result });
+                }
+                else
+                {
+                    TempData["Error"] = "No se encontró la habitación.";
+                    return RedirectToAction(nameof(Index));
                 }
             }
             catch (Exception ex)
@@ -676,139 +316,36 @@ namespace WebApi.Controllers.RoomControllers
 
         private async Task CargarListasDesplegables()
         {
-            // Cargar estados de habitación
-            try
-            {
-                using (var client = new HttpClient())
-                {
-                    var responseEstados = await client.GetAsync($"{_apiBaseUrl}/EstadoHabitacion/GetEstadoHabitaciones");
-                    if (responseEstados.IsSuccessStatusCode)
-                    {
-                        var contentEstados = await responseEstados.Content.ReadAsStringAsync();
-                        List<EstadoHabitacionModel> estados = null;
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(contentEstados);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                estados = JsonConvert.DeserializeObject<List<EstadoHabitacionModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            estados = JsonConvert.DeserializeObject<List<EstadoHabitacionModel>>(contentEstados);
-                        }
-                        
-                        if (estados != null && estados.Any())
-                        {
-                            ViewBag.EstadosHabitacion = estados.Select(e => new SelectListItem
-                            {
-                                Value = e.IdEstadoHabitacion.ToString(),
-                                Text = e.Descripcion
-                            }).ToList();
-                        }
-                        else
-                        {
-                            ViewBag.EstadosHabitacion = null;
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                ViewBag.EstadosHabitacion = null;
-            }
+            await CargarEstados();
+            await CargarPisos();
+            await CargarCategorias();
+        }
 
-            // Cargar pisos
-            try
+        private async Task CargarEstados()
+        {
+            var estados = await _estadoHabitacionRepository.GetAllAsync();
+            if (estados != null)
             {
-                using (var client = new HttpClient())
-                {
-                    var responsePisos = await client.GetAsync($"{_apiBaseUrl}/Piso/GetAllPisos");
-                    if (responsePisos.IsSuccessStatusCode)
-                    {
-                        var contentPisos = await responsePisos.Content.ReadAsStringAsync();
-                        List<PisoModel> pisos = null;
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(contentPisos);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                pisos = JsonConvert.DeserializeObject<List<PisoModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            pisos = JsonConvert.DeserializeObject<List<PisoModel>>(contentPisos);
-                        }
-                        
-                        if (pisos != null && pisos.Any())
-                        {
-                            ViewBag.Pisos = pisos.Select(p => new SelectListItem
-                            {
-                                Value = p.IdPiso.ToString(),
-                                Text = p.Descripcion
-                            }).ToList();
-                        }
-                        else
-                        {
-                            ViewBag.Pisos = null;
-                        }
-                    }
-                }
+                ViewBag.Estados = new SelectList(estados, "IdEstadoHabitacion", "Descripcion");
+                ViewBag.EstadosHabitacion = new SelectList(estados, "IdEstadoHabitacion", "Descripcion");
             }
-            catch (Exception)
+        }
+        
+        private async Task CargarPisos()
+        {
+            var pisos = await _pisoRepository.GetAllAsync();
+            if (pisos != null)
             {
-                ViewBag.Pisos = null;
+                ViewBag.Pisos = new SelectList(pisos, "IdPiso", "Descripcion");
             }
+        }
 
-            // Cargar categorías
-            try
+        private async Task CargarCategorias()
+        {
+            var categorias = await _categoriaRepository.GetAllAsync();
+            if (categorias != null)
             {
-                using (var client = new HttpClient())
-                {
-                    var responseCategorias = await client.GetAsync($"{_apiBaseUrl}/Categoria/GetAllCategorias");
-                    if (responseCategorias.IsSuccessStatusCode)
-                    {
-                        var contentCategorias = await responseCategorias.Content.ReadAsStringAsync();
-                        List<CategoriaModel> categorias = null;
-                        
-                        try
-                        {
-                            var operationResult = JsonConvert.DeserializeObject<OperationResult>(contentCategorias);
-                            if (operationResult?.IsSuccess == true && operationResult.Data != null)
-                            {
-                                categorias = JsonConvert.DeserializeObject<List<CategoriaModel>>(
-                                    JsonConvert.SerializeObject(operationResult.Data));
-                            }
-                        }
-                        catch
-                        {
-                            categorias = JsonConvert.DeserializeObject<List<CategoriaModel>>(contentCategorias);
-                        }
-                        
-                        if (categorias != null && categorias.Any())
-                        {
-                            ViewBag.Categorias = categorias.Select(c => new SelectListItem
-                            {
-                                Value = c.IdCategoria.ToString(),
-                                Text = c.Descripcion
-                            }).ToList();
-                        }
-                        else
-                        {
-                            ViewBag.Categorias = null;
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                ViewBag.Categorias = null;
+                ViewBag.Categorias = new SelectList(categorias, "IdCategoria", "Descripcion");
             }
         }
     }

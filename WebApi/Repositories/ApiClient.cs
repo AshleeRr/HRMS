@@ -1,16 +1,10 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Newtonsoft.Json;
 using WebApi.Interfaces;
 using WebApi.Models;
 
 namespace WebApi.Repositories
 {
-    /// <summary>
-    /// Cliente HTTP para consumir la API
-    /// </summary>
     public class ApiClient : IApiClient
     {
         private readonly HttpClient _httpClient;
@@ -19,300 +13,201 @@ namespace WebApi.Repositories
         public ApiClient(string baseUrl)
         {
             _httpClient = new HttpClient();
-            _baseUrl = baseUrl;
+            _baseUrl = baseUrl.TrimEnd('/');
         }
 
-        /// <summary>
-        /// Realiza una petición GET a la API
-        /// </summary>
-        public async Task<T> GetAsync<T>(string endpoint)
-        {
-            try
-            {
-                // Preservar el formato original del endpoint
-                string url = $"{_baseUrl}/{endpoint}";
-                
-                var response = await _httpClient.GetAsync(url);
-                var result = await ProcessResponseAsync<T>(response);
+        public Task<T> GetAsync<T>(string endpoint) =>
+            SendRequestAsync<T>(HttpMethod.Get, BuildUrl(endpoint));
 
-                if (result == null || EqualityComparer<T>.Default.Equals(result, default(T)))
-                {
-                    if (typeof(T) == typeof(OperationResult))
-                    {
-                        return (T)(object)OperationResult.Failure($"Error al obtener datos de {endpoint}");
-                    }
-                }
+        public Task<T> GetByIdAsync<T>(string endpoint, int id) =>
+            SendRequestAsync<T>(HttpMethod.Get, BuildUrl(endpoint, id));
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                if (typeof(T) == typeof(OperationResult))
-                {
-                    return (T)(object)OperationResult.Failure($"Error inesperado: {ex.Message}");
-                }
+        public Task<OperationResult> PostAsync<T>(string endpoint, T data) =>
+            SendDataAsync(HttpMethod.Post, BuildUrl(endpoint), data);
 
-                return default(T);
-            }
-        }
+        public Task<OperationResult> PutAsync<T>(string endpoint, int id, T data) =>
+            SendDataAsync(HttpMethod.Put, BuildUrl(endpoint, id), data);
 
-        /// <summary>
-        /// Realiza una petición GET a la API para obtener un elemento por ID
-        /// </summary>
-        public async Task<T> GetByIdAsync<T>(string endpoint, int id)
-        {
-            try
-            {
-                // No modificar el endpoint - dejarlo como está
-                string url = $"{_baseUrl}/{endpoint}{id}";
-                
-                var response = await _httpClient.GetAsync(url);
-                var result = await ProcessResponseAsync<T>(response);
-
-                if (result == null || EqualityComparer<T>.Default.Equals(result, default(T)))
-                {
-                    if (typeof(T) == typeof(OperationResult))
-                    {
-                        return (T)(object)OperationResult.Failure($"Error al obtener datos con ID {id} de {endpoint}");
-                    }
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                if (typeof(T) == typeof(OperationResult))
-                {
-                    return (T)(object)OperationResult.Failure($"Error inesperado: {ex.Message}");
-                }
-
-                return default(T);
-            }
-        }
-
-        /// <summary>
-        /// Realiza una petición POST a la API
-        /// </summary>
-        public async Task<OperationResult> PostAsync<T>(string endpoint, T data)
-        {
-            try
-            {
-                var json = JsonConvert.SerializeObject(data);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                
-                string url = $"{_baseUrl}/{endpoint}";
-                var response = await _httpClient.PostAsync(url, content);
-                
-                return await ProcessOperationResultAsync(response);
-            }
-            catch (Exception ex)
-            {
-                return OperationResult.Failure($"Error al realizar POST: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Realiza una petición PUT a la API
-        /// </summary>
-        public async Task<OperationResult> PutAsync<T>(string endpoint, int id, T data)
-        {
-            try
-            {
-                var json = JsonConvert.SerializeObject(data);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                
-                // Concatenar el ID directamente sin barra diagonal
-                string url = $"{_baseUrl}/{endpoint}{id}";
-                var response = await _httpClient.PutAsync(url, content);
-                
-                return await ProcessOperationResultAsync(response);
-            }
-            catch (Exception ex)
-            {
-                return OperationResult.Failure($"Error al realizar PUT: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Realiza una petición DELETE a la API
-        /// </summary>
         public async Task<OperationResult> DeleteAsync(string endpoint, int id)
         {
-            try
+            var response = await _httpClient.DeleteAsync(BuildUrl(endpoint, id));
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode && content.Contains("habitaciones asociadas"))
             {
-                // Concatenar el ID directamente sin barra diagonal
-                string url = $"{_baseUrl}/{endpoint}{id}";
-                var response = await _httpClient.DeleteAsync(url);
-                
-                // Manejo específico para errores comunes en eliminación
-                var content = await response.Content.ReadAsStringAsync();
-                if (!response.IsSuccessStatusCode && content.Contains("habitaciones asociadas"))
-                {
-                    return OperationResult.Failure("No se puede eliminar porque tiene elementos asociados. Debe eliminar o reubicar estos elementos primero.");
-                }
-                
-                return await ProcessOperationResultAsync(response);
+                return OperationResult.Failure("No se puede eliminar porque tiene elementos asociados. Debe eliminar o reubicar estos elementos primero.");
             }
-            catch (Exception ex)
-            {
-                return OperationResult.Failure($"Error al realizar DELETE: {ex.Message}");
-            }
+
+            return await ProcessOperationResultAsync(response);
         }
 
-        /// <summary>
-        /// Realiza una petición PATCH a la API
-        /// </summary>
-        public async Task<OperationResult> PatchAsync<T>(string endpoint, int id, T data)
+        public Task<OperationResult> PatchAsync<T>(string endpoint, int id, T data)
+        {
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), BuildUrl(endpoint, id))
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json")
+            };
+
+            return SendRequestWithOperationResultAsync(request);
+        }
+
+        private string BuildUrl(string endpoint, int? id = null)
+        {
+            var cleanEndpoint = endpoint.Trim('/');
+            return id.HasValue
+                ? $"{_baseUrl}/{cleanEndpoint}{id.Value}"
+                : $"{_baseUrl}/{cleanEndpoint}";
+        }
+
+        private async Task<T> SendRequestAsync<T>(HttpMethod method, string url)
         {
             try
             {
-                var json = JsonConvert.SerializeObject(data);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.SendAsync(new HttpRequestMessage(method, url));
+                var result = await ProcessResponseAsync<T>(response);
 
-                // Concatenar el ID directamente sin barra diagonal
-                string url = $"{_baseUrl}/{endpoint}{id}";
-                
-                // Crear una solicitud PATCH
-                var request = new HttpRequestMessage(new HttpMethod("PATCH"), url);
-                request.Content = content;
+                if (EqualityComparer<T>.Default.Equals(result, default))
+                {
+                    if (typeof(T) == typeof(OperationResult))
+                    {
+                        return (T)(object)OperationResult.Failure($"Error al obtener datos desde {url}");
+                    }
+                }
 
+                return result;
+            }
+            catch (Exception ex)
+            {
+                if (typeof(T) == typeof(OperationResult))
+                {
+                    return (T)(object)OperationResult.Failure($"Error inesperado: {ex.Message}");
+                }
+
+                return default;
+            }
+        }
+
+        private Task<OperationResult> SendDataAsync<T>(HttpMethod method, string url, T data)
+        {
+            var json = JsonConvert.SerializeObject(data);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = new HttpRequestMessage(method, url) { Content = content };
+
+            return SendRequestWithOperationResultAsync(request);
+        }
+
+        private async Task<OperationResult> SendRequestWithOperationResultAsync(HttpRequestMessage request)
+        {
+            try
+            {
                 var response = await _httpClient.SendAsync(request);
                 return await ProcessOperationResultAsync(response);
             }
             catch (Exception ex)
             {
-                return OperationResult.Failure($"Error al realizar PATCH: {ex.Message}");
+                return OperationResult.Failure($"Error en la solicitud HTTP: {ex.Message}");
             }
         }
 
-        /// <summary>
-        /// Procesa la respuesta HTTP y retorna el objeto deserializado
-        /// </summary>
         private async Task<T> ProcessResponseAsync<T>(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                try
-                {
-                    var apiError = JsonConvert.DeserializeObject<ApiErrorResponse>(content);
-                    if (apiError != null && !string.IsNullOrEmpty(apiError.Detail))
-                    {
-                        if (typeof(T) == typeof(OperationResult))
-                        {
-                            return (T)(object)OperationResult.Failure(apiError.Detail, apiError);
-                        }
-
-                        return default(T);
-                    }
-                }
-                catch
-                {
-                    // Ignorar errores de deserialización y continuar
-                }
-
-                if (typeof(T) == typeof(OperationResult))
-                {
-                    return (T)(object)OperationResult.Failure($"Error: {response.ReasonPhrase}. Detalles: {content}");
-                }
-
-                return default(T);
+                return HandleApiError<T>(content, response.ReasonPhrase!);
             }
 
             try
             {
                 var operationResult = JsonConvert.DeserializeObject<OperationResult>(content);
-
-                if (operationResult != null)
+                if (operationResult?.IsSuccess == true && operationResult.Data != null)
                 {
-                    if (operationResult.IsSuccess && operationResult.Data != null)
-                    {
-                        return JsonConvert.DeserializeObject<T>(
-                            JsonConvert.SerializeObject(operationResult.Data));
-                    }
-                    else if (!operationResult.IsSuccess)
-                    {
-                        if (typeof(T) == typeof(OperationResult))
-                        {
-                            return (T)(object)operationResult;
-                        }
+                    return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(operationResult.Data))!;
+                }
 
-                        return default(T);
-                    }
+                if (typeof(T) == typeof(OperationResult))
+                {
+                    return (T)(object)(operationResult ?? OperationResult.Failure("Respuesta inválida de la API"));
                 }
             }
-            catch
-            {
-                // Ignorar errores de deserialización y continuar
-            }
+            catch { }
 
             try
             {
-                var result = JsonConvert.DeserializeObject<T>(content);
-                return result;
+                return JsonConvert.DeserializeObject<T>(content);
             }
             catch
             {
                 if (typeof(T) == typeof(OperationResult))
                 {
-                    return (T)(object)OperationResult.Failure(
-                        $"No se pudo deserializar la respuesta. Contenido: {content}");
+                    return (T)(object)OperationResult.Failure($"No se pudo deserializar la respuesta: {content}");
                 }
 
-                return default(T);
+                return default;
             }
         }
 
-        /// <summary>
-        /// Procesa la respuesta HTTP para operaciones que devuelven OperationResult
-        /// </summary>
+        private T HandleApiError<T>(string content, string reason)
+        {
+            try
+            {
+                var apiError = JsonConvert.DeserializeObject<ApiErrorResponse>(content);
+                if (!string.IsNullOrEmpty(apiError?.Detail) && typeof(T) == typeof(OperationResult))
+                {
+                    return (T)(object)OperationResult.Failure(apiError.Detail, apiError);
+                }
+            }
+            catch { }
+
+            if (typeof(T) == typeof(OperationResult))
+            {
+                return (T)(object)OperationResult.Failure($"Error: {reason}. Detalles: {content}");
+            }
+
+            return default;
+        }
+
         private async Task<OperationResult> ProcessOperationResultAsync(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                try
-                {
-                    // Primero intentamos deserializar como ApiErrorResponse (formato detail/title/status)
-                    var apiError = JsonConvert.DeserializeObject<ApiErrorResponse>(content);
-                    if (apiError != null && !string.IsNullOrEmpty(apiError.Detail))
-                    {
-                        return OperationResult.Failure(apiError.Detail, apiError);
-                    }
-                }
-                catch
-                {
-                    // Si no es un ApiErrorResponse, continuamos con el siguiente intento
-                }
-
-                try
-                {
-                    // Intentamos deserializar como OperationResult
-                    var errorResult = JsonConvert.DeserializeObject<OperationResult>(content);
-                    if (errorResult != null)
-                    {
-                        return errorResult;
-                    }
-                }
-                catch
-                {
-                    // Si no es un OperationResult, continuamos
-                }
-
-                return OperationResult.Failure($"Error: {response.ReasonPhrase}. Detalles: {content}");
+                return HandleOperationError(content, response.ReasonPhrase);
             }
 
             try
             {
-                var result = JsonConvert.DeserializeObject<OperationResult>(content);
-                return result ?? OperationResult.Success("Operación completada con éxito");
+                return JsonConvert.DeserializeObject<OperationResult>(content) ?? OperationResult.Success("Operación completada con éxito");
             }
             catch
             {
                 return OperationResult.Success("Operación completada con éxito");
             }
+        }
+
+        private OperationResult HandleOperationError(string content, string reason)
+        {
+            try
+            {
+                var apiError = JsonConvert.DeserializeObject<ApiErrorResponse>(content);
+                if (!string.IsNullOrEmpty(apiError?.Detail))
+                {
+                    return OperationResult.Failure(apiError.Detail, apiError);
+                }
+            }
+            catch { }
+
+            try
+            {
+                var opResult = JsonConvert.DeserializeObject<OperationResult>(content);
+                if (opResult != null)
+                    return opResult;
+            }
+            catch { }
+
+            return OperationResult.Failure($"Error: {reason}. Detalles: {content}");
         }
     }
 }

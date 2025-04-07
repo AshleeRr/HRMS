@@ -8,12 +8,10 @@ namespace WebApi.Controllers.RoomControllers
     public class EstadoHabitacionController : Controller
     {
         private readonly IEstadoHabitacionRepository _estadoHabitacionRepository;
-        private readonly IApiClient _apiClient;
 
-        public EstadoHabitacionController(IEstadoHabitacionRepository estadoHabitacionRepository, IApiClient apiClient)
+        public EstadoHabitacionController(IEstadoHabitacionRepository estadoHabitacionRepository)
         {
             _estadoHabitacionRepository = estadoHabitacionRepository;
-            _apiClient = apiClient;
         }
         
         // GET: EstadoHabitacionController

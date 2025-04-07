@@ -23,6 +23,8 @@ namespace WebApi
             builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
             builder.Services.AddScoped<IPisoRepository, PisoRepository>();
             builder.Services.AddScoped<IEstadoHabitacionRepository, EstadoHabitacionRepository>();
+            builder.Services.AddScoped<IHabitacionRepository, HabitacionRepository>();
+            builder.Services.AddScoped<ITarifaRepository, TarifaRepository>();
 
             // Agregar soporte para HttpClient factory
             builder.Services.AddHttpClient();

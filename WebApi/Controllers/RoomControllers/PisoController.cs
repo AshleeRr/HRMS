@@ -8,12 +8,10 @@ namespace WebApi.Controllers.RoomControllers
     public class PisoController : Controller
     {
         private readonly IPisoRepository _pisoRepository;
-        private readonly IApiClient _apiClient;
 
-        public PisoController(IPisoRepository pisoRepository, IApiClient apiClient)
+        public PisoController(IPisoRepository pisoRepository)
         {
             _pisoRepository = pisoRepository;
-            _apiClient = apiClient;
         }
 
         // GET: PisoController
