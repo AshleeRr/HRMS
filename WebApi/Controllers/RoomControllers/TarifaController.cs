@@ -252,7 +252,6 @@ namespace WebApi.Controllers.RoomControllers
             {
                 var categorias = await _categoriaRepository.GetAllAsync();
                 
-                // Comprobamos si la propiedad es "Nombre" o "Descripcion"
                 bool usarNombre = categorias?.FirstOrDefault()?.GetType().GetProperty("Nombre") != null;
                 
                 if (categorias != null && categorias.Any())
