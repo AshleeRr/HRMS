@@ -1,6 +1,11 @@
+
 using WebApi.Interfaces;
+using WebApi.Interfaces.IUsersServices;
 using WebApi.Interfaces.RoomInterface;
+using WebApi.Models.UsersModels;
+using WebApi.Models.UsersModels.Validations;
 using WebApi.Repositories;
+using WebApi.Repositories.UsersRepositories;
 
 namespace WebApi
 {
@@ -20,6 +25,11 @@ namespace WebApi
             
             // Registrar los repositorios como servicios con ámbito (scoped)
             builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+            builder.Services.AddScoped<IClientRepository, ClientRepository>();
+            builder.Services.AddScoped<UserValidations>();
+            builder.Services.AddScoped<UserRoleValidations>();
 
             // Agregar soporte para HttpClient factory
             builder.Services.AddHttpClient();

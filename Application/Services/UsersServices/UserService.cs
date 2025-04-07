@@ -31,7 +31,7 @@ namespace HRMS.Application.Services.UsersServices
             return new User
             {
                 IdRolUsuario = dto.IdRolUsuario,
-                FechaCreacion = DateTime.Now,
+              //  FechaCreacion = DateTime.Now,
                 NombreCompleto = dto.NombreCompleto,
                 Correo = dto.Correo,
                 Clave = dto.Clave,
@@ -157,10 +157,6 @@ namespace HRMS.Application.Services.UsersServices
                     result.Data = dto;
                     return result;
                 }
-                var existingCorreo = await _userRepository.GetUserByEmailAsync(dto.Correo);
-                var existingDocument = await _userRepository.GetUserByDocumentAsync(dto.Documento);
-                ValidateExistingData(existingCorreo, "correo");
-                ValidateExistingData(existingDocument, "documento");
                 await ValidateUserIDAsync(dto.UserID);
                 var usuario = MapSaveDto(dto);
                 result = await _userRepository.SaveEntityAsync(usuario);
@@ -194,10 +190,6 @@ namespace HRMS.Application.Services.UsersServices
                 await ValidateUserIDAsync(dto.UserID);
                 var user = await _userRepository.GetEntityByIdAsync(dto.IdUsuario);
                 ValidateUser(user);
-                var existingCorreo = await _userRepository.GetUserByEmailAsync(dto.Correo);
-                var existingDocument = await _userRepository.GetUserByDocumentAsync(dto.Documento);
-                ValidateExistingData(existingCorreo, "correo");
-                ValidateExistingData(existingDocument, "documento");
 
                 user.Correo = dto.Correo;
                 user.NombreCompleto = dto.NombreCompleto;
@@ -237,8 +229,6 @@ namespace HRMS.Application.Services.UsersServices
             {
                 ValidateId(idUsuario);
                 ValidateNulleable(nuevoCorreo, "nuevo correo");
-                var existingCorreo = await _userRepository.GetUserByEmailAsync(nuevoCorreo);
-                ValidateExistingData(existingCorreo, "correo");
                 var user = await _userRepository.GetEntityByIdAsync(idUsuario);
                 ValidateUser(user);
                 user.Correo = nuevoCorreo;
@@ -339,9 +329,6 @@ namespace HRMS.Application.Services.UsersServices
                 ValidateId(idUsuario);
                 ValidateNulleable(tipoDocumento, "tipo de documento");
                 ValidateNulleable(documento, "documento");
-
-                var existingDocument = await _userRepository.GetUserByDocumentAsync(documento);
-                ValidateExistingData(existingDocument, "documento");
                 var usuario = await _userRepository.GetEntityByIdAsync(idUsuario);
                 ValidateUser(usuario);
                 usuario.TipoDocumento = tipoDocumento;
@@ -435,13 +422,7 @@ namespace HRMS.Application.Services.UsersServices
                 throw new ArgumentNullException($"El campo: {message} no puede estar vacio.");
             }
         }
-        private void ValidateExistingData(OperationResult user, string data)
-        {
-            if (user.IsSuccess)
-            {
-                throw new ArgumentException($"Este {data} ya esta registrado");
-            }
-        }
+        
         private void ValidateClave(string? clave)
         {
             if (string.IsNullOrEmpty(clave))
@@ -470,6 +451,5 @@ namespace HRMS.Application.Services.UsersServices
                 throw new ArgumentException("La clave no debe contener espacios.");
             }
         }
-        
     }
 }

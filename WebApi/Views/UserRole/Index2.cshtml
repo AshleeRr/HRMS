@@ -1,40 +1,31 @@
-﻿@model IEnumerable<WebApi.Models.UsersModels.ClientModel>
+﻿@model IEnumerable<WebApi.Models.UsersModels.UserModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Index2";
 }
 
-<h1 class="text-center">Clientes</h1>
-<div class="text-center mb-3">
-    <form asp-action="Filter" method="get">
-        <div class="d-inline-block w-50">
-            <label for="filterType">Filtrar por:</label>
-            <select name="filterType" class="form-select">
-                <option value="1">ID</option>
-                <option value="2">Documento</option>
-                <option value="3">Email</option>
-                <option value="4">TipoDocumento</option>
-            </select>
-        </div>
-        <input type="text" name="filterValue" placeholder="Ingrese el filtro" class="form-control d-inline-block w-50" />
-        <button type="submit" class="btn btn-secondary">Filtrar</button>
-    </form>
-</div>
+<h1>UserRoles</h1>
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.IdCliente)
+                @Html.DisplayNameFor(model => model.IdUsuario)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IdUsuario)
+                @Html.DisplayNameFor(model => model.ReferenceID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdRolUsuario)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.NombreCompleto)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Correo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Clave)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.TipoDocumento)
@@ -56,16 +47,22 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdCliente)
+                    @Html.DisplayFor(modelItem => item.IdUsuario)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdUsuario)
+                    @Html.DisplayFor(modelItem => item.ReferenceID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdRolUsuario)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.NombreCompleto)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Correo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Clave)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.TipoDocumento)
@@ -79,13 +76,8 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.UserID)
                 </td>
-                <td>
-                    @Html.ActionLink("Details", "Details", new { id = item.IdCliente })
-                </td>
+
             </tr>
         }
-        <div>
-            <a asp-action="Index">Back to List</a>
-        </div>
     </tbody>
 </table>

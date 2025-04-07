@@ -82,7 +82,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
         }
 
         [HttpGet("role/{id}/users")]
-        public async Task<IActionResult> GetUserFromARole(int id)
+        public async Task<IActionResult> GetUsersFromARole(int id)
         {
             ValidateId(id);
             var users = await _userRoleRepository.GetUsersByUserRoleIdAsync(id);

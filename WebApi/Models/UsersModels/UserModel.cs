@@ -1,6 +1,6 @@
 ﻿using HRMS.Application.DTOs.BaseDTO;
 
-namespace WebApi.Models.UsersModels.UserModels
+namespace WebApi.Models.UsersModels
 {
     public class UserModel : BaseUsersDTO
     {

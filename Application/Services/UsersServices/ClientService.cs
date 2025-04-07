@@ -38,7 +38,7 @@ namespace HRMS.Application.Services.UsersServices
                 Clave = dto.Clave,
                 TipoDocumento = dto.TipoDocumento,
                 Documento = dto.Documento,
-                FechaCreacion = DateTime.Now,
+               // FechaCreacion = DateTime.Now,
                 UserID = dto.UserID,
             };
         }

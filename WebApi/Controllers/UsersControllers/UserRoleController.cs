@@ -1,12 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using WebApi.Interfaces;
+using WebApi.Interfaces.IUsersServices;
 using WebApi.Models;
-using WebApi.Models.UsersModels.UserRoleModels;
+using WebApi.Models.UsersModels;
+using WebApi.Models.UsersModels.Validations;
 
 namespace WebApi.Controllers.UsersControllers
 {
     public class UserRoleController : Controller
     {
+        private readonly IUserRoleRepository _userRoleRepository;
+        private readonly IApiClient _client;
+        private readonly UserRoleValidations _validator;
+        public UserRoleController(IUserRoleRepository userRoleRepository, IApiClient client, UserRoleValidations validator)
+        {
+            _userRoleRepository = userRoleRepository;
+            _client = client;
+            _validator = validator;
+        }
         // GET: UserRoleController
         public async Task<IActionResult> Index()
         {
@@ -14,22 +25,7 @@ namespace WebApi.Controllers.UsersControllers
 
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync("https://localhost:7175/api/UserRole/roles");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var jsonString = await response.Content.ReadAsStringAsync();
-                        var result = JsonConvert.DeserializeObject<OperationResult>(jsonString);
-
-                        if (result?.IsSuccess == true && result.Data != null)
-                        {
-                            roles = JsonConvert.DeserializeObject<List<UserRoleModel>>(result.Data.ToString());
-                        }
-
-                    };
-                }
+                roles = (await _userRoleRepository.GetAllAsync()).ToList();
             }
             catch (Exception ex)
             {
@@ -42,42 +38,17 @@ namespace WebApi.Controllers.UsersControllers
         // GET: UserRoleController/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            UserRoleModel role = new UserRoleModel();
 
+            if(!IsValidateId(id)) return RedirectToAction("Index");
+            UserRoleModel role = new UserRoleModel();
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"https://localhost:7175/api/UserRole/role/{id}");
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var jsonString = await response.Content.ReadAsStringAsync();
-
-                        try
-                        {
-                            role = JsonConvert.DeserializeObject<UserRoleModel>(jsonString);
-                        }
-                        catch (Exception ex)
-                        {
-                            TempData["Error"] = $"Error al deserializar los datos: {ex.Message}";
-                        }
-                    }
-                    else
-                    {
-                        TempData["Error"] = $"Error de la API: {response.ReasonPhrase}";
-                    }
-                }
+                role = await _userRoleRepository.GetByIdAsync(id);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = $"Error inesperado: {ex.Message}";
             }
-
-            if (role == null)
-            {
-                return RedirectToAction("Index");
-            }
-
             return View(role);
         }
 
@@ -92,106 +63,159 @@ namespace WebApi.Controllers.UsersControllers
         // POST: UserRoleController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(UserRoleSaveModel model)
+        public async Task<IActionResult> Create(UserRoleModel model)
         {
             OperationResult op = new OperationResult();
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.PostAsJsonAsync<UserRoleSaveModel>("https://localhost:7175/api/UserRole/role", model);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var jsonString = await response.Content.ReadAsStringAsync();
-                        op = await response.Content.ReadFromJsonAsync<OperationResult>();
-
-                    }
-                    else
-                    {
-                        ViewBag.Error = "Error al crear el rol de usuario";
-                        return View();
-                    }
-                }
+                if(!IsValidModel(model))return RedirectToAction("Index");
+                
+                op = await _userRoleRepository.CreateAsync(model);
                 return RedirectToAction(nameof(Index));
+                
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                return View(model);
             }
         }
 
         // GET: UserRoleController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
+            if (!IsValidateId(id)) return RedirectToAction("Index");
             UserRoleModel rol = new UserRoleModel();
 
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.GetAsync($"https://localhost:7175/api/UserRole/role/{id}");
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var jsonString = await response.Content.ReadAsStringAsync();
-                        var result = JsonConvert.DeserializeObject<OperationResult>(jsonString);
-
-                        if (result != null && result.IsSuccess && result.Data != null)
-                        {
-                            var dataJson = JsonConvert.SerializeObject(result.Data);
-                            Console.WriteLine($"JSON antes de deserializar: {dataJson}");
-                            rol = JsonConvert.DeserializeObject<UserRoleModel>(dataJson);
-                        }
-                        else
-                        {
-                            ViewBag.Message = "No se pudo procesar la respuesta de la API.";
-                            return View();
-                        }
-                    }
-                    else
-                    {
-                        ViewBag.Message = $"Error de la API: {response.ReasonPhrase}";
-                        return View();
-                    }
-                }
+                rol = await _userRoleRepository.GetByIdAsync(id);
             }
             catch (Exception ex)
             {
-                ViewBag.Message = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error inesperado: {ex.Message}";
             }
-             return View(rol);
+            return View(rol);
         }
 
 
         // POST: UserRoleController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(UserRoleModel model)
+        public async Task<IActionResult> Edit(int id, UserRoleModel model)
         {
             OperationResult op = new OperationResult();
 
             try
             {
-                using (var client = new HttpClient())
-                {
-                    var response = await client.PutAsJsonAsync<UserRoleModel>($"https://localhost:7175/api/UserRole/role/{model.IdRolUsuario}", model);
+                if (!IsValidateId(id) || !IsValidModel(model))
+                    return RedirectToAction("Index");
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        op = await response.Content.ReadFromJsonAsync<OperationResult>();
-                    }
-                    else
-                    {
-                        ViewBag.Error = "Error al actualizar el rol";
-                        return View();
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                op = await _userRoleRepository.UpdateAsync(id, model);
             }
             catch (Exception ex)
             {
-                ViewBag.Error = $"Error inesperado: {ex.Message}";
+                TempData["Error"] = $"Error inesperado: {ex.Message}";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+        // GET: UserRoleController/Delete/5
+        public async Task<ActionResult> Delete(int id)
+        {
+            if (!IsValidateId(id)) return RedirectToAction("Index");
+            try
+            {
+                var rol = await _userRoleRepository.GetByIdAsync(id);
+                return View(rol);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error inesperado: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
+        }
+
+        // POST: UserRoleController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Delete(int id, IFormCollection collection)
+        {
+            if (!IsValidateId(id)) return RedirectToAction("Index");
+            try
+            {
+                var rol = await _userRoleRepository.DeleteAsync(id);
+                if (rol.IsSuccess)return RedirectToAction(nameof(Index));
+                
+                else
+                TempData["Error"] = "Error al eliminar";
+
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error inesperado: {ex.Message}";
+                
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Filter(int filterType, string filterValue)
+        {
+            if (string.IsNullOrEmpty(filterValue))
+            {
+                TempData["Error"] = "Debe ingresar un filtro válido.";
+                return RedirectToAction("Index");
+            }
+            List<UserRoleModel> roles = new List<UserRoleModel>();
+            List<UserModel> usersByRole = new List<UserModel>();
+            switch (filterType)
+            {
+                case 1:
+                    var rolById = await _userRoleRepository.GetByIdAsync(int.Parse(filterValue));
+                    if (rolById != null)
+                        roles.Add(rolById);
+                    break;
+                case 2:
+                    var rolByDesc = await _userRoleRepository.GetRoleByDescription(filterValue);
+                    if (rolByDesc != null)
+                        roles.Add(rolByDesc);
+                    break;
+                case 3:
+                    var rolByName = await _userRoleRepository.GetRoleByName(filterValue);
+                    if (rolByName != null)
+                        roles.Add(rolByName);
+                    break;
+                case 4:
+                    usersByRole = (await _userRoleRepository.GetUsersByRole(int.Parse(filterValue))).ToList();
+                    break;
+                default:
+                    TempData["Error"] = "Filtro no válido.";
+                    return RedirectToAction("Index");
+            }
+            if (filterType == 4)
+            {
+                return View("Index2", usersByRole);
+            }
+            return View("Index", roles);
+        }
+
+        private bool IsValidateId(int id)
+        {
+            if (id <= 0)
+            {
+                TempData["Error"] = "ID no válido.";
+                return false;
+            }
+            return true;
+        }
+        private bool IsValidModel(UserRoleModel model)
+        {
+            var result = _validator.Validate(model);
+            if (!result.IsSuccess)
+            {
+                TempData["Error"] = "Error al validar los campos.";
+                return false;
+            }
+            return true;
         }
     }
 }

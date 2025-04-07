@@ -1,25 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using WebApi.Models.UsersModels.ClientModels;
+using WebApi.Interfaces;
+using WebApi.Interfaces.IUsersServices;
+using WebApi.Models.UsersModels;
 
 namespace WebApi.Controllers.UsersControllers
 {
     public class ClientController : Controller
     {
+        private readonly IApiClient _client;
+        private readonly IClientRepository _clientRepository;
+        public ClientController(IApiClient client, IClientRepository clientRepository)
+        {
+            _client = client;
+            _clientRepository = clientRepository;
+        }
         // GET: ClientController
         public async Task<IActionResult> Index()
         {
             List<ClientModel> clients = new List<ClientModel>();
             try
             {
-                using (var client = new HttpClient())
+                clients = (await _clientRepository.GetAllAsync()).ToList();
+                if (!clients.Any())
                 {
-                    var response = await client.GetAsync("https://localhost:7175/api/Client/clients");
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var jsonString = await response.Content.ReadAsStringAsync();
-                        clients = JsonConvert.DeserializeObject<List<ClientModel>>(jsonString);
-                    }
+                    TempData["Error"] = "Error cargando los datos";
+                    return View(new List<ClientModel>());
                 }
             }
             catch (Exception ex)
@@ -36,16 +41,16 @@ namespace WebApi.Controllers.UsersControllers
             ClientModel cliente = new ClientModel();
             try
             {
-                using (var client = new HttpClient())
+                if (id <= 0)
                 {
-                    var response = await client.GetAsync($"https://localhost:7175/api/Client/client/{id}");
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var jsonString = await response.Content.ReadAsStringAsync();
-                        cliente = JsonConvert.DeserializeObject<ClientModel>(jsonString);
-                        
-                    }
+                    TempData["Error"] = "ID no válido.";
+                    return RedirectToAction("Index");
                 }
+                else
+                {
+                    cliente = await _clientRepository.GetByIdAsync(id);
+                }
+                
             }
             catch (Exception ex)
             {
@@ -54,6 +59,36 @@ namespace WebApi.Controllers.UsersControllers
 
             return View(cliente);
         }
-
+         public async Task<IActionResult> Filter(int filterType, string filterValue)
+        {
+            if (string.IsNullOrEmpty(filterValue))
+            {
+                TempData["Error"] = "Debe ingresar un filtro válido.";
+                return RedirectToAction("Index");
+            }
+            List<ClientModel> clientes = new List<ClientModel>();
+            switch (filterType)
+            {
+                case 1:
+                    var clientById = await _clientRepository.GetByIdAsync(int.Parse(filterValue));
+                    if (clientById != null)clientes.Add(clientById);
+                    break;
+                case 2:
+                    var clientByDocument = await _clientRepository.GetClientByDocument(filterValue);
+                    if (clientByDocument != null) clientes.Add(clientByDocument);
+                    break;
+                case 3:
+                    var clientByEmail = await _clientRepository.GetClientByEmail(filterValue);
+                    if (clientByEmail != null)clientes.Add(clientByEmail);
+                    break;
+                case 4:
+                    clientes = (await _clientRepository.GetClientsByDocumentType(filterValue)).ToList();
+                    break;
+                default:
+                    TempData["Error"] = "Filtro no válido.";
+                    return RedirectToAction("Index");
+            }
+            return View("Index", clientes);
+        }
     }
 }

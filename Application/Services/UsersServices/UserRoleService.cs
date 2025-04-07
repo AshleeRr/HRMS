@@ -30,7 +30,7 @@ namespace HRMS.Application.Services.UsersServices
             {
                 RolNombre = dto.RolNombre,
                 Descripcion = dto.Descripcion,
-                FechaCreacion = DateTime.Now,
+               // FechaCreacion = DateTime.Now,
                 UserID = dto.UserID
             };
         }

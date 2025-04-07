@@ -77,6 +77,18 @@ namespace HRMS.APIs.Controllers.UsersControllers
             }
             return Ok(clientes);
         }
+        /*
+        [HttpGet("client/name")]
+        public async Task<IActionResult> GetClientsByName(string nombre)
+        {
+            ValidateNull(nombre, "nombre");
+            var clientes = await _clientRepository.GetClientsByName(nombre);
+            if (!clientes.IsSuccess)
+            {
+                return NotFound("No se han encontrado clientes con este nombre");
+            }
+            return Ok(clientes);
+        }*/
         private IActionResult ValidateNull(string x, string comment)
         {
             if (string.IsNullOrEmpty(x))

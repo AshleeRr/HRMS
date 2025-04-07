@@ -1,4 +1,4 @@
-﻿namespace WebApi.Models.UsersModels.UsersValidations
+﻿namespace WebApi.Models.UsersModels.Validations
 {
     public class DataValidations
     {

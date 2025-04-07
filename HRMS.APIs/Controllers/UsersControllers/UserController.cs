@@ -73,7 +73,7 @@ namespace HRMS.APIs.Controllers.UsersControllers
             {
                 return BadRequest("Error obteniendo todos los usuarios");
             }
-            return Ok(usuarios);
+            return Ok(usuarios.Data);
             
         }
 
