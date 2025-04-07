@@ -272,7 +272,7 @@ namespace HRMS.Application.Test.RoomServiceTest.Services
 
             // Assert
             Assert.False(result.IsSuccess);
-            Assert.Equal("El numero de habitacion no puede estar vacio", result.Message);
+            Assert.Equal("El número de habitación no puede estar vacío", result.Message);
             _mockRepository.Verify(r => r.SaveEntityAsync(It.IsAny<Habitacion>()), Times.Never);
         }
 

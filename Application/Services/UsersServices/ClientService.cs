@@ -1,6 +1,5 @@
 ﻿using HRMS.Application.DTOs.UsersDTOs.ClientDTOs;
 using HRMS.Application.DTOs.UsersDTOs.UserDTOs;
-using HRMS.Application.DTOs.UsersDTOs.UserRoleDTOs;
 using HRMS.Application.Interfaces.IUsersServices;
 using HRMS.Domain.Base;
 using HRMS.Domain.Base.Validator;
@@ -60,7 +59,7 @@ namespace HRMS.Application.Services.UsersServices
                 if (!clients.Any())
                 {
                     result.IsSuccess = false;
-                    result.Data = new List<UserRoleDTO>();
+                    result.Data = new List<ClientViewDTO>();
                     result.Message = "No hay clientes registrados";
                 }
                 else
@@ -233,7 +232,7 @@ namespace HRMS.Application.Services.UsersServices
                 result = await _clientRepository.UpdateEntityAsync(client);
                 if(!result.IsSuccess)
                 {
-                    result.Message = "Error actualizando la clave cliente";
+                    result.Message = "Error actualizando la clave del cliente";
                 }
                 else
                 {

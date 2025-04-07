@@ -40,7 +40,7 @@ namespace HRMS.Application.Services.UsersServices
                 ChangeTime = (DateTime)userRole.FechaCreacion,
             };
         }
-        // methods
+        // metodos
 
         public async Task<OperationResult> GetAll()
         {
@@ -97,26 +97,27 @@ namespace HRMS.Application.Services.UsersServices
             {
                 ValidateId(dto.IdUserRole);
                 var rolInUse = await _userRoleRepository.GetUsersByUserRoleIdAsync(dto.IdUserRole);
-                if (!rolInUse.IsSuccess || rolInUse.Data.Any()) 
+                result.Message = ($"Resultado de GetUsersByUserRoleIdAsync: IsSuccess={rolInUse.IsSuccess}, Data={rolInUse.Data}");
+                if (rolInUse.Data != null && rolInUse.Data.Count == 0) 
                 {
-                    result.IsSuccess = false;
-                    result.Message = "Este rol está siendo utilizado por usuarios. No se puede eliminar";
-                    return result;
-                }
-                var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
-                ValidateUserRole(userRole);
-                userRole.Estado = false;
-                result = await _userRoleRepository.UpdateEntityAsync(userRole);
-                if (!result.IsSuccess)
-                {
-                    result.Message = "Error eliminando el rol";
-                }
-                else
-                {
+                    result.Message = "No hay usuarios utilizando el rol, se eliminara el rol seleccionado";
+
+                    var userRole = await _userRoleRepository.GetEntityByIdAsync(dto.IdUserRole);
+                    ValidateUserRole(userRole);
+                    userRole.Estado = false;
+                    await _userRoleRepository.UpdateEntityAsync(userRole);
+                    result.IsSuccess = true;
                     result.Message = "Rol de usuario eliminado correctamente";
                     result.Data = dto;
 
                 }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Este rol está siendo utilizado por usuarios. No se puede eliminar.";
+                    return result;
+                }
+                
             }
             catch (ArgumentException ex)
             {
@@ -126,6 +127,9 @@ namespace HRMS.Application.Services.UsersServices
             catch (Exception ex)
             {
                 result = await _loggerServices.LogError(ex.Message, this);
+                ///
+                result.Message = "Se produjo un error inesperado durante la eliminación del rol.";
+                result.Message = ex.Message;
             }
             return result;
         }

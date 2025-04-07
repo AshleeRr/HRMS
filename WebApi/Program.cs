@@ -11,13 +11,14 @@ namespace WebApi
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            // En Program.cs o Startup.cs
+            builder.Services.AddHttpClient();
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<ILoggingServices, LoggingServices>();
             builder.Services.AddReceptionDependencies(builder.Configuration);
             builder.Services.AddScoped<IValidatorProvider, ValidatorProvider>();
 
             var app = builder.Build();
-
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {

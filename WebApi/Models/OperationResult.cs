@@ -1,4 +1,6 @@
-﻿namespace HRMS.WebApi.Models
+
+﻿namespace WebApi.Models
+
 {
     public class OperationResult
     {
@@ -12,3 +14,4 @@
         
     }
 }
+

@@ -13,8 +13,6 @@ namespace HRMS.Application.DTOs.UsersDTOs.ValidationsForSaveDTOs
                 .WithErrorMessage("La descripcion rol de usuario debe tener menos de 50 caracteres");
             AddRule(ur => ur.Nombre != null && ur.Nombre.Length <= 30)
                 .WithErrorMessage("El nombre del rol de usuario debe tener menos de 50 caracteres");
-            AddRule(ur => ur.UserID >= 1)
-                .WithErrorMessage("El id del usuario debe ser mayor que 0 para la auditoria");
         }
 
     }
