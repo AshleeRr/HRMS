@@ -134,7 +134,7 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: EstadoHabitacionController/Delete/5
-        public async Task<ActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
@@ -152,7 +152,7 @@ namespace WebApi.Controllers.RoomControllers
         // POST: EstadoHabitacionController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
             try
             {
@@ -175,7 +175,7 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: EstadoHabitacionController/GetByDescripcion
-        public async Task<ActionResult> GetByDescripcion(string descripcion)
+        public async Task<IActionResult> GetByDescripcion(string descripcion)
         {
             try
             {

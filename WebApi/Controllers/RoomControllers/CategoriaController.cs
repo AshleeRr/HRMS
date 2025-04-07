@@ -18,7 +18,7 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: CategoriaController
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
             List<CategoriaModel> categorias = new List<CategoriaModel>();
             try
@@ -34,7 +34,7 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: CategoriaController/Details/5
-        public async Task<ActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: CategoriaController/Create
-        public async Task<ActionResult> Create()
+        public async Task<IActionResult> Create()
         {
             await CargarServicios();
             return View(new CategoriaModel());
@@ -59,7 +59,7 @@ namespace WebApi.Controllers.RoomControllers
         // POST: CategoriaController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(CategoriaModel categoria)
+        public async Task<IActionResult> Create(CategoriaModel categoria)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: CategoriaController/Edit/5
-        public async Task<ActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace WebApi.Controllers.RoomControllers
         // POST: CategoriaController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(int id, CategoriaModel categoria)
+        public async Task<IActionResult> Edit(int id, CategoriaModel categoria)
         {
             try
             {
@@ -148,7 +148,7 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: CategoriaController/Delete/5
-        public async Task<ActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
@@ -167,7 +167,7 @@ namespace WebApi.Controllers.RoomControllers
         // POST: CategoriaController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
             try
             {
@@ -204,7 +204,7 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: CategoriaController/GetByDescripcion
-        public async Task<ActionResult> GetByDescripcion(string descripcion)
+        public async Task<IActionResult> GetByDescripcion(string descripcion)
         {
             List<CategoriaModel> categorias = new List<CategoriaModel>();
             try
@@ -229,7 +229,7 @@ namespace WebApi.Controllers.RoomControllers
         }
 
         // GET: CategoriaController/GetByCapacidad
-        public async Task<ActionResult> GetByCapacidad(int capacidad)
+        public async Task<IActionResult> GetByCapacidad(int capacidad)
         {
             try
             {

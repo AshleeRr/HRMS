@@ -22,7 +22,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment=".">
+    <list default="true" id="abd33a32-1714-4df9-b64d-3d4b24f85b21" name="Changes" comment="Final">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.HRMS/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -36,7 +36,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="b5639a02d1c97b923353e4f54ebe972b42a7c132" />
+        <entry key="$PROJECT_DIR$" value="c277961b580ef33ad3a28dd978ce67ff7bea0490" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -60,9 +60,7 @@
     <setting file="file://$PROJECT_DIR$/HRMS.Application.Test/RoomServiceTest/Services/HabitacionServiceTest.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Domain/Base/Validator/RoomValidations/PisoValidator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/HRMS.Web/Controllers/RoomControllers/EstadoHabitacionController.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/WebApi/Controllers/RoomControllers/CategoriaController.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/WebApi/Repositories/CategoriaRepository.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/HRMS/WebApi/Repositories/CategoriaRepository.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/HRMS/WebApi/Controllers/RoomControllers/TarifaController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0fbc4d3b821e47d7a79878451a0956b944928/d0/f35b51ac/ValidationSummary.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3bd4df5aff92cabbc4d630be64227073db1b8539b3a1e47786b4b189d7cdb7/DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5acc345db3c207bc9d886a36ff14867ef8d65557432172c2a42f19aeac04d1b/Nullable.cs" root0="FORCE_HIGHLIGHTING" />
@@ -109,7 +107,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected=".NET Launch Settings Profile.HRMS.APIs: http">
+  <component name="RunManager" selected=".NET Launch Settings Profile.WebApi: http">
     <configuration name="Unnamed (1)" type="AspireHostConfiguration" factoryName="Aspire Host" activateToolWindowBeforeRun="false" temporary="true">
       <option name="PROJECT_FILE_PATH" value="$PROJECT_DIR$/HRMS.Application.Test/HRMS.Application.Test.csproj" />
       <option name="PROJECT_TFM" value="" />
@@ -407,9 +405,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="HTTP Request.HRMS.APIs | #1" />
+        <item itemvalue="HTTP Request.HRMS.APIs | #1" />
         <item itemvalue="Aspire Host.Unnamed (1)" />
         <item itemvalue="Aspire Host.Unnamed" />
-        <item itemvalue="HTTP Request.HRMS.APIs | #1" />
         <item itemvalue="HTTP Request.HRMS.APIs | #1" />
       </list>
     </recent_temporary>
@@ -677,7 +675,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743989629414</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Final">
+      <option name="closed" value="true" />
+      <created>1744002704026</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1744002704026</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -708,7 +714,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="Todos los metodos de &quot;RoomManagement&quot; agregados" />
     <MESSAGE value="Algunos metodos de RoomManagementService añadidos" />
     <MESSAGE value="Metodos refactorizado en persistencia y en la capa de Services" />
     <MESSAGE value="Servicios de Habitaciones y CategoriaServices.cs agregados" />
@@ -733,7 +738,8 @@
     <MESSAGE value="," />
     <MESSAGE value="Buenas practicas hechas" />
     <MESSAGE value="." />
-    <option name="LAST_COMMIT_MESSAGE" value="." />
+    <MESSAGE value="Final" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -749,10 +755,10 @@
           <line>168</line>
           <properties documentPath="C:\HRMS\HRMS.Persistence.Test\RoomManagementTest\CategoriaRepositoryTest.cs" containingFunctionPresentation="Method 'GetCategoriaByServiciosAsync_ValidNombre_ReturnsCategorias'">
             <startOffsets>
-              <option value="6444" />
+              <option value="6167" />
             </startOffsets>
             <endOffsets>
-              <option value="6551" />
+              <option value="6256" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="5" />
