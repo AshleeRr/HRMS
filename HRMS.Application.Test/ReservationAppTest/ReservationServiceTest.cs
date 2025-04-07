@@ -8,6 +8,7 @@ using HRMS.Domain.Entities.RoomManagement;
 using HRMS.Domain.Entities.Servicio;
 using HRMS.Domain.Entities.Users;
 using HRMS.Domain.Repository;
+using HRMS.Infraestructure.Notification;
 using HRMS.Persistence.Context;
 using HRMS.Persistence.Repositories.Reserv;
 using HRMS.Persistence.Test.ReservationTests;
@@ -118,7 +119,7 @@ namespace HRMS.Application.Test.ReservationAppTest
             reservTestId = ReservToReadPlaceHolder.IdRecepcion;
             reservToUpdate = ReservToReadPlaceHolder;
             _reservCanceled = ReservCanceledPlaceHolder;
-            _reservationService = new ReservationService(reservationRepository, new FakeLoggingServices());
+            _reservationService = new ReservationService(reservationRepository, new NotificationServiceFake(),new FakeLoggingServices());
         }
 
 

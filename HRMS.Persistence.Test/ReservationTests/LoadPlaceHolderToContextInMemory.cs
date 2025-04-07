@@ -31,7 +31,7 @@ namespace HRMS.Persistence.Test.ReservationTests
 
             var serv1 = new Servicios
             {
-                IdSercicio = 1,
+                IdServicio = 1,
                 Nombre = "SPA",
                 Descripcion = "Prueba 1",
                 Estado = true,
@@ -39,7 +39,7 @@ namespace HRMS.Persistence.Test.ReservationTests
             };
             var serv2 = new Servicios
             {
-                IdSercicio = 2,
+                IdServicio = 2,
                 Nombre = "CINE",
                 Descripcion = "Prueba 2",
                 Estado = true,

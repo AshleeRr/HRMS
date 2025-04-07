@@ -1,3 +1,7 @@
+using HRMS.WebApi.Logging;
+using WebApi.IOC.Reservation;
+using WebApi.Validators;
+
 namespace WebApi
 {
     public class Program
@@ -8,6 +12,9 @@ namespace WebApi
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<ILoggingServices, LoggingServices>();
+            builder.Services.AddReceptionDependencies(builder.Configuration);
+            builder.Services.AddScoped<IValidatorProvider, ValidatorProvider>();
 
             var app = builder.Build();
 
